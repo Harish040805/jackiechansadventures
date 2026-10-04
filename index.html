@@ -183,6 +183,11 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+function clearInputKeys() { 
+  keysP1.left = keysP1.right = keysP1.up = keysP1.down = false; 
+  keysP2.left = keysP2.right = keysP2.up = keysP2.down = false; 
+} 
+window.addEventListener('blur', clearInputKeys);
 const m = document.getElementById('m');
 const t = document.getElementById('t');
 const b1 = document.getElementById('b1');
