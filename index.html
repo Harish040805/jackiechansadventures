@@ -402,25 +402,25 @@ function addHealingParticles(targetChr) {
 }
 
 function StartOverlay({ onStart }) {
-    const [visible, setVisible] = React.useState(true);
-
-    if (!visible) return null;
-
+    const [visible, setVisible] = React.useState(true); 
+  
+    if (!visible) return null; 
+  
     const handleStart = () => {
-        setVisible(false);
-        onStart();
-    };
-
+        setVisible(false); 
+        onStart(); 
+    }; 
+    
     return (
-        <div id="start-overlay" class="start-overlay-class">
-            <img src="https://github.com/Harish040805/jackiechansadventures/blob/main/jackiechancoverpage.jpg?raw=true" class="coverimage" alt="Jackie Chan Adventures" />
+        <div id="start-overlay" className="start-overlay-class"> 
+            <img src="https://github.com/Harish040805/jackiechansadventures/blob/main/jackiechancoverpage.jpg?raw=true" className="coverimage" alt="Jackie Chan Adventures" /> 
             <div id="controls-guide">
                 <strong>🎮 2-Player Co-Op Mode (Tiger Talisman):</strong><br />
-                <span style={{ color: '#60a5fa' }}>● Player 1 (Blue)</span>: <span class="key-badge">←</span> <span class="key-badge">→</span> Move, <span class="key-badge">↑</span> Jump/Fly, <span class="key-badge">Q</span> Pufferfish Laser, Keys <span class="key-badge">1</span>-<span class="key-badge">=</span> Talismans<br />
-                <span style={{ color: '#f87171' }}>● Player 2 (Red)</span>: <span class="key-badge">A</span> <span class="key-badge">D</span> Move, <span class="key-badge">W</span> Jump/Fly, <span class="key-badge">E</span> Lizard Laser, Red Bar Talismans<br />
+                <span style={{ color: '#60a5fa' }}>● Player 1 (Blue)</span>: <span class="key-badge">←</span> <span className="key-badge">→</span> Move, <span className="key-badge">↑</span> Jump/Fly, <span className="key-badge">Q</span> Pufferfish Laser, Keys <span className="key-badge">1</span>-<span className="key-badge">=</span> Talismans<br />
+                <span style={{ color: '#f87171' }}>● Player 2 (Red)</span>: <span class="key-badge">A</span> <span className="key-badge">D</span> Move, <span className="key-badge">W</span> Jump/Fly, <span className="key-badge">E</span> Lizard Laser, Red Bar Talismans<br />
                 <em>★ All talismans act 100% independently for each player!</em>
             </div>
-            <button onClick={handleStart} class="start-game-class">▶️ Start Adventure</button>
+            <button onClick={handleStart} className="start-game-class">▶️ Start Adventure</button>
         </div>
     );
 }
@@ -429,11 +429,30 @@ const reactStartRoot = ReactDOM.createRoot(document.getElementById('react-start-
 reactStartRoot.render(<StartOverlay onStart={startGame} />);
 
 let gt = 0;
-function startGame() {
-    gameStarted = true;
-    gt = Date.now();
-    scheduleNextSpawn();
-}
+function resetGameState() {
+  hp = 100; 
+  hp2 = 100; 
+  isGameOver = false; 
+  sgk = 0; 
+  ek = 0; 
+  dist = 0; 
+  prevScore = -1; 
+  prevDist = -1; 
+  ems = []; 
+  arws = []; 
+  fbs = []; 
+  magicBeams = []; 
+  particles = []; 
+  floatTexts = []; 
+  keysP1.left = keysP1.right = keysP1.up = keysP1.down = false; 
+  keysP2.left = keysP2.right = keysP2.up = keysP2.down = false; 
+} 
+  function startGame() {
+    resetGameState(); 
+    gameStarted = true; 
+    gt = Date.now(); 
+    scheduleNextSpawn(); 
+  }
 
 function scheduleNextSpawn() {
     if (!gameStarted || isGameOver) return;
