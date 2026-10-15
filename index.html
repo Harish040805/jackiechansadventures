@@ -388,6 +388,20 @@ function scheduleNextSpawn() {
     enemyInterval = setTimeout(() => { spawnE(); scheduleNextSpawn(); }, delay);
 }
 
+function scheduleNextSpawn() {
+    if (!gameStarted || isGameOver) return;
+    const elapsedSeconds = (Date.now() - gt) / 1000;
+    const delay = Math.max(450, 3000 - elapsedSeconds * 30);
+    enemyInterval = setTimeout(() => {
+        try {
+            const batch = Math.min(4, 1 + Math.floor(elapsedSeconds / 60));
+            for (let k = 0; k < batch; k++) spawnE();
+        } finally {
+            scheduleNextSpawn();
+        }
+    }, delay);
+}
+
 function triggerGameOver() {
     isGameOver = true;
     if (enemyInterval) {
@@ -459,12 +473,10 @@ function healPlayer(chr, amount) {
     setTimeout(() => { chr.light = false; }, 400);
 }
 
-// Lines 480-506, replace the whole function with:
 function spawnE() {
     if (!gameStarted || isGameOver) return;
-    const rightEdge = Math.min(Math.max(...ems.map(e => e.x), window.innerWidth), window.innerWidth + 400);
     const isFly = Math.random() > 0.45;
-    const startX = rightEdge + 80 + (Math.random() * 60);
+    const startX = canvas.width + 80 + (Math.random() * 120);
     const startY = isFly ? Math.random() * 180 + 130 : 0;
     const baseSpeed = Math.random() * 1.2 + 2.4;
 
@@ -1043,7 +1055,7 @@ function u() {
                 });
             }
 
-            if (e.x < -150) {
+            if (e.x < -150 || !Number.isFinite(e.x) || !Number.isFinite(e.y)) {
                 ems.splice(i, 1);
             }
         }
