@@ -356,6 +356,7 @@ const reactStartRoot = ReactDOM.createRoot(document.getElementById('react-start-
 reactStartRoot.render(<StartOverlay onStart={startGame} />);
 
 let gt = 0;
+let nextSpawnAt = 0;
 function resetGameState() {
   hp = 100; 
   hp2 = 100; 
@@ -374,18 +375,23 @@ function resetGameState() {
   keysP1.left = keysP1.right = keysP1.up = keysP1.down = false; 
   keysP2.left = keysP2.right = keysP2.up = keysP2.down = false; 
 } 
-  function startGame() {
+function startGame() {
     resetGameState(); 
     gameStarted = true; 
     gt = Date.now(); 
-    scheduleNextSpawn(); 
-  }
+    nextSpawnAt = Date.now() + 1500; 
+}
 
-function scheduleNextSpawn() {
-    if (!gameStarted || isGameOver) return;
+function getSpawnDelay() {
     const elapsedSeconds = (Date.now() - gt) / 1000;
-    const delay = Math.max(600, 3000 - elapsedSeconds * 30);
-    enemyInterval = setTimeout(() => { spawnE(); scheduleNextSpawn(); }, delay);
+    return Math.max(250, 3000 * Math.pow(0.5, elapsedSeconds / 60));
+}
+
+function spawnTick() {
+    const now = Date.now();
+    if (now < nextSpawnAt) return;
+    nextSpawnAt = now + getSpawnDelay();
+    spawnE();
 }
 
 function triggerGameOver() {
@@ -459,12 +465,10 @@ function healPlayer(chr, amount) {
     setTimeout(() => { chr.light = false; }, 400);
 }
 
-// Lines 480-506, replace the whole function with:
 function spawnE() {
     if (!gameStarted || isGameOver) return;
-    const rightEdge = Math.min(Math.max(...ems.map(e => e.x), window.innerWidth), window.innerWidth + 400);
     const isFly = Math.random() > 0.45;
-    const startX = rightEdge + 80 + (Math.random() * 60);
+    const startX = window.innerWidth + 80 + (Math.random() * 160);
     const startY = isFly ? Math.random() * 180 + 130 : 0;
     const baseSpeed = Math.random() * 1.2 + 2.4;
 
@@ -930,6 +934,7 @@ let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
 
 function u() {
     if (gameStarted && !isGameOver) {
+        spawnTick();
         updatePlayer(character, keysP1, 1);
         if (isSplit) {
             updatePlayer(character2, keysP2, 2);
