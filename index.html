@@ -151,6 +151,8 @@ let hp = 100;
 let hp2 = 100;
 let isGameOver = false;
 let gameStarted = false;
+let enemiesActive = false;
+let introOpen = false;
 let enemyInterval = null;
 let sgk = 0;
 let ek = 0;
@@ -398,24 +400,30 @@ function resetGameState() {
   keysP2.left = keysP2.right = keysP2.up = keysP2.down = false; 
 } 
 function startGame() {
-    resetGameState(); 
-    gameStarted = true; 
-    gt = Date.now(); 
-    nextSpawnAt = Date.now() + 1500; 
+    resetGameState();
+    gameStarted = true;
+    enemiesActive = false;
+    introOpen = true;
+    document.getElementById('intro-dialog').style.display = 'flex';
 }
-
+document.getElementById('intro-start-btn').addEventListener('click', () => {
+    document.getElementById('intro-dialog').style.display = 'none';
+    introOpen = false;
+    enemiesActive = true;
+    gt = Date.now();
+    nextSpawnAt = Date.now() + 1500;
+});
 function getSpawnDelay() {
     const elapsedSeconds = (Date.now() - gt) / 1000;
     return Math.max(250, 3000 * Math.pow(0.5, elapsedSeconds / 60));
 }
-
 function spawnTick() {
+    if (!enemiesActive) return;
     const now = Date.now();
     if (now < nextSpawnAt) return;
     nextSpawnAt = now + getSpawnDelay();
     spawnE();
 }
-
 function triggerGameOver() {
     isGameOver = true;
     if (enemyInterval) {
@@ -847,7 +855,7 @@ function sayHip() {
 }
 
 window.addEventListener('keydown', (e) => {
-    if (!gameStarted || isGameOver) return;
+    if (!gameStarted || isGameOver || introOpen) return;
     if (e.key === 'ArrowLeft') { keysP1.left = true; e.preventDefault(); }
     if (e.key === 'ArrowRight') { keysP1.right = true; e.preventDefault(); }
     if (e.key === 'ArrowUp') {
@@ -915,8 +923,8 @@ window.addEventListener('mousemove', (e) => {
 });
 
 window.addEventListener('click', (e) => {
-    if (!gameStarted || isGameOver) return;
-    if (e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go')) return;
+    if (!gameStarted || isGameOver || introOpen) return;
+    if (e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go') || e.target.closest('#intro-dialog')) return;
     if (character.isDragonShooting && hp > 0) {
         shootDragonFireball(character);
     }
