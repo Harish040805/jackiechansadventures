@@ -559,15 +559,44 @@ function clearTalismanForPlayer(chr) {
 
 function startPlayerTimer(chr, tName, sec, onExpire) {
     if (!chr.activeTalismans) chr.activeTalismans = {};
+    if (!chr.talismanEnds) chr.talismanEnds = {};
     if (chr.activeTalismans[tName]) clearInterval(chr.activeTalismans[tName]);
 
+    chr.talismanEnds[tName] = Date.now() + sec * 1000;
     updatePlayerTalismanUI(chr);
 
     chr.activeTalismans[tName] = setTimeout(() => {
         delete chr.activeTalismans[tName];
+        delete chr.talismanEnds[tName];
         if (onExpire) onExpire();
         updatePlayerTalismanUI(chr);
     }, sec * 1000);
+}
+
+function updateTalismanTimers(chr) {
+    const bI = chr.playerNum === 1 ? 'b1' : 'b2';
+    const tE = document.getElementById(chr.playerNum === 1 ? 'p1-power-text' : 'p2-power-text');
+    const now = Date.now();
+    const ends = chr.talismanEnds || {};
+    const active = chr.activeTalismans || {};
+
+    document.querySelectorAll(`#${bI} .timer-tag`).forEach(tag => {
+        const t = tag.parentElement.getAttribute('data-t');
+        if (active[t] && ends[t]) {
+            tag.textContent = Math.max(0, Math.ceil((ends[t] - now) / 1000)) + 's';
+            tag.style.display = 'block';
+        } else {
+            tag.style.display = 'none';
+        }
+    });
+
+    const list = Object.keys(active);
+    if (tE && list.length > 0) {
+        tE.textContent = list.map(t => {
+            const icon = getTalismanDisplayName(t).split(' ')[0];
+            return ends[t] ? icon + ' ' + Math.max(0, Math.ceil((ends[t] - now) / 1000)) + 's' : icon;
+        }).join(' + ');
+    }
 }
 
 function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
@@ -867,6 +896,9 @@ function shootDragonFireball(chr) {
 
 function setupButtonHandlers() {
     document.querySelectorAll('.o, .pf, .sl').forEach(btn => {
+        const timerTag = document.createElement('span');
+        timerTag.className = 'timer-tag';
+        btn.appendChild(timerTag);
         btn.addEventListener('click', () => {
             const talismanType = btn.getAttribute('data-t');
             const playerNum = btn.getAttribute('data-p');
@@ -935,6 +967,8 @@ let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
 function u() {
     if (gameStarted && !isGameOver) {
         spawnTick();
+        updateTalismanTimers(character);
+        if (isSplit) updateTalismanTimers(character2);
         updatePlayer(character, keysP1, 1);
         if (isSplit) {
             updatePlayer(character2, keysP2, 2);
