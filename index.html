@@ -226,6 +226,8 @@ const character2 = {
 };
 
 let lastMagicLaserTime = 0;
+let dt = 1;
+let lastFrameTime = performance.now();
 
 function initBg() {
     m.innerHTML = '';
@@ -787,7 +789,7 @@ function toggleTigerSplit() {
         character2.vx = 0;
         character2.vy = 0;
         character2.invisible = false;
-        character2.dark = true;
+        character2.dark = false;
 
         showChiBanner("🐅 2-Player Co-Op Active! P1: Arrows | P2: WASD");
         addFloatText("P2 (Red) Joined!", character2.x, canvas.height - character2.y - 65, '#dc2626', 18);
@@ -923,33 +925,33 @@ function updatePlayer(chr, keysState, playerNum) {
     if (playerNum === 1 && hp <= 0) return;
     if (playerNum === 2 && hp2 <= 0) return;
 
-    if (keysState.left) {
-        chr.vx -= chr.acceleration;
+        if (keysState.left) {
+        chr.vx -= chr.acceleration * dt;
         if (chr.vx < -chr.speed) chr.vx = -chr.speed;
         chr.facing = -1;
     } else if (keysState.right) {
-        chr.vx += chr.acceleration;
+        chr.vx += chr.acceleration * dt;
         if (chr.vx > chr.speed) chr.vx = chr.speed;
         chr.facing = 1;
     } else {
-        chr.vx *= chr.friction;
+        chr.vx *= Math.pow(chr.friction, dt);
         if (Math.abs(chr.vx) < 0.05) chr.vx = 0;
     }
 
-    chr.x += chr.vx;
+    chr.x += chr.vx * dt;
 
     const groundLevel = 0;
     if (chr.isFlying) {
-        if (keysState.up) chr.y += 8;
-        if (keysState.down) chr.y -= 8;
+        if (keysState.up) chr.y += 8 * dt;
+        if (keysState.down) chr.y -= 8 * dt;
         if (chr.y < groundLevel) chr.y = groundLevel;
         if (chr.y > canvas.height - 110) chr.y = canvas.height - 110;
         chr.vy = 0;
         chr.isJumping = false;
     } else {
-        chr.y += chr.vy;
+        chr.y += chr.vy * dt;
         if (chr.y > groundLevel || chr.vy > 0) {
-            chr.vy -= chr.gravity;
+            chr.vy -= chr.gravity * dt;
         }
         if (chr.y <= groundLevel) {
             chr.y = groundLevel;
@@ -960,7 +962,7 @@ function updatePlayer(chr, keysState, playerNum) {
 
     chr.squish += (1 - chr.squish) * 0.15;
     if (Math.abs(chr.vx) > 0.2 && !chr.isJumping && !chr.isFlying) {
-        chr.walkCycle += Math.abs(chr.vx) * chr.strideFrequency;
+        chr.walkCycle += Math.abs(chr.vx) * chr.strideFrequency * dt;
     } else {
         chr.walkCycle = 0;
     }
@@ -972,6 +974,9 @@ let smoothLeftLegAngle2 = 0, smoothRightLegAngle2 = 0;
 let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
 
 function u() {
+    const frameNow = performance.now();
+    dt = Math.min((frameNow - lastFrameTime) / 16.667, 3);
+    lastFrameTime = frameNow;
     if (gameStarted && !isGameOver) {
         spawnTick();
         updateTalismanTimers(character);
@@ -1026,7 +1031,7 @@ function u() {
 
         if (scroll > 0 || Math.abs(character.vx) > 0) {
             b -= scroll;
-            dist += (scroll > 0 ? scroll : Math.abs(character.vx)) * 0.05;
+            dist += (scroll > 0 ? scroll : Math.abs(character.vx) * dt) * 0.05;
             updateScoreUI();
         }
 
@@ -1038,13 +1043,13 @@ function u() {
         for (let i = ems.length - 1; i >= 0; i--) {
             const e = ems[i];
             e.spd = e.baseSpd;
-            e.x -= (e.spd + scroll);
-            e.anim += 0.1;
-            if (e.hitCooldown > 0) e.hitCooldown--;
+            e.x -= (e.spd * dt + scroll);
+            e.anim += 0.1 * dt;
+            if (e.hitCooldown > 0) e.hitCooldown -= dt;
 
             const enemyScreenY = canvas.height - e.y - 35;
 
-            if (e.hitCooldown === 0) {
+            if (e.hitCooldown <= 0) {
                 const p1CenterY = canvas.height - character.y - 35;
                 const hitP1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
                               Math.abs(character.x - e.x) < (character.giant ? 45 : 30) &&
@@ -1096,8 +1101,8 @@ function u() {
 
         for (let i = arws.length - 1; i >= 0; i--) {
             const a = arws[i];
-            a.x += (a.vx - scroll);
-            a.y += a.vy;
+            a.x += (a.vx * dt - scroll);
+            a.y += a.vy * dt;
 
             const hit1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
                          Math.abs(character.x - a.x) < 22 &&
@@ -1124,8 +1129,8 @@ function u() {
 
         for (let i = fbs.length - 1; i >= 0; i--) {
             const f = fbs[i];
-            f.x += f.vx;
-            f.y += f.vy;
+            f.x += f.vx * dt;
+            f.y += f.vy * dt;
 
             let hitEnemy = false;
             for (let j = ems.length - 1; j >= 0; j--) {
@@ -1267,7 +1272,7 @@ function u() {
         ctx.fill();
         ctx.restore();
 
-        b.duration--;
+        b.duration -= dt;
         if (b.duration <= 0) {
             magicBeams.splice(i, 1);
         }
@@ -1335,9 +1340,9 @@ function u() {
 
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= p.decay;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.alpha -= p.decay * dt;
 
         if (p.alpha <= 0) {
             particles.splice(i, 1);
@@ -1359,8 +1364,8 @@ function u() {
 
     for (let i = floatTexts.length - 1; i >= 0; i--) {
         const ft = floatTexts[i];
-        ft.y += ft.vy;
-        ft.opacity -= 0.022;
+        ft.y += ft.vy * dt;
+        ft.opacity -= 0.022 * dt;
 
         if (ft.opacity <= 0) {
             floatTexts.splice(i, 1);
