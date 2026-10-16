@@ -749,7 +749,9 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
         case 'rooster':
             chr.isFlying = true;
             chr.activeTalismans['rooster'] = true;
-            updatePlayerTalismanUI(chr);
+            startPlayerTimer(chr, 'rooster', 10, () => {
+                chr.isFlying = false;
+            });
             break;
 
         case 'sheep':
