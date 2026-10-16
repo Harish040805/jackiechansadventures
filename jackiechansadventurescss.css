@@ -54,7 +54,7 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .intro-title {font-size:26px; font-weight:bold; color:#fff; margin-bottom:12px;}
 .intro-box p {font-size:16px; line-height:1.7; text-align:left; margin-bottom:20px;}
 .intro-box a {color:#60a5fa; font-weight:bold; text-decoration:underline;}
-.captainblackclass{position: absolute; top: 15px; right: 15px; width: 160px; height: 160px; border-radius: 50%; border 5px solid #fff; object-fit: cover;}
+.captainblackclass{position: absolute; top: 1px; right: 1px; width: 160px; height: 160px; border-radius: 50%; border: 5px solid #fff; object-fit: cover;}
 @property --bg-color-1 {
   syntax: '<color>';
   inherits: false;
