@@ -32,7 +32,7 @@ canvas { display: block; position: absolute; bottom: 100px; left: 0; width: 100v
 #b2 { background-image: linear-gradient(#b91c1c, #991b1b, #7f1d1d); }
 .o, .pf, .sl { position: relative; width: 46px; height: 42px; font-size: 21px; background-image: linear-gradient(#a3a3a3, #888, #666); clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); display: flex; justify-content: center; align-items: center; border: 3px solid #444; cursor: pointer; user-select: none; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; }
 .o:hover, .pf:hover, .sl:hover { background-image: linear-gradient(#bfbfbf, #999, #777); transform: scale(1.08); }
-.o.active-talisman, .pf.active-talisman, .sl.active-talisman { background-image: linear-gradient(#ffeaa7, #fdcb6e, #e17055) !important; transform: scale(1.15); filter: drop-shadow(0 0 8px #ffd700); animation: talismanPulse 1.2s infinite alternate ease-in-out; }
+.o.active-talisman, .pf.active-talisman, .sl.active-talisman { background-image: linear-gradient(#ffeaa7, #fdcb6e, #e17055) !important; transform: scale(1.15); filter: drop-shadow(0 0 8px #ffd700); animation: talismanPulse 1.2s infinite alternate ease-in-out; will-change: transform; }
 .hotkey-tag { position: absolute; bottom: -2px; right: 0px; background: rgba(0, 0, 0, 0.85); color: #ffd700; font-size: 9px; font-family: monospace; font-weight: bold; padding: 1px 3px; border-radius: 3px; border: 1px solid rgba(255, 215, 0, 0.4); pointer-events: none; line-height: 1; }
 .timer-tag { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: none; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 10px; font-family: monospace; font-weight: bold; padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, 0.4); pointer-events: none; line-height: 1; }
 .start-overlay-class { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); color: #fff; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; }
@@ -66,6 +66,6 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
   100% { opacity: 1; }
 }
 @keyframes talismanPulse {
-    from { filter: drop-shadow(0 0 6px #ffd700); }
-    to { filter: drop-shadow(0 0 14px #ff7675); }
+    from { transform: scale(1.1); }
+    to { transform: scale(1.2); }
 }
