@@ -1,6 +1,13 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { overflow: hidden; background-color: #1a1a1a; transition: background 1.5s ease-in-out; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-#g { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; animation: dawnToDuskCycle 150s infinite linear; }
+#g { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; background: #1a1a1a; }
+.sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; animation: skyFade 150s infinite linear; will-change: opacity; pointer-events: none; }
+.sky1 { background: linear-gradient(135deg, #ffd700, #ee82ee); animation-delay: 0s; }
+.sky2 { background: linear-gradient(135deg, #87ceeb, #0000cd); animation-delay: -125s; }
+.sky3 { background: linear-gradient(135deg, #87ceeb, #ffffff); animation-delay: -100s; }
+.sky4 { background: linear-gradient(135deg, #ee82ee, #ffd700); animation-delay: -75s; }
+.sky5 { background: linear-gradient(135deg, #ee82ee, #ffa500); animation-delay: -50s; }
+.sky6 { background: linear-gradient(135deg, #00008b, #000033); animation-delay: -25s; }
 #m { position: absolute; bottom: 100px; left: 0; width: 100vw; height: 250px; white-space: nowrap; will-change: transform; }
 #t { position: absolute; bottom: 100px; left: 0; width: 100vw; height: 150px; white-space: nowrap; will-change: transform; }
 .m-item { display: inline-block; width: 600px; height: 250px; background: repeating-linear-gradient(135deg, #6c5ce7 0px, #6c5ce7 100px, #a29bfe 100px, #a29bfe 200px); clip-path: polygon(0% 100%, 20% 20%, 50% 100%, 70% 10%, 100% 100%); }
@@ -52,25 +59,11 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
   inherits: false;
   initial-value: #ee82ee;
 }
-@keyframes dawnToDuskCycle {
-  0%, 100% {
-    background: linear-gradient(135deg, #ffd700, #ee82ee);
-  }
-  20% {
-    background: linear-gradient(135deg, #87ceeb, #0000cd);
-  }
-  40% {
-    background: linear-gradient(135deg, #87ceeb, #ffffff);
-  }
-  60% {
-    background: linear-gradient(135deg, #ee82ee, #ffd700);
-  }
-  80% {
-    background: linear-gradient(135deg, #ee82ee, #ffa500);
-  }
-  95% {
-    background: linear-gradient(135deg, #00008b, #000033);
-  }
+@keyframes skyFade {
+  0% { opacity: 1; }
+  16.67% { opacity: 0; }
+  83.33% { opacity: 0; }
+  100% { opacity: 1; }
 }
 @keyframes talismanPulse {
     from { filter: drop-shadow(0 0 6px #ffd700); }
