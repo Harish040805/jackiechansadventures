@@ -21,7 +21,7 @@ canvas { display: block; position: absolute; bottom: 100px; left: 0; width: 100v
 #p1-power-badge { background: rgba(30, 64, 175, 0.9); color: #ffd700; border: 2px solid #60a5fa; box-shadow: 0 0 12px rgba(96, 165, 250, 0.5); }
 #p2-power-badge { background: rgba(185, 28, 28, 0.9); color: #ffd700; border: 2px solid #f87171; box-shadow: 0 0 12px rgba(248, 113, 113, 0.5); }
 .ui-c { position: absolute; bottom: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding-bottom: 4px; z-index: 10; }
-.b { display: flex; flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 6px 0; background-image: linear-gradient(#16C716, #19B319, #22A122); box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); gap: 20px; }
+.b { display: flex; flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 6px 0; background-image: linear-gradient(#16C716, #19B319, #22A122); box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); gap: 40px; }
 #b2 { background-image: linear-gradient(#b91c1c, #991b1b, #7f1d1d); }
 .o, .pf, .sl { position: relative; width: 46px; height: 42px; font-size: 21px; background-image: linear-gradient(#a3a3a3, #888, #666); clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); display: flex; justify-content: center; align-items: center; border: 3px solid #444; cursor: pointer; user-select: none; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; }
 .o:hover, .pf:hover, .sl:hover { background-image: linear-gradient(#bfbfbf, #999, #777); transform: scale(1.08); }
