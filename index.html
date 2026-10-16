@@ -671,11 +671,14 @@ function switchTalismanForPlayer(chr, name) {
     }
 
     if (name === 'pufferfish') {
+        const s = new SpeechSynthesisUtterance("Yu-Mo-Gui-Gwai-Fai-Di-Zao!");
+        window.speechSynthesis.speak(s);
         fireStraightLaser(chr, "Yu-Mo-Gui-Gwai-Fai-Di-Zao!", '#00ff66');
         return;
     }
-
     if (name === 'lizard') {
+        const s = new SpeechSynthesisUtterance("Magic must defeat magic!");
+        window.speechSynthesis.speak(s);
         fireStraightLaser(chr, "Magic must defeat magic!", '#00ff88');
         return;
     }
