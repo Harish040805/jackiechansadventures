@@ -299,9 +299,9 @@ function initBg() {
     }
 }
 initBg();
-function calcScore() {
-    const meters = Math.floor(dist);
-    return meters > 0 ? Math.round(((sgk * 100) + (ek * 150)) / meters) : ((sgk * 100) + (ek * 150));
+function calcScore(sgk, ek, dist) {
+    const meters = Math.ceil(dist);
+    return Math.ceil(Math.ceil(sgk * 1) + Math.ceil(ek * 1.5) + meters);
 }
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
