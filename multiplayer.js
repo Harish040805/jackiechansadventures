@@ -1,12 +1,3 @@
-/* ============================================================
-   Jackie Chan's Adventures - Online 2-Client Layer
-   Load with:  <script type="text/babel" src="multiplayer.js"></script>
-   (after the main game script, and after the PeerJS <script> tag)
-
-   Model: HOST = the person who loaded the game (P1, Blue). The host
-   runs the whole simulation exactly as before. The GUEST (P2, Red)
-   only sends inputs and renders the state snapshots the host streams.
-   ============================================================ */
 (function () {
   'use strict';
 
@@ -14,30 +5,33 @@
   const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const rid = () => Array.from({ length: 6 }, () => ALPHA[Math.floor(Math.random() * ALPHA.length)]).join('');
   const GUEST_TALISMANS = ['dog', 'dragon', 'horse', 'monkey', 'rat', 'rabbit', 'pig', 'ox', 'rooster', 'sheep', 'snake'];
+  const HK = { '1': 'dog', '2': 'dragon', '3': 'horse', '4': 'monkey', '5': 'rat', '6': 'rabbit', '7': 'pig', '8': 'ox', '9': 'rooster', '0': 'sheep', '-': 'snake' };
+  const DIR = { left: 'l', right: 'r', up: 'u', down: 'd' };
 
-  let sessionId = rid();            // random session ID, created on every load
-  let peer = null, peerReady = false;
-  let guestConn = null;             // host side: the single allowed guest
-  let hostConn = null;              // guest side: connection to host
+  let sessionId = '';
+  let hostPeer = null, hostReady = false;
+  let joinPeer = null;
+  let guestConn = null;
+  let hostConn = null;
   let currentHost = '';
-  let pendingJoin = null, joinTimer = null, lastSplit = false, lostShown = false;
+  let joinTimer = null, lastSplit = false, lostShown = false;
   let snapTimer = null, inTimer = null;
   const fxQ = [];
   const gk = { l: false, r: false, u: false, d: false };
 
-  /* ---------------- UI ---------------- */
   const style = document.createElement('style');
   style.textContent = `
   #mp-panel{position:fixed;left:20px;top:150px;z-index:200;background:rgba(0,0,0,.8);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
   #mp-panel .mp-h{font-weight:bold;font-size:14px;margin-bottom:4px}
   #mp-panel b#mp-id{color:#ffd700;font-family:monospace;font-size:16px;letter-spacing:2px}
   #mp-panel button{background:#2e86de;color:#fff;border:0;border-radius:6px;padding:3px 9px;cursor:pointer;font-weight:bold}
+  #mp-panel button.sel{background:#16a34a}
   #mp-panel input{width:150px;padding:3px 6px;border-radius:6px;border:1px solid #888;text-transform:uppercase}
+  #mp-ctrl{margin-bottom:6px}
   #mp-state,#mp-msg{font-size:12px;color:#cfe8ff;margin-top:3px}
+  #mp-host{margin-top:6px}
   #mp-join{margin-top:8px;border-top:1px solid rgba(255,255,255,.2);padding-top:6px}
   body.remote-p2 #b2{display:none !important}
-  body.guest #b1{display:none !important}
-  body.guest #mp-host{display:none}
   #mp-lost{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.9);color:#fff;display:flex;flex-direction:column;gap:16px;justify-content:center;align-items:center;font:22px 'Segoe UI',sans-serif}
   #mp-lost button{font-size:20px;padding:10px 24px;border:0;border-radius:8px;background:#2e86de;color:#fff;cursor:pointer;font-weight:bold}`;
   document.head.appendChild(style);
@@ -45,13 +39,14 @@
   const panel = document.createElement('div');
   panel.id = 'mp-panel';
   panel.innerHTML = `
-    <div class="mp-h">🌐 Online Co-Op</div>
-    <div id="mp-host">
-      <div>Session ID: <b id="mp-id"></b> <button id="mp-copy">Copy link</button></div>
+    <div class="mp-h">Online Co-Op</div>
+    <div id="mp-ctrl">Controls: <button id="mp-arrows" tabindex="-1">Arrows</button> <button id="mp-wasd" tabindex="-1">WASD</button></div>
+    <div id="mp-host" style="display:none">
+      <div>Session ID: <b id="mp-id"></b> <button id="mp-copy" tabindex="-1">Copy link</button></div>
       <div id="mp-state"></div>
     </div>
     <div id="mp-join">
-      <div id="mp-row"><input id="mp-in" maxlength="80" placeholder="Friend's session ID"> <button id="mp-go">Join</button></div>
+      <div id="mp-row"><input id="mp-in" maxlength="80" placeholder="Friend's session ID"> <button id="mp-go" tabindex="-1">Join</button></div>
       <div id="mp-msg"></div>
     </div>`;
   document.body.appendChild(panel);
@@ -67,40 +62,76 @@
       () => setMsg('Link copied!'), () => setMsg(link));
   });
 
+  function setScheme(s) {
+    controlScheme = s;
+    $('mp-arrows').classList.toggle('sel', s === 'arrows');
+    $('mp-wasd').classList.toggle('sel', s === 'wasd');
+    clearInputKeys();
+    gk.l = gk.r = gk.u = gk.d = false;
+    if (isGuest) sendIn();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  }
+  $('mp-arrows').addEventListener('click', () => setScheme('arrows'));
+  $('mp-wasd').addEventListener('click', () => setScheme('wasd'));
+
   function refresh() {
+    const hosting = !!hostPeer && !isGuest;
+    $('mp-host').style.display = hosting ? 'block' : 'none';
     $('mp-id').textContent = sessionId;
-    let s;
-    if (isGuest) { s = ''; setMsg('🎮 Connected to ' + currentHost + ' — you are Player 2 (Red)'); $('mp-row').style.display = 'none'; }
-    else if (!peerReady) s = '⏳ Connecting to network…';
-    else if (guestConn) s = '✅ Player 2 connected (2/2)';
-    else if (isSplit) s = '🔓 Open — share the ID/link. Waiting for Player 2…';
-    else s = '🔒 Locked — activate the 🐅 Tiger talisman to let a friend join.';
+    let s = '';
+    if (hosting) {
+      if (!hostReady) s = 'Connecting to network...';
+      else if (guestConn) s = 'Player connected (2/2)';
+      else s = 'Open. Share the ID or link and wait for the other player.';
+    }
     $('mp-state').textContent = s;
+    if (isGuest) {
+      setMsg('Connected to ' + currentHost + '. You are the blue Jackie.');
+      $('mp-row').style.display = 'none';
+    }
   }
 
-  /* ---------------- Peer / session ---------------- */
-  function createPeer() {
-    if (typeof Peer === 'undefined') { $('mp-state').textContent = '⚠️ PeerJS failed to load (online play unavailable)'; return; }
-    peer = new Peer(PREFIX + sessionId, { debug: 0 });
-    peer.on('open', () => {
-      peerReady = true; refresh();
-      if (pendingJoin) { const p = pendingJoin; pendingJoin = null; joinSession(p); }
-    });
-    peer.on('error', err => {
-      if (err.type === 'unavailable-id') { sessionId = rid(); try { peer.destroy(); } catch (e) {} peerReady = false; createPeer(); return; }
-      if (err.type === 'peer-unavailable') { clearTimeout(joinTimer); setMsg('Session not found. Check the ID.'); return; }
-      $('mp-state').textContent = '⚠️ Network problem: ' + err.type;
-    });
-    peer.on('disconnected', () => { try { peer.reconnect(); } catch (e) {} });
-    peer.on('connection', onIncoming);
+  function startHosting() {
+    if (hostPeer || isGuest) return;
+    if (typeof Peer === 'undefined') { setMsg('PeerJS failed to load (online play unavailable).'); return; }
+    sessionId = rid();
+    openHostPeer();
+    refresh();
   }
 
-  /* ---------------- HOST side ---------------- */
+  function openHostPeer() {
+    hostReady = false;
+    const p = new Peer(PREFIX + sessionId, { debug: 0 });
+    hostPeer = p;
+    p.on('open', () => { if (hostPeer !== p) return; hostReady = true; refresh(); });
+    p.on('error', err => {
+      if (hostPeer !== p) return;
+      if (err.type === 'unavailable-id') {
+        sessionId = rid();
+        try { p.destroy(); } catch (e) {}
+        openHostPeer();
+        refresh();
+        return;
+      }
+      $('mp-state').textContent = 'Network problem: ' + err.type;
+    });
+    p.on('disconnected', () => { try { p.reconnect(); } catch (e) {} });
+    p.on('connection', onIncoming);
+  }
+
+  function stopHosting() {
+    if (guestConn) kickGuest('Host switched back to single player');
+    const p = hostPeer;
+    hostPeer = null; hostReady = false; sessionId = '';
+    if (p) setTimeout(() => { try { p.destroy(); } catch (e) {} }, 600);
+    refresh();
+  }
+
   function onIncoming(conn) {
     conn.on('open', () => {
       let reason = null;
       if (isGuest) reason = 'This player is a guest in another session.';
-      else if (!gameStarted || !isSplit) reason = '🔒 Session is locked. The host must activate the 🐅 Tiger talisman first.';
+      else if (!gameStarted || !isSplit) reason = 'Session is locked. The host must activate the Tiger talisman.';
       else if (isGameOver) reason = 'The game is over.';
       else if (guestConn && guestConn.open) reason = 'Session is full (2/2 players).';
       if (reason) {
@@ -111,8 +142,17 @@
       guestConn = conn; remoteP2 = true;
       document.body.classList.add('remote-p2');
       keysP2.left = keysP2.right = keysP2.up = keysP2.down = false;
+      hp2 = 100;
+      hp2V.textContent = '100';
+      updateHpBar(hp2Bar, 100);
+      hp2Container.style.display = 'block';
+      character2.x = character.x + 80;
+      character2.y = character.y;
+      character2.vx = 0;
+      character2.vy = 0;
+      character2.invisible = false;
       conn.send({ t: 'accepted' });
-      showChiBanner('🐅 Player 2 (Red) joined online!');
+      showChiBanner('Player 2 (Red) joined online!');
       snapTimer = setInterval(sendSnap, 33);
       refresh();
     });
@@ -126,9 +166,15 @@
     document.body.classList.remove('remote-p2');
     keysP2.left = keysP2.right = keysP2.up = keysP2.down = false;
     clearInterval(snapTimer); snapTimer = null; fxQ.length = 0;
+    hp2 = 0;
+    hp2V.textContent = '0';
+    updateHpBar(hp2Bar, 0);
+    hp2Container.style.display = 'none';
+    clearTalismanForPlayer(character2);
     if (msg) showChiBanner(msg);
     refresh();
   }
+
   function kickGuest(reason) {
     const c = guestConn;
     try { c.send({ t: 'kicked', reason }); } catch (e) {}
@@ -182,48 +228,68 @@
     } catch (e) {}
   }
 
-  // Forward visual effects (sparks / floating text / banners) to the guest
   const _sp = addSparks, _ft = addFloatText, _bn = showChiBanner;
   const fxOn = () => guestConn && guestConn.open && !isGuest && fxQ.length < 150;
   addSparks = function (x, y, c, n) { _sp(x, y, c, n); if (fxOn()) fxQ.push(['s', r1(x), r1(y), c, n]); };
   addFloatText = function (tx, x, y, c, s) { _ft(tx, x, y, c, s); if (fxOn()) fxQ.push(['f', tx, r1(x), r1(y), c, s]); };
   showChiBanner = function (msg) { _bn(msg); if (fxOn()) fxQ.push(['b', msg]); };
 
-  /* ---------------- GUEST side ---------------- */
   function joinSession(raw) {
-    if (isGuest || (gameStarted && !isGuest)) return;
+    if (isGuest) return;
     let id = (raw || '').trim();
     const mm = id.match(/join=([A-Za-z0-9-]+)/); if (mm) id = mm[1];
     id = id.toUpperCase().replace(/^JCA-/, '');
     if (!/^[A-Z0-9]{6}$/.test(id)) { setMsg('Invalid session ID.'); return; }
     if (id === sessionId) { setMsg("That's your own session ID."); return; }
-    if (!peerReady) { pendingJoin = id; setMsg('Connecting to network…'); return; }
-    setMsg('Joining ' + id + '…');
-    const conn = peer.connect(PREFIX + id, { serialization: 'json', reliable: true });
-    let done = false;
+    if (guestConn) { setMsg('Someone is already connected to you.'); return; }
+    if (typeof Peer === 'undefined') { setMsg('PeerJS failed to load (online play unavailable).'); return; }
+    setMsg('Joining ' + id + '...');
     clearTimeout(joinTimer);
-    joinTimer = setTimeout(() => { if (!done) { setMsg('No response from host. Check the ID / network.'); try { conn.close(); } catch (e) {} } }, 12000);
-    conn.on('data', d => {
-      if (!d) return;
-      if (d.t === 'denied') { done = true; clearTimeout(joinTimer); setMsg(d.reason); try { conn.close(); } catch (e) {} }
-      else if (d.t === 'accepted') { done = true; clearTimeout(joinTimer); hostConn = conn; currentHost = id; becomeGuest(); }
-      else if (d.t === 'snap' && isGuest) applySnap(d);
-      else if (d.t === 'kicked') showLost(d.reason);
+    if (joinPeer) { try { joinPeer.destroy(); } catch (e) {} joinPeer = null; }
+    const jp = new Peer({ debug: 0 });
+    joinPeer = jp;
+    let done = false;
+    joinTimer = setTimeout(() => {
+      if (!done) { setMsg('No response from host. Check the ID / network.'); try { jp.destroy(); } catch (e) {} }
+    }, 12000);
+    jp.on('error', err => {
+      if (done) return;
+      clearTimeout(joinTimer);
+      setMsg(err.type === 'peer-unavailable' ? 'Session not found. The host must activate the Tiger talisman first.' : 'Network problem: ' + err.type);
     });
-    conn.on('close', () => {
-      if (isGuest) showLost('Host disconnected');
-      else if (!done) { done = true; clearTimeout(joinTimer); setMsg('Connection closed.'); }
+    jp.on('open', () => {
+      const conn = jp.connect(PREFIX + id, { serialization: 'json', reliable: true });
+      conn.on('data', d => {
+        if (!d) return;
+        if (d.t === 'denied') { done = true; clearTimeout(joinTimer); setMsg(d.reason); try { conn.close(); } catch (e) {} }
+        else if (d.t === 'accepted') { done = true; clearTimeout(joinTimer); hostConn = conn; currentHost = id; becomeGuest(); }
+        else if (d.t === 'snap' && isGuest) applySnap(d);
+        else if (d.t === 'kicked') showLost(d.reason);
+      });
+      conn.on('close', () => {
+        if (isGuest) showLost('Host disconnected');
+        else if (!done) { done = true; clearTimeout(joinTimer); setMsg('Connection closed.'); }
+      });
+      conn.on('error', () => { if (isGuest) showLost('Connection lost'); });
     });
-    conn.on('error', () => { if (isGuest) showLost('Connection lost'); });
   }
 
   function becomeGuest() {
-    isGuest = true; gameStarted = true; isSplit = true; introOpen = false; enemiesActive = false;
+    stopHosting();
+    isGuest = true; gameStarted = true; isSplit = true; isGameOver = false; introOpen = false; enemiesActive = false; remoteP2 = false;
     document.body.classList.add('guest');
-    ['start-overlay', 'intro-dialog', 'instructions-dialog'].forEach(i => { const el = $(i); if (el) el.style.display = 'none'; });
+    ['start-overlay', 'intro-dialog', 'instructions-dialog', 'go'].forEach(i => { const el = $(i); if (el) el.style.display = 'none'; });
     try { window.speechSynthesis.cancel(); } catch (e) {}
+    clearTalismanForPlayer(character);
+    clearTalismanForPlayer(character2);
+    character.shirtColor = '#dc2626'; character.pantsColor = '#1e3a8a';
+    character2.shirtColor = '#2563eb'; character2.pantsColor = '#78350f';
+    character.invisible = false; character2.invisible = false;
+    keysP1.left = keysP1.right = keysP1.up = keysP1.down = false;
+    $('hp1-label').firstChild.nodeValue = '\u2764\uFE0F Partner (Red) \u00a0 \u00a0';
+    $('hp2-label').firstChild.nodeValue = '\u2764\uFE0F Me (Blue) \u00a0 \u00a0';
     hp2Container.style.display = 'block';
-    b2.style.display = 'flex';
+    b2.style.display = 'none';
     refresh();
     inTimer = setInterval(sendIn, 33);
   }
@@ -233,7 +299,7 @@
     clearInterval(inTimer);
     const d = document.createElement('div');
     d.id = 'mp-lost';
-    d.innerHTML = '<div>🔌 ' + msg + '</div><button>Back to menu</button>';
+    d.innerHTML = '<div>' + msg + '</div><button>Back to menu</button>';
     d.querySelector('button').onclick = () => { location.href = location.href.split('?')[0]; };
     document.body.appendChild(d);
   }
@@ -268,7 +334,7 @@
     arws = s.a.map(a => ({ x: a[0], y: a[1], ang: a[2] }));
     fbs = s.f.map(a => ({ x: a[0], y: a[1], radius: 10 }));
     magicBeams = s.mb;
-    gAimX = s.ax; gAimY = s.ay;   // on the guest this is the HOST's aim (for P1's pig laser)
+    gAimX = s.ax; gAimY = s.ay;
     s.fx.forEach(f => {
       if (f[0] === 's') _sp(f[1], f[2], f[3] || undefined, f[4] || undefined);
       else if (f[0] === 'f') _ft(f[1], f[2], f[3], f[4] || undefined, f[5] || undefined);
@@ -291,30 +357,32 @@
     my = e.clientY * canvas.height / Math.max(1, window.innerHeight - 100);
   };
 
-  /* ---------------- Input interception (capture phase) ---------------- */
-  const KM = { ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r', ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd' };
-  const hostBlocked = k => k.length === 1 && 'adwseADWSE'.indexOf(k) >= 0;
-
   window.addEventListener('keydown', e => {
+    if (!isGuest) return;
     if (e.target && e.target.tagName === 'INPUT') return;
-    if (isGuest) {
-      const k = KM[e.key];
-      if (k) {
-        if (k === 'u' && !e.repeat && !gk.u && hp2 > 0 && !character2.isFlying && !character2.isJumping) sayHip();
-        if (!gk[k]) { gk[k] = true; sendIn(); }
-        e.preventDefault();
-      } else if ((e.key === 'e' || e.key === 'E') && !e.repeat) guestLaser();
-      e.stopImmediatePropagation();
-    } else if (remoteP2 && hostBlocked(e.key)) e.stopImmediatePropagation();
+    const dir = moveKey(e);
+    if (dir) {
+      const k = DIR[dir];
+      if (k === 'u' && !e.repeat && !gk.u && hp2 > 0 && !character2.isFlying && !character2.isJumping) sayHip();
+      if (!gk[k]) { gk[k] = true; sendIn(); }
+      e.preventDefault();
+    } else if ((e.key === 'e' || e.key === 'E' || e.key === 'q' || e.key === 'Q') && !e.repeat) {
+      guestLaser();
+    } else if (HK[e.key] && !e.repeat) {
+      if (hostConn && hostConn.open && !isGameOver) hostConn.send({ t: 'tal', name: HK[e.key] });
+    }
+    e.stopImmediatePropagation();
   }, true);
 
   window.addEventListener('keyup', e => {
+    if (!isGuest) return;
     if (e.target && e.target.tagName === 'INPUT') return;
-    if (isGuest) {
-      const k = KM[e.key];
-      if (k && gk[k]) { gk[k] = false; sendIn(); }
-      e.stopImmediatePropagation();
-    } else if (remoteP2 && hostBlocked(e.key)) e.stopImmediatePropagation();
+    const dir = moveKey(e);
+    if (dir) {
+      const k = DIR[dir];
+      if (gk[k]) { gk[k] = false; sendIn(); }
+    }
+    e.stopImmediatePropagation();
   }, true);
 
   window.addEventListener('blur', () => {
@@ -344,20 +412,17 @@
     hostConn.send({ t: 'click', ax: Math.round(mx), ay: Math.round(my) });
   }, true);
 
-  /* ---------------- Boot ---------------- */
   setInterval(() => {
     if (!isGuest && isSplit !== lastSplit) {
       lastSplit = isSplit;
-      if (!isSplit && guestConn) kickGuest('Host switched back to single player');
-      refresh();
+      if (isSplit) startHosting(); else stopHosting();
     }
-    $('mp-join').style.display = (gameStarted && !isGuest) ? 'none' : 'block';
+    $('mp-join').style.display = guestConn ? 'none' : 'block';
   }, 200);
 
-  createPeer();
+  setScheme('arrows');
   refresh();
 
-  // Invite link support: ?join=ABC123
   const qp = (location.search.match(/[?&]join=([A-Za-z0-9-]+)/) || [])[1];
-  if (qp) { inputEl.value = qp.toUpperCase().replace(/^JCA-/, ''); pendingJoin = inputEl.value; setMsg('Connecting to network…'); }
+  if (qp) { inputEl.value = qp.toUpperCase().replace(/^JCA-/, ''); joinSession(inputEl.value); }
 })();
