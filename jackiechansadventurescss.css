@@ -55,6 +55,12 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .intro-box p {font-size:16px; line-height:1.7; text-align:left; margin-bottom:20px; padding-right:150px; width: calc(100% - 20px);}
 .intro-box a {color:#60a5fa; font-weight:bold; text-decoration:underline;}
 .captainblackclass {position: absolute; right: -10px; top: 0px; width: 130px; height: 130px; border-radius: 50%; border: 4px solid #fff; object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.4);}
+#instructions-dialog { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 90; justify-content: center; align-items: center; }
+.instr-box { background: rgba(0,0,0,0.9); color: #fff; max-width: 760px; width: 92%; max-height: 92vh; overflow-y: auto; padding: 24px 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 6px 20px rgba(0,0,0,0.6); text-align: center; }
+.instr-grid { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 20px; text-align: left; }
+.instr-section { background: rgba(255,255,255,0.08); border-left: 4px solid #ffd700; border-radius: 8px; padding: 10px 14px; }
+.instr-section h3 { font-size: 16px; color: #ffd700; margin-bottom: 4px; }
+.instr-section p { font-size: 14px; line-height: 1.65; margin-bottom: 4px; }
 @property --bg-color-1 {
   syntax: '<color>';
   inherits: false;
