@@ -22,7 +22,7 @@
         <div class="sky sky6"></div>
     <div id="hp-m">
         <div id="hp1-container">
-            <div id="hp1-label" style="color:#1d4ed8;">❤️ P1 (Blue) &nbsp; &nbsp;<span id="hp-v">100</span>%</div>
+            <div id="hp1-label" style="color:#1d4ed8;">❤️ P1 (Me) (Blue) &nbsp; &nbsp;<span id="hp-v">100</span>%</div>
             <div class="hp-bar-bg"><div id="hp1-bar" class="hp-bar-fill"></div></div>
         </div>
         <div id="hp2-container">
@@ -72,7 +72,7 @@
     <div class="instr-grid">
       <div class="instr-section">
         <h3>🏃 Movement</h3>
-        <p><span class="key-badge">←</span> <span class="key-badge">→</span> Move &nbsp; <span class="key-badge">↑</span> Jump (or fly up with Rooster) &nbsp; <span class="key-badge">↓</span> Fly down</p>
+        <p>Choose <span class="key-badge">Arrows or WASD</span> in the Controls box on the left. <span class="key-badge">Left/Right (A/D)</span> move, <span class="key-badge">Up (W)</span> jumps or flies up with Rooster, <span class="key-badge">Down (S)</span> flies down.</p>
       </div>
       <div class="instr-section">
         <h3>⚔️ Attacking Enemies</h3>
@@ -85,7 +85,7 @@
       </div>
       <div class="instr-section">
         <h3>🐅 2-Player Co-Op</h3>
-        <p>Press <span class="key-badge">=</span> (Tiger) to bring in Player 2. P2 uses <span class="key-badge">A</span> <span class="key-badge">D</span> to move, <span class="key-badge">W</span> to jump or fly, <span class="key-badge">S</span> to fly down and <span class="key-badge">E</span> for the Lizard Counter Magic Laser. P2 uses the red talisman bar with the mouse. Press <span class="key-badge">=</span> again to return to single player.</p>
+        <p>Press <span class="key-badge">=</span> (Tiger) to open an online session and share the Session ID, or paste a friend's Session ID in the Online Co-Op box to join. Everyone plays their own blue Jackie and sees the other player as the red Jackie. Press <span class="key-badge">=</span> again to return to single player.</p>
       </div>
       <div class="instr-section">
         <h3>❤️ Survive</h3>
@@ -194,6 +194,20 @@ let particles = [];
 let floatTexts = [];
 const keysP1 = { left: false, right: false, up: false, down: false };
 const keysP2 = { left: false, right: false, up: false, down: false };
+const MOVE_SCHEMES = {
+    arrows: { left: 'arrowleft', right: 'arrowright', up: 'arrowup', down: 'arrowdown' },
+    wasd: { left: 'a', right: 'd', up: 'w', down: 's' }
+};
+let controlScheme = 'arrows';
+function moveKey(e) {
+    const k = (e.key || '').toLowerCase();
+    const s = MOVE_SCHEMES[controlScheme];
+    if (k === s.left) return 'left';
+    if (k === s.right) return 'right';
+    if (k === s.up) return 'up';
+    if (k === s.down) return 'down';
+    return null;
+}
 const character = {
     playerNum: 1,
     name: "P1 (Blue)",
@@ -574,7 +588,7 @@ function getTalismanDisplayName(name) {
 
 function updatePlayerTalismanUI(chr) {
     const pN = chr.playerNum;
-    const bI = pN === 1 ? 'b1' : 'b2';
+    const bI = (pN === 1) !== isGuest ? 'b1' : 'b2';
     const bE = document.getElementById(pN === 1 ? 'p1-power-badge' : 'p2-power-badge');
     const tE = document.getElementById(pN === 1 ? 'p1-power-text' : 'p2-power-text');
 
@@ -639,7 +653,7 @@ function startPlayerTimer(chr, tName, sec, onExpire) {
 }
 
 function updateTalismanTimers(chr) {
-    const bI = chr.playerNum === 1 ? 'b1' : 'b2';
+    const bI = (chr.playerNum === 1) !== isGuest ? 'b1' : 'b2';
     const tE = document.getElementById(chr.playerNum === 1 ? 'p1-power-text' : 'p2-power-text');
     const now = Date.now();
     const ends = chr.talismanEnds || {};
@@ -839,29 +853,22 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
 function toggleTigerSplit() {
     if (!isSplit) {
         isSplit = true;
-        hp2Container.style.display = 'block';
-        b2.style.display = 'flex';
-        hp2 = 100;
-        hp2V.textContent = '100';
-        updateHpBar(hp2Bar, 100);
-
-        character2.x = character.x + 80;
-        character2.y = character.y;
-        character2.vx = 0;
-        character2.vy = 0;
-        character2.invisible = false;
-        character2.dark = false;
-
-        showChiBanner("🐅 2-Player Co-Op Active! P1: Arrows | P2: WASD");
-        addFloatText("P2 (Red) Joined!", character2.x, canvas.height - character2.y - 65, '#dc2626', 18);
-        addSparks(character2.x, canvas.height - character2.y - 35, '#dc2626', 15);
-    } else {
-        isSplit = false;
+        hp2 = 0;
+        hp2V.textContent = '0';
+        updateHpBar(hp2Bar, 0);
         hp2Container.style.display = 'none';
         b2.style.display = 'none';
-
+        character2.invisible = false;
+        showChiBanner("Multiplayer ON. Share the Session ID from the Online Co-Op panel.");
+        addSparks(character.x, canvas.height - character.y - 35, '#dc2626', 15);
+    } else {
+        isSplit = false;
+        hp2 = 0;
+        hp2V.textContent = '0';
+        updateHpBar(hp2Bar, 0);
+        hp2Container.style.display = 'none';
+        b2.style.display = 'none';
         clearTalismanForPlayer(character2);
-
         addSparks(character.x, canvas.height - character.y - 35, '#2563eb', 15);
         addFloatText("Single Player Mode", character.x, canvas.height - character.y - 65, '#2563eb', 18);
     }
@@ -891,37 +898,23 @@ function sayHip() {
 
 window.addEventListener('keydown', (e) => {
     if (!gameStarted || isGameOver || introOpen) return;
-    if (e.key === 'ArrowLeft') { keysP1.left = true; e.preventDefault(); }
-    if (e.key === 'ArrowRight') { keysP1.right = true; e.preventDefault(); }
-    if (e.key === 'ArrowUp') {
-        keysP1.up = true;
-        if (!character.isFlying && !character.isJumping) {
+    if (e.target && e.target.tagName === 'INPUT') return;
+    const dir = moveKey(e);
+    if (dir) {
+        keysP1[dir] = true;
+        if (dir === 'up' && hp > 0 && !character.isFlying && !character.isJumping) {
             character.vy = character.jumpForce;
             character.isJumping = true;
             if (!e.repeat) sayHip();
         }
         e.preventDefault();
     }
-    if (e.key === 'ArrowDown') { keysP1.down = true; e.preventDefault(); }
-    if (e.key === 'a' || e.key === 'A') { keysP2.left = true; }
-    if (e.key === 'd' || e.key === 'D') { keysP2.right = true; }
-    if (e.key === 'w' || e.key === 'W') {
-        keysP2.up = true;
-        if (isSplit && !character2.isFlying && !character2.isJumping) {
-            character2.vy = character2.jumpForce;
-            character2.isJumping = true;
-        }
-    }
-    if (e.key === 's' || e.key === 'S') { keysP2.down = true; }
-
     if (e.key === 'q' || e.key === 'Q') {
         fireStraightLaser(character, "Yu-Mo-Gui-Gwai-Fai-Di-Zao!", '#00ff66');
     }
     if (e.key === 'e' || e.key === 'E') {
-        const caster = isSplit ? character2 : character;
-        fireStraightLaser(caster, "Magic must defeat magic!", '#00ff88');
+        fireStraightLaser(character, "Magic must defeat magic!", '#00ff88');
     }
-
     const hotkeyMapP1 = {
         '1': 'dog',
         '2': 'dragon',
@@ -942,14 +935,8 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
-    if (e.key === 'ArrowLeft') keysP1.left = false;
-    if (e.key === 'ArrowRight') keysP1.right = false;
-    if (e.key === 'ArrowUp') keysP1.up = false;
-    if (e.key === 'ArrowDown') keysP1.down = false;
-    if (e.key === 'a' || e.key === 'A') keysP2.left = false;
-    if (e.key === 'd' || e.key === 'D') keysP2.right = false;
-    if (e.key === 'w' || e.key === 'W') keysP2.up = false;
-    if (e.key === 's' || e.key === 'S') keysP2.down = false;
+    const dir = moveKey(e);
+    if (dir) keysP1[dir] = false;
 });
 
 window.addEventListener('mousemove', (e) => {
@@ -1432,10 +1419,10 @@ arws.push({
     }
 
     if ((!character.invisible || character.activeTalisman === 'snake') && hp > 0) {
-        drawHuman(character, "P1 (Arrows)");
+        drawHuman(character, isGuest ? "Partner" : "Me");
     }
     if (isSplit && (!character2.invisible || character2.activeTalisman === 'snake') && hp2 > 0) {
-        drawHuman(character2, "P2 (WASD)");
+        drawHuman(character2, isGuest ? "Me" : "Partner");
     }
 
     for (let i = particles.length - 1; i >= 0; i--) {
@@ -1621,7 +1608,7 @@ function drawHuman(chr, label) {
     if (isSplit) {
         ctx.save();
         ctx.font = 'bold 13px sans-serif';
-        ctx.fillStyle = chr === character ? '#2563eb' : '#dc2626';
+        ctx.fillStyle = chr.shirtColor;
         ctx.textAlign = 'center';
         ctx.shadowBlur = 4;
         ctx.shadowColor = '#fff';
