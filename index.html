@@ -30,21 +30,17 @@
             <div class="hp-bar-bg"><div id="hp2-bar" class="hp-bar-fill"></div></div>
         </div>
     </div>
-
     <div id="active-power-hud">
         <div id="p1-power-badge" class="power-pill">P1: <span id="p1-power-text">None</span></div>
         <div id="p2-power-badge" class="power-pill">P2: <span id="p2-power-text">None</span></div>
     </div>
-
     <div id="chi-banner">Magic must defeat magic!</div>
-
     <div id="sc-m">
         <div class="hud-title">🏆 SCORE BOARD</div>
         <div>🥷 Shadow Guards: <span id="hud-sgk">0</span> (<span id="hud-sgs">0</span> pts)</div>
         <div>🦇 Bats: <span id="hud-ek">0</span> (<span id="hud-es">0</span> pts)</div>
         <div>🛣️ Distance: <span id="hud-dc">0</span> m</div>
     </div>
-
     <div id="go">
         <h1 class="gameover">🎮 GAME OVER 🎮</h1>
         <div class="game-board-new-class">
@@ -63,7 +59,10 @@
         <img src="captainblack.png" class="captainblackclass">
         <div class="intro-title">🐉 Jackie Chan's Adventures</div>
         <p id="intro-speech-text">Jackie! The Dark Hand gang has recently started targeting us. Walter is in need of all the 12 talismans now. You very well know what will happen if those talismans fall into his hands. If it happens, then Shendu will get liberty and that is dangerous for the entire world. To prevent that, the talismans should not go to the hands of the Dark Hand. All the way you go, Shadow Guards will follow you to steal the talismans from you. Protecting the talismans from the Shadow Guards sent by Walter is your job. I have hope in you and at this situation, I can trust only you. Safeguard the talismans from going to the hands of Dark Hand. All the best!</p>
-        <button id="intro-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">➡️ Next</button>
+        <div class="intro-btn-row">
+            <button id="intro-skip-btn" class="skip-game-class">Skip</button>
+            <button id="intro-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">➡️ Next</button>
+        </div>
       </div>
     </div>
 <div id="instructions-dialog">
