@@ -58,13 +58,13 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 #instructions-dialog { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 90; justify-content: center; align-items: center; }
 .instr-box { background: rgba(0,0,0,0.9); color: #fff; max-width: 760px; width: 92%; max-height: 92vh; overflow-y: auto; padding: 24px 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 6px 20px rgba(0,0,0,0.6); text-align: center; }
 .instr-grid { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 20px; text-align: left; }
-.instr-section { background: rgba(255,255,255,0.08); border-left: 4px solid #ffd700; border-radius: 8px; padding: 10px 14px; }
-.instr-section h3 { font-size: 16px; color: #ffd700; margin-bottom: 4px; }
+.instr-section { background: rgba(255,255,255,0.08); border-left: 4px solid #0088ff; border-radius: 8px; padding: 10px 14px; }
+.instr-section h3 { font-size: 16px; color: #0088ff; margin-bottom: 4px; }
 .instr-section p { font-size: 14px; line-height: 1.65; margin-bottom: 4px; }
 @property --bg-color-1 {
   syntax: '<color>';
   inherits: false;
-  initial-value: #ffd700;
+  initial-value: #0088ff;
 }
 @property --bg-color-2 {
   syntax: '<color>';
