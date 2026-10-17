@@ -143,9 +143,8 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
-function clearInputKeys() { 
-  keysP1.left = keysP1.right = keysP1.up = keysP1.down = false; 
-  keysP2.left = keysP2.right = keysP2.up = keysP2.down = false; 
+function clearInputKeys() {
+  [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
 } 
 window.addEventListener('blur', clearInputKeys);
 const m = document.getElementById('m');
@@ -410,9 +409,8 @@ function resetGameState() {
   fbs = []; 
   magicBeams = []; 
   particles = []; 
-  floatTexts = []; 
-  keysP1.left = keysP1.right = keysP1.up = keysP1.down = false; 
-  keysP2.left = keysP2.right = keysP2.up = keysP2.down = false; 
+  floatTexts = [];
+  [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
 } 
 function startGame() {
     resetGameState();
@@ -449,10 +447,7 @@ document.getElementById('instructions-start-btn').addEventListener('click', () =
     gt = Date.now();
     nextSpawnAt = Date.now() + 1500;
 });
-function getSpawnDelay() {
-    const elapsedSeconds = (Date.now() - gt) / 1000;
-    return Math.max(250, 3000 * Math.pow(0.5, elapsedSeconds / 60));
-}
+const getSpawnDelay = () => Math.max(250, 3000 * 0.5 ** ((Date.now() - gt) / 60000));
 function spawnTick() {
     if (!enemiesActive) return;
     const now = Date.now();
@@ -466,8 +461,7 @@ function triggerGameOver() {
         clearTimeout(enemyInterval);
         enemyInterval = null;
     }
-    keysP1.left = keysP1.right = keysP1.up = keysP1.down = false;
-    keysP2.left = keysP2.right = keysP2.up = keysP2.down = false;
+    [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
     document.getElementById('go-sgk').textContent = sgk;
     document.getElementById('go-ek').textContent = ek;
     document.getElementById('go-sgs').textContent = sgk * 100;
