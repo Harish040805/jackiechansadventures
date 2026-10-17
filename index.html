@@ -58,12 +58,12 @@
         </div>
     </div>
     <div id="intro-dialog">
-    <div class="intro-box" style="position: relative;">
+      <div class="intro-box" style="position: relative;">
         <img src="captainblack.png" class="captainblackclass">
         <div class="intro-title">🐉 Jackie Chan's Adventures</div>
-        <p>Jackie! The Dark Hand gang has recently started targeting us. Walter is in need of all the 12 talismans now. You very well know what will happen if those talismans fall into his hands. If it happens, then Shendu will get liberty and that is dangerous for the entire world. To prevent that, the talismans should not go to the hands of the Dark Hand. All the way you go, Shadow Guards will follow you to steal the talismans from you. Protecting the talismans from the Shadow Guards sent by Walter is your job. I have hope in you and at this situation, I can trust only you. Safeguard the talismans from going to the hands of Dark Hand. All the best!</p>
-        <button id="intro-start-btn" class="start-game-class">▶️ Start</button>
-    </div>
+        <p id="intro-speech-text">Jackie! The Dark Hand gang has recently started targeting us. Walter is in need of all the 12 talismans now. You very well know what will happen if those talismans fall into his hands. If it happens, then Shendu will get liberty and that is dangerous for the entire world. To prevent that, the talismans should not go to the hands of the Dark Hand. All the way you go, Shadow Guards will follow you to steal the talismans from you. Protecting the talismans from the Shadow Guards sent by Walter is your job. I have hope in you and at this situation, I can trust only you. Safeguard the talismans from going to the hands of Dark Hand. All the best!</p>
+        <button id="intro-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">▶️ Start</button>
+      </div>
     </div>
 
     <div id="m"></div>
@@ -398,6 +398,18 @@ function startGame() {
     enemiesActive = false;
     introOpen = true;
     document.getElementById('intro-dialog').style.display = 'flex';
+    const startBtn = document.getElementById('intro-start-btn');
+    startBtn.disabled = true;
+    startBtn.style.opacity = '0.5';
+    startBtn.style.cursor = 'not-allowed';
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(document.getElementById('intro-speech-text').textContent);
+    utter.onend = () => {
+        startBtn.disabled = false;
+        startBtn.style.opacity = '1';
+        startBtn.style.cursor = 'pointer';
+    };
+    window.speechSynthesis.speak(utter);
 }
 document.getElementById('intro-start-btn').addEventListener('click', () => {
     document.getElementById('intro-dialog').style.display = 'none';
