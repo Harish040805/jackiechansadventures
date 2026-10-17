@@ -21,7 +21,7 @@
 
   const style = document.createElement('style');
   style.textContent = `
-  #mp-panel{position:fixed;left:20px;top:150px;z-index:200;background:rgba(0,0,0,.8);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
+  #mp-panel{position:fixed;left:20px;top:150px;z-index:10;background:rgba(0,0,0,.8);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
   #mp-panel .mp-h{font-weight:bold;font-size:14px;margin-bottom:4px}
   #mp-panel b#mp-id{color:#ffd700;font-family:monospace;font-size:16px;letter-spacing:2px}
   #mp-panel button{background:#2e86de;color:#fff;border:0;border-radius:6px;padding:3px 9px;cursor:pointer;font-weight:bold}
@@ -49,7 +49,7 @@
       <div id="mp-row"><input id="mp-in" maxlength="80" placeholder="Friend's session ID"> <button id="mp-go" tabindex="-1">Join</button></div>
       <div id="mp-msg"></div>
     </div>`;
-  document.body.appendChild(panel);
+  document.getElementById('g').appendChild(panel);
   const $ = id => document.getElementById(id);
   const setMsg = s => { $('mp-msg').textContent = s; };
   const inputEl = $('mp-in');
