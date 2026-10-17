@@ -1059,6 +1059,34 @@ let smoothLeftLegAngle = 0, smoothRightLegAngle = 0;
 let smoothLeftArmAngle = 0, smoothRightArmAngle = 0;
 let smoothLeftLegAngle2 = 0, smoothRightLegAngle2 = 0;
 let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
+const ARROW_SPEED = 7.5;
+const AIM_ERROR = 0;
+
+function futureY(chr, keys, t) {
+    if (chr.isFlying) {
+        const vyFly = (keys.up ? 8 : 0) - (keys.down ? 8 : 0);
+        return Math.max(0, Math.min(canvas.height - 110, chr.y + vyFly * t));
+    }
+    if (chr.y <= 0 && chr.vy <= 0) return 0;
+    return Math.max(0, chr.y + chr.vy * t - 0.5 * chr.gravity * t * t);
+}
+
+function aimArrow(sx, sy, chr, spd) {
+    const keys = chr.playerNum === 1 ? keysP1 : keysP2;
+    const cx = chr.x;
+    const cy = canvas.height - chr.y - 35;
+    let ax = cx - sx, ay = cy - sy;
+    let T = Math.hypot(ax, ay) / spd;
+    for (let i = 0; i < 5; i++) {
+        const t = Math.min(T, 90);
+        ax = (cx + chr.vx * t) - sx;
+        ay = (canvas.height - futureY(chr, keys, t) - 35) - sy;
+        T = Math.hypot(ax, ay) / spd;
+    }
+    let ang = Math.atan2(ay, ax);
+    if (AIM_ERROR > 0) ang += (Math.random() - 0.5) * 2 * AIM_ERROR;
+    return { vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, ang: ang };
+}
 
 function u() {
     const frameNow = performance.now();
@@ -1162,23 +1190,20 @@ function u() {
 
             if (validTargets.length > 0 && now - e.lt > 2600 && e.x > 320 && e.x < canvas.width + 20) {
                 e.lt = now;
-                const targetChr = validTargets[Math.floor(Math.random() * validTargets.length)];
-                const sx = e.x;
-                const sy = enemyScreenY;
-                const tx = targetChr.x;
-                const ty = canvas.height - targetChr.y - 35;
-                const dx = tx - sx;
-                const dy = ty - sy;
-                const len = Math.hypot(dx, dy) || 1;
-                const spd = 7.5;
+                // Target the closest valid player (more threatening than a random pick)
+const targetChr = validTargets.reduce((best, c) =>
+    Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best);
+const sx = e.x;
+const sy = enemyScreenY;
+const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
 
-                arws.push({
-                    x: sx,
-                    y: sy,
-                    vx: (dx / len) * spd,
-                    vy: (dy / len) * spd,
-                    ang: Math.atan2(dy, dx)
-                });
+arws.push({
+    x: sx,
+    y: sy,
+    vx: aim.vx,
+    vy: aim.vy,
+    ang: aim.ang
+});
             }
 
             if (e.x < -150) {
