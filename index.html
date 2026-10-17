@@ -181,6 +181,11 @@ let b = 0;
 const lw = 1800;
 let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 let isSplit = false;
+let isGuest = false, remoteP2 = false, gAimX = 0, gAimY = 0;
+function aimPt(chr) {
+    if (isGuest) return chr === character2 ? {x: mx, y: my} : {x: gAimX, y: gAimY};
+    return (remoteP2 && chr === character2) ? {x: gAimX, y: gAimY} : {x: mx, y: my};
+}
 let ems = [];
 let arws = [];
 let fbs = [];
@@ -964,12 +969,13 @@ window.addEventListener('click', (e) => {
     if (character.isDragonShooting && hp > 0) {
         shootDragonFireball(character);
     }
-    if (isSplit && character2.isDragonShooting && hp2 > 0) {
+    if (isSplit && character2.isDragonShooting && hp2 > 0 && !remoteP2) {
         shootDragonFireball(character2);
     }
 });
 
 function shootDragonFireball(chr) {
+    const mx = aimPt(chr).x, my = aimPt(chr).y;
     const sx = chr.x;
     const sy = canvas.height - chr.y - 35;
     const dx = mx - sx;
@@ -1089,7 +1095,7 @@ function u() {
     const frameNow = performance.now();
     dt = Math.min((frameNow - lastFrameTime) / 16.667, 3);
     lastFrameTime = frameNow;
-    if (gameStarted && !isGameOver) {
+    if (gameStarted && !isGameOver && !isGuest) {
         spawnTick();
         updateTalismanTimers(character);
         if (isSplit) updateTalismanTimers(character2);
@@ -1253,6 +1259,7 @@ arws.push({
         }
 
         const checkLaserHits = (chr) => {
+            const mx = aimPt(chr).x, my = aimPt(chr).y;
             const ex = chr.x;
             const ey = canvas.height - chr.y - 35;
             const dx = mx - ex;
@@ -1302,6 +1309,7 @@ arws.push({
     }
 
     const drawPigLaser = (chr) => {
+        const mx = aimPt(chr).x, my = aimPt(chr).y;
         const ex = chr.x;
         const ey = canvas.height - chr.y - 35;
         ctx.save();
