@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jackie Chan's Adventures</title>
-<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<link rel="shortcut icon" href="https://github.com/Harish040805/jackiechansadventures/blob/main/dragon.jpg?raw=true" type="image/x-icon">
-<link rel="stylesheet" href="jackiechansadventurescss.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jackie Chan's Adventures</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="shortcut icon" href="https://github.com/Harish040805/jackiechansadventures/blob/main/dragon.jpg?raw=true" type="image/x-icon">
+    <link rel="stylesheet" href="jackiechansadventurescss.css">
 </head>
 <body>
-<div id="react-start-root"></div>
-<div id="g">
-    <div class="sky sky1"></div>
-    <div class="sky sky2"></div>
-    <div class="sky sky3"></div>
-    <div class="sky sky4"></div>
-    <div class="sky sky5"></div>
-    <div class="sky sky6"></div>
+    <div id="react-start-root"></div>
+    <div id="g">
+        <div class="sky sky1"></div>
+        <div class="sky sky2"></div>
+        <div class="sky sky3"></div>
+        <div class="sky sky4"></div>
+        <div class="sky sky5"></div>
+        <div class="sky sky6"></div>
     <div id="hp-m">
         <div id="hp1-container">
             <div id="hp1-label" style="color:#1d4ed8;">❤️ P1 (Blue) &nbsp; &nbsp;<span id="hp-v">100</span>%</div>
@@ -62,9 +62,38 @@
         <img src="captainblack.png" class="captainblackclass">
         <div class="intro-title">🐉 Jackie Chan's Adventures</div>
         <p id="intro-speech-text">Jackie! The Dark Hand gang has recently started targeting us. Walter is in need of all the 12 talismans now. You very well know what will happen if those talismans fall into his hands. If it happens, then Shendu will get liberty and that is dangerous for the entire world. To prevent that, the talismans should not go to the hands of the Dark Hand. All the way you go, Shadow Guards will follow you to steal the talismans from you. Protecting the talismans from the Shadow Guards sent by Walter is your job. I have hope in you and at this situation, I can trust only you. Safeguard the talismans from going to the hands of Dark Hand. All the best!</p>
-        <button id="intro-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">▶️ Start</button>
+        <button id="intro-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">➡️ Next</button>
       </div>
     </div>
+<div id="instructions-dialog">
+  <div class="instr-box">
+    <div class="intro-title">📜 How to Play</div>
+    <div class="instr-grid">
+      <div class="instr-section">
+        <h3>🏃 Movement</h3>
+        <p><span class="key-badge">←</span> <span class="key-badge">→</span> Move &nbsp; <span class="key-badge">↑</span> Jump (or fly up with Rooster) &nbsp; <span class="key-badge">↓</span> Fly down</p>
+      </div>
+      <div class="instr-section">
+        <h3>⚔️ Attacking Enemies</h3>
+        <p>Defeat 🥷 Shadow Guards (100 pts) and 🦇 Bats (150 pts). Press <span class="key-badge">Q</span> for the Pufferfish Chi Laser (fires straight in the direction you face). With the Dragon talisman, <b>click</b> to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches.</p>
+      </div>
+      <div class="instr-section">
+        <h3>🐾 Talismans</h3>
+        <p>Press <span class="key-badge">1</span>–<span class="key-badge">0</span>, <span class="key-badge">-</span> or click the buttons at the bottom. Press again to turn one off. Several can be active at once, and each has a timer (except Dragon and Ox, which stay on until you turn them off).</p>
+        <p>🐕 Invulnerable · 🐉 Fireballs · 🐴 Heal +20 HP · 🐒 Shape Transform to Ninja · 🐀 Giving Movement for Trees · 🐇 Super Speed · 🐷 Eye Laser · 🐂 Giant (Half Damage) · 🐓 Flight · 🐑 Astral Spirit · 🐍 Invisibility · 🦎/🐡 One Shot Magic Laser</p>
+      </div>
+      <div class="instr-section">
+        <h3>🐅 2-Player Co-Op</h3>
+        <p>Press <span class="key-badge">=</span> (Tiger) to bring in Player 2. P2 uses <span class="key-badge">A</span> <span class="key-badge">D</span> to move, <span class="key-badge">W</span> to jump or fly, <span class="key-badge">S</span> to fly down and <span class="key-badge">E</span> for the Lizard Counter Magic Laser. P2 uses the red talisman bar with the mouse. Press <span class="key-badge">=</span> again to return to single player.</p>
+      </div>
+      <div class="instr-section">
+        <h3>❤️ Survive</h3>
+        <p>Dodge arrows and avoid touching enemies. The game ends when your HP reaches 0. The longer you survive, the faster enemies spawn!</p>
+      </div>
+    </div>
+    <button id="instructions-start-btn" class="start-game-class">🎮 Start Game</button>
+  </div>
+</div>
 
     <div id="m"></div>
     <div id="t"></div>
@@ -412,7 +441,12 @@ function startGame() {
     window.speechSynthesis.speak(utter);
 }
 document.getElementById('intro-start-btn').addEventListener('click', () => {
+    window.speechSynthesis.cancel();
     document.getElementById('intro-dialog').style.display = 'none';
+    document.getElementById('instructions-dialog').style.display = 'flex';
+});
+document.getElementById('instructions-start-btn').addEventListener('click', () => {
+    document.getElementById('instructions-dialog').style.display = 'none';
     introOpen = false;
     enemiesActive = true;
     gt = Date.now();
