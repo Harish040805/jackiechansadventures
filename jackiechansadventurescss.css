@@ -36,8 +36,10 @@ canvas { display: block; position: absolute; bottom: 100px; left: 0; width: 100v
 .hotkey-tag { position: absolute; bottom: -2px; right: 0px; background: rgba(0, 0, 0, 0.85); color: #ffd700; font-size: 9px; font-family: monospace; font-weight: bold; padding: 1px 3px; border-radius: 3px; border: 1px solid rgba(255, 215, 0, 0.4); pointer-events: none; line-height: 1; }
 .timer-tag { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: none; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 10px; font-family: monospace; font-weight: bold; padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, 0.4); pointer-events: none; line-height: 1; }
 .start-overlay-class { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); color: #fff; z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; }
-.start-game-class { padding: 14px 32px; font-size: 22px; cursor: pointer; background: #2e86de; border: none; border-radius: 8px; color: #fff; font-weight: bold; box-shadow: 0 4px 15px rgba(46, 134, 222, 0.5); transition: background-color 0.2s, transform 0.1s; }
+.start-game-class { padding: 10px 28px; font-size: 17px; cursor: pointer; background: #2e86de; border: none; border-radius: 8px; color: #fff; font-weight: bold; box-shadow: 0 4px 15px rgba(46, 134, 222, 0.5); transition: background-color 0.2s, transform 0.1s; }
 .start-game-class:hover { background-color: #3f94e9; transform: translateY(-2px); }
+.skip-game-class { padding: 10px 28px; font-size: 17px; cursor: pointer; background: transparent; border: 2px solid rgba(255,255,255,0.6); border-radius: 8px; color: #fff; font-weight: bold; transition: background-color 0.2s, transform 0.1s; }
+.skip-game-class:hover { background-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
 .coverimage { border-radius: 40px; max-width: 320px; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
 #controls-guide { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; padding: 14px 22px; max-width: 640px; font-size: 14px; line-height: 1.7; text-align: center; }
 .key-badge { background: #333; color: #ffd700; border: 1px solid #666; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
@@ -89,5 +91,3 @@ body.guest #p1-power-badge { background: rgba(185, 28, 28, 0.9); border-color: #
 body.guest #p2-power-badge { background: rgba(30, 64, 175, 0.9); border-color: #60a5fa; box-shadow: 0 0 12px rgba(96, 165, 250, 0.5); }
 body.guest #b2 { display: none !important; }
 .intro-btn-row { display: flex; justify-content: center; align-items: center; gap: 16px; }
-.skip-game-class { padding: 10px 28px; font-size: 17px; cursor: pointer; background: transparent; border: 2px solid rgba(255,255,255,0.6); border-radius: 8px; color: #fff; font-weight: bold; transition: background-color 0.2s, transform 0.1s; }
-.skip-game-class:hover { background-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
