@@ -11,7 +11,7 @@ canvas { display: block; position: absolute; bottom: 100px; left: 0; width: 100v
 hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25); }
 .b { display: flex; flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 6px 0; background-image: linear-gradient(#16C716, #19B319, #22A122); box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); gap: 40px; }
 .captainblackclass {position: absolute; right: -10px; top: 0px; width: 130px; height: 130px; border-radius: 50%; border: 4px solid #fff; object-fit: cover; box-shadow: 0 8px 20px rgba(0,0,0,0.4);}
-.coverimage { border: 2px solid #0088ff; border-radius: 40px; max-width: 320px; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
+.coverimage { border: 8px solid #0088ff; border-radius: 40px; max-width: 320px; box-shadow: 0 6px 20px rgba(0,0,0,0.6); }
 .game-board-new-class { background: rgba(255, 255, 255, 0.1); padding: 25px 40px; border-radius: 15px; border: 2px solid rgba(255, 255, 255, 0.2); font-size: 19px; text-align: left; line-height: 1.8; min-width: 360px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
 .gameover { font-size: 46px; text-shadow: 0 0 15px #2563eb; color: #60a5fa; }
 .hotkey-tag { position: absolute; bottom: -2px; right: 0px; background: rgba(0, 0, 0, 0.85); color: #ffd700; font-size: 9px; font-family: monospace; font-weight: bold; padding: 1px 3px; border-radius: 3px; border: 1px solid rgba(255, 215, 0, 0.4); pointer-events: none; line-height: 1; }
