@@ -42,7 +42,7 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .skip-game-class { padding: 10px 28px; font-size: 17px; cursor: pointer; background: transparent; border: 2px solid rgba(255,255,255,0.6); border-radius: 8px; color: #fff; font-weight: bold; transition: background-color 0.2s, transform 0.1s; }
 .skip-game-class:hover { background-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
 .timer-tag { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: none; background: rgba(0, 0, 0, 0.85); color: #fff; font-size: 10px; font-family: monospace; font-weight: bold; padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, 0.4); pointer-events: none; line-height: 1; }
-.tot-score { font-size: 26px; font-weight: bold; color: #60a5fa; }
+.tot-score { font-size: 26px; font-weight: bold; color: #fff; -webkit-text-stroke: 1px #2563eb; paint-order: stroke fill; }
 .tree { position: absolute; bottom: 0; width: 20px; height: 40px; background: #8d5524; }
 .tree::after { content: ''; position: absolute; bottom: 30px; left: -30px; width: 80px; height: 80px; background: #2ed573; clip-path: polygon(50% 5%, 95% 55%, 75% 53%, 97% 73%, 76% 73%, 100% 100%, 0% 100%, 22% 74%, 2% 75%, 23% 54%, 4% 56%); }
 .tree-group { display: inline-block; position: relative; width: 600px; height: 150px; }
@@ -63,6 +63,8 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 #intro-dialog {display:none; position:absolute; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.85); z-index:90; justify-content:center; align-items:center;}
 #instructions-dialog { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 90; justify-content: center; align-items: center; }
 #m { position: absolute; bottom: 100px; left: 0; width: 100vw; height: 350px; white-space: nowrap; will-change: transform; }
+#special-id { padding: 10px 28px; font-size: 17px; cursor: pointer; background: #2e86de; border: none; border-radius: 8px; color: #fff; font-weight: bold; box-shadow: 0 4px 15px rgba(46, 134, 222, 0.5); transition: background-color 0.2s, transform 0.1s; }
+#special-id:hover { background-color: #3f94e9; transform: translateY(-2px); }
 #t { position: absolute; bottom: 100px; left: 0; width: 100vw; height: 150px; white-space: nowrap; will-change: transform; }
 #grd { position: absolute; bottom: 60px; width: 100%; height: 40px; background: #26de81; z-index: 2; border-top: 3px solid #20bf6b; }
 #hp-m { position: absolute; top: 20px; right: 20px; font-size: 16px; font-weight: bold; color: #222; background: rgba(255, 255, 255, 0.94); padding: 10px 18px; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.25); z-index: 10; display: flex; align-items: center; gap: 15px; }
