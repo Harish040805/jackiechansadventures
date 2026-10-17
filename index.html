@@ -242,7 +242,6 @@ const character = {
     invisible: false,
     light: false
 };
-
 const character2 = {
     playerNum: 2,
     name: "P2 (Red)",
@@ -278,11 +277,9 @@ const character2 = {
     invisible: false,
     light: false
 };
-
 let lastMagicLaserTime = 0;
 let dt = 1;
 let lastFrameTime = performance.now();
-
 function initBg() {
     m.innerHTML = '';
     t.innerHTML = '';
@@ -303,12 +300,10 @@ function initBg() {
     }
 }
 initBg();
-
 function calcScore() {
     const meters = Math.floor(dist);
     return meters > 0 ? Math.round(((sgk * 100) + (ek * 150)) / meters) : ((sgk * 100) + (ek * 150));
 }
-
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
@@ -321,7 +316,6 @@ function updateScoreUI(force = false) {
     if (hudEs) hudEs.textContent = ek * 150;
     if (hudDc) hudDc.textContent = currentDist;
 }
-
 function updateHpBar(barEl, val) {
     if (!barEl) return;
     const clamped = Math.max(0, Math.min(100, val));
@@ -334,7 +328,6 @@ function updateHpBar(barEl, val) {
         barEl.style.backgroundColor = '#e84118';
     }
 }
-
 function showChiBanner(msg) {
     chiBanner.textContent = msg;
     chiBanner.style.opacity = '1';
@@ -342,7 +335,6 @@ function showChiBanner(msg) {
         chiBanner.style.opacity = '0';
     }, 1400);
 }
-
 function addFloatText(text, x, y, color = '#2ed573', size = 18) {
     floatTexts.push({
         text: text,
@@ -354,7 +346,6 @@ function addFloatText(text, x, y, color = '#2ed573', size = 18) {
         size: size
     });
 }
-
 function addSparks(x, y, color = '#ffcc00', count = 8) {
     for (let i = 0; i < count; i++) {
         const ang = Math.random() * Math.PI * 2;
@@ -371,7 +362,6 @@ function addSparks(x, y, color = '#ffcc00', count = 8) {
         });
     }
 }
-
 function addHealingParticles(targetChr) {
     for (let i = 0; i < 5; i++) {
         const offsetX = (Math.random() - 0.5) * 40;
@@ -388,17 +378,13 @@ function addHealingParticles(targetChr) {
         });
     }
 }
-
 function StartOverlay({ onStart }) {
     const [visible, setVisible] = React.useState(true); 
-  
     if (!visible) return null; 
-  
     const handleStart = () => {
         setVisible(false); 
         onStart(); 
     }; 
-    
     return (
         <div id="start-overlay" className="start-overlay-class"> 
             <img src="https://github.com/Harish040805/jackiechansadventures/blob/main/jackiechancoverpage.jpg?raw=true" className="coverimage" alt="Jackie Chan Adventures" />
@@ -406,10 +392,8 @@ function StartOverlay({ onStart }) {
         </div>
     );
 }
-
 const reactStartRoot = ReactDOM.createRoot(document.getElementById('react-start-root'));
 reactStartRoot.render(<StartOverlay onStart={startGame} />);
-
 let gt = 0;
 let nextSpawnAt = 0;
 function resetGameState() {
@@ -484,7 +468,6 @@ function triggerGameOver() {
     }
     keysP1.left = keysP1.right = keysP1.up = keysP1.down = false;
     keysP2.left = keysP2.right = keysP2.up = keysP2.down = false;
-    
     document.getElementById('go-sgk').textContent = sgk;
     document.getElementById('go-ek').textContent = ek;
     document.getElementById('go-sgs').textContent = sgk * 100;
@@ -493,15 +476,12 @@ function triggerGameOver() {
     goSc.textContent = calcScore();
     goEl.style.display = 'flex';
 }
-
 function dmg(amount, targetP) {
     if (!gameStarted || isGameOver) return;
     if (targetP.isDogImmortal || targetP.isRatActive) return;
-
     const finalDmg = targetP.giant ? Math.ceil(amount * 0.5) : amount;
     addSparks(targetP.x, canvas.height - targetP.y - 35, '#ff4757', 6);
     addFloatText(`-${finalDmg}`, targetP.x, canvas.height - targetP.y - 50, '#ff4757', 16);
-
     if (targetP === character && hp > 0) {
         hp = Math.max(0, hp - finalDmg);
         hpV.textContent = Math.round(hp);
@@ -513,7 +493,6 @@ function dmg(amount, targetP) {
         updateHpBar(hp2Bar, hp2);
         if (hp2 <= 0) character2.invisible = true;
     }
-
     if (isSplit) {
         if (hp <= 0 && hp2 <= 0) {
             triggerGameOver();
@@ -524,7 +503,6 @@ function dmg(amount, targetP) {
         }
     }
 }
-
 function healPlayer(chr, amount) {
     if (chr.playerNum === 1) {
         if (hp < 100) {
@@ -546,14 +524,12 @@ function healPlayer(chr, amount) {
     chr.light = true;
     setTimeout(() => { chr.light = false; }, 400);
 }
-
 function spawnE() {
     if (!gameStarted || isGameOver) return;
     const isFly = Math.random() > 0.45;
     const startX = window.innerWidth + 80 + (Math.random() * 160);
     const startY = isFly ? Math.random() * 180 + 130 : 0;
     const baseSpeed = Math.random() * 1.2 + 2.4;
-
     ems.push({
         x: startX,
         y: startY,
@@ -568,7 +544,6 @@ function spawnE() {
         anim: Math.random() * 10
     });
 }
-
 function getTalismanDisplayName(name) {
     switch (name) {
         case 'dog': return '🐕 Dog (Invulnerable)';
@@ -588,13 +563,11 @@ function getTalismanDisplayName(name) {
         default: return 'Active';
     }
 }
-
 function updatePlayerTalismanUI(chr) {
     const pN = chr.playerNum;
     const bI = (pN === 1) !== isGuest ? 'b1' : 'b2';
     const bE = document.getElementById(pN === 1 ? 'p1-power-badge' : 'p2-power-badge');
     const tE = document.getElementById(pN === 1 ? 'p1-power-text' : 'p2-power-text');
-
     document.querySelectorAll(`#${bI} .o, #${bI} .pf, #${bI} .sl`).forEach(e => {
         const t = e.getAttribute('data-t');
         if (chr.activeTalismans && chr.activeTalismans[t]) {
@@ -603,7 +576,6 @@ function updatePlayerTalismanUI(chr) {
             e.classList.remove('active-talisman');
         }
     });
-
     const activeList = Object.keys(chr.activeTalismans || {});
     if (activeList.length > 0) {
         if (bE && tE) {
@@ -614,7 +586,6 @@ function updatePlayerTalismanUI(chr) {
         if (bE) bE.style.display = 'none';
     }
 }
-
 function clearTalismanForPlayer(chr) {
     if (chr.activeTalismans) {
         Object.keys(chr.activeTalismans).forEach(t => {
@@ -635,18 +606,14 @@ function clearTalismanForPlayer(chr) {
     chr.invisible = false;
     chr.speed = chr.baseSpeed;
     chr.light = false;
-
     updatePlayerTalismanUI(chr);
 }
-
 function startPlayerTimer(chr, tName, sec, onExpire) {
     if (!chr.activeTalismans) chr.activeTalismans = {};
     if (!chr.talismanEnds) chr.talismanEnds = {};
     if (chr.activeTalismans[tName]) clearInterval(chr.activeTalismans[tName]);
-
     chr.talismanEnds[tName] = Date.now() + sec * 1000;
     updatePlayerTalismanUI(chr);
-
     chr.activeTalismans[tName] = setTimeout(() => {
         delete chr.activeTalismans[tName];
         delete chr.talismanEnds[tName];
@@ -654,14 +621,12 @@ function startPlayerTimer(chr, tName, sec, onExpire) {
         updatePlayerTalismanUI(chr);
     }, sec * 1000);
 }
-
 function updateTalismanTimers(chr) {
     const bI = (chr.playerNum === 1) !== isGuest ? 'b1' : 'b2';
     const tE = document.getElementById(chr.playerNum === 1 ? 'p1-power-text' : 'p2-power-text');
     const now = Date.now();
     const ends = chr.talismanEnds || {};
     const active = chr.activeTalismans || {};
-
     document.querySelectorAll(`#${bI} .timer-tag`).forEach(tag => {
         const t = tag.parentElement.getAttribute('data-t');
         if (active[t] && ends[t]) {
@@ -671,7 +636,6 @@ function updateTalismanTimers(chr) {
             tag.style.display = 'none';
         }
     });
-
     const list = Object.keys(active);
     if (tE && list.length > 0) {
         tE.textContent = list.map(t => {
@@ -680,21 +644,17 @@ function updateTalismanTimers(chr) {
         }).join(' + ');
     }
 }
-
 function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     const now = Date.now();
     if (now - lastMagicLaserTime < 400) return;
     lastMagicLaserTime = now;
-
     showChiBanner(incantation);
     addFloatText(incantation, caster.x, canvas.height - caster.y - 75, beamColor, 18);
-
     const startX = caster.x;
     const startY = canvas.height - caster.y - 35;
     const facing = caster.facing >= 0 ? 1 : -1;
     const endX = facing > 0 ? canvas.width + 120 : -120;
     const endY = startY;
-
     magicBeams.push({
         startX: startX,
         startY: startY,
@@ -705,15 +665,12 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
         duration: 20,
         maxDuration: 20
     });
-
     addSparks(startX, startY, beamColor, 12);
-
     for (let j = ems.length - 1; j >= 0; j--) {
         const e = ems[j];
         const ey = canvas.height - e.y - 35;
         const inFront = facing > 0 ? (e.x >= startX - 25) : (e.x <= startX + 25);
         const verticalDist = Math.abs(ey - startY);
-
         if (inFront && verticalDist < (e.height * 0.5 + 24)) {
             addSparks(e.x, ey, beamColor, 15);
             addFloatText("+150", e.x, ey - 15, '#ffd700', 18);
@@ -722,7 +679,6 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
             updateScoreUI(true);
         }
     }
-
     for (let j = arws.length - 1; j >= 0; j--) {
         const a = arws[j];
         const inFront = facing > 0 ? (a.x >= startX - 25) : (a.x <= startX + 25);
@@ -733,18 +689,15 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
         }
     }
 }
-
 function switchTalismanForPlayer(chr, name) {
     if (!gameStarted || isGameOver) return;
     const pNum = chr.playerNum;
     if (pNum === 1 && hp <= 0) return;
     if (pNum === 2 && hp2 <= 0) return;
-
     if (name === 'horse') {
         healPlayer(chr, 20);
         return;
     }
-
     if (name === 'pufferfish') {
         const s = new SpeechSynthesisUtterance("Yoo Mo Guaai Guaai Fai Dee Zaa!");
         window.speechSynthesis.speak(s);
@@ -757,18 +710,14 @@ function switchTalismanForPlayer(chr, name) {
         fireStraightLaser(chr, "Magic must defeat magic!", '#00ff88');
         return;
     }
-
     if (name === 'tiger') {
         toggleTigerSplit();
         return;
     }
-
 if (!chr.activeTalismans) chr.activeTalismans = {};
-
     if (chr.activeTalismans[name]) {
         if (typeof chr.activeTalismans[name] !== 'boolean') clearInterval(chr.activeTalismans[name]);
         delete chr.activeTalismans[name];
-
         if (name === 'dog') chr.isDogImmortal = false;
         if (name === 'dragon') chr.isDragonShooting = false;
         if (name === 'monkey') chr.isShadowGuard = false;
@@ -779,58 +728,48 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
         if (name === 'rooster') chr.isFlying = false;
         if (name === 'sheep') chr.isAstral = false;
         if (name === 'snake') chr.invisible = false;
-
         addFloatText("Talisman Off", chr.x, canvas.height - chr.y - 60, '#ddd', 16);
         updatePlayerTalismanUI(chr);
         return;
     }
-
     addSparks(chr.x, canvas.height - chr.y - 35, '#ffd700', 12);
     addFloatText(`${getTalismanDisplayName(name).split(' ')[0]} Active!`, chr.x, canvas.height - chr.y - 65, '#ffd700', 18);
-
     switch (name) {
         case 'dog':
             chr.isDogImmortal = true;
             chr.activeTalismans['dog'] = true;
             startPlayerTimer(chr, 'dog', 10, () => { chr.isDogImmortal = false; });
             break;
-
         case 'dragon':
             chr.isDragonShooting = true;
             chr.activeTalismans['dragon'] = true;
             updatePlayerTalismanUI(chr);
             break;
-
         case 'monkey':
             chr.isShadowGuard = true;
             chr.activeTalismans['monkey'] = true;
             startPlayerTimer(chr, 'monkey', 10, () => { chr.isShadowGuard = false; });
             break;
-
         case 'rat':
             chr.isRatActive = true;
             chr.activeTalismans['rat'] = true;
             startPlayerTimer(chr, 'rat', 10, () => { chr.isRatActive = false; });
             break;
-
         case 'rabbit':
             chr.speed = 9.0;
             chr.activeTalismans['rabbit'] = true;
             startPlayerTimer(chr, 'rabbit', 10, () => { chr.speed = chr.baseSpeed; });
             break;
-
         case 'pig':
             chr.isPigLaserActive = true;
             chr.activeTalismans['pig'] = true;
             startPlayerTimer(chr, 'pig', 12, () => { chr.isPigLaserActive = false; });
             break;
-
         case 'ox':
             chr.giant = true;
             chr.activeTalismans['ox'] = true;
             updatePlayerTalismanUI(chr);
             break;
-
         case 'rooster':
             chr.isFlying = true;
             chr.activeTalismans['rooster'] = true;
@@ -838,13 +777,11 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
                 chr.isFlying = false;
             });
             break;
-
         case 'sheep':
             chr.isAstral = true;
             chr.activeTalismans['sheep'] = true;
             startPlayerTimer(chr, 'sheep', 12, () => { chr.isAstral = false; });
             break;
-
         case 'snake':
             chr.invisible = true;
             chr.activeTalismans['snake'] = true;
@@ -852,7 +789,6 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
             break;
     }
 }
-
 function toggleTigerSplit() {
     if (!isSplit) {
         isSplit = true;
@@ -876,21 +812,17 @@ function toggleTigerSplit() {
         addFloatText("Single Player Mode", character.x, canvas.height - character.y - 65, '#2563eb', 18);
     }
 }
-
 let hipCount = 0;
 let hipTimer = null;
-
 function sayHip() {
     hipCount++;
     clearTimeout(hipTimer);
     hipTimer = setTimeout(() => { hipCount = 0; }, 2000);
-
     let text = "hip!";
     if (hipCount >= 4) {
         text = "hip hip! hip hip!";
         hipCount = 0;
     }
-
     window.speechSynthesis.cancel();
     const s = new SpeechSynthesisUtterance(text);
     s.rate = 1.4;
@@ -898,7 +830,6 @@ function sayHip() {
     s.volume = 1;
     window.speechSynthesis.speak(s);
 }
-
 window.addEventListener('keydown', (e) => {
     if (!gameStarted || isGameOver || introOpen) return;
     if (e.target && e.target.tagName === 'INPUT') return;
@@ -936,17 +867,14 @@ window.addEventListener('keydown', (e) => {
         switchTalismanForPlayer(character, hotkeyMapP1[e.key]);
     }
 });
-
 window.addEventListener('keyup', (e) => {
     const dir = moveKey(e);
     if (dir) keysP1[dir] = false;
 });
-
 window.addEventListener('mousemove', (e) => {
     mx = e.clientX;
     my = e.clientY;
 });
-
 window.addEventListener('click', (e) => {
     if (!gameStarted || isGameOver || introOpen) return;
     if (e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go') || e.target.closest('#intro-dialog')) return;
@@ -957,7 +885,6 @@ window.addEventListener('click', (e) => {
         shootDragonFireball(character2);
     }
 });
-
 function shootDragonFireball(chr) {
     const mx = aimPt(chr).x, my = aimPt(chr).y;
     const sx = chr.x;
@@ -966,7 +893,6 @@ function shootDragonFireball(chr) {
     const dy = my - sy;
     const len = Math.hypot(dx, dy) || 1;
     const spd = 14;
-
     fbs.push({
         x: sx,
         y: sy,
@@ -976,7 +902,6 @@ function shootDragonFireball(chr) {
     });
     addSparks(sx, sy, '#ff9f43', 6);
 }
-
 function setupButtonHandlers() {
     document.querySelectorAll('.o, .pf, .sl').forEach(btn => {
         const timerTag = document.createElement('span');
@@ -993,12 +918,10 @@ function setupButtonHandlers() {
     });
 }
 setupButtonHandlers();
-
 function updatePlayer(chr, keysState, playerNum) {
     if (isGameOver || !gameStarted) return;
     if (playerNum === 1 && hp <= 0) return;
     if (playerNum === 2 && hp2 <= 0) return;
-
         if (keysState.left) {
         chr.vx -= chr.acceleration * dt;
         if (chr.vx < -chr.speed) chr.vx = -chr.speed;
@@ -1011,9 +934,7 @@ function updatePlayer(chr, keysState, playerNum) {
         chr.vx *= Math.pow(chr.friction, dt);
         if (Math.abs(chr.vx) < 0.05) chr.vx = 0;
     }
-
     chr.x += chr.vx * dt;
-
     const groundLevel = 0;
     if (chr.isFlying) {
         if (keysState.up) chr.y += 8 * dt;
@@ -1033,7 +954,6 @@ function updatePlayer(chr, keysState, playerNum) {
             chr.isJumping = false;
         }
     }
-
     chr.squish += (1 - chr.squish) * 0.15;
     if (Math.abs(chr.vx) > 0.2 && !chr.isJumping && !chr.isFlying) {
         chr.walkCycle += Math.abs(chr.vx) * chr.strideFrequency * dt;
@@ -1041,14 +961,12 @@ function updatePlayer(chr, keysState, playerNum) {
         chr.walkCycle = 0;
     }
 }
-
 let smoothLeftLegAngle = 0, smoothRightLegAngle = 0;
 let smoothLeftArmAngle = 0, smoothRightArmAngle = 0;
 let smoothLeftLegAngle2 = 0, smoothRightLegAngle2 = 0;
 let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
 const ARROW_SPEED = 7.5;
 const AIM_ERROR = 0;
-
 function futureY(chr, keys, t) {
     if (chr.isFlying) {
         const vyFly = (keys.up ? 8 : 0) - (keys.down ? 8 : 0);
@@ -1057,7 +975,6 @@ function futureY(chr, keys, t) {
     if (chr.y <= 0 && chr.vy <= 0) return 0;
     return Math.max(0, chr.y + chr.vy * t - 0.5 * chr.gravity * t * t);
 }
-
 function aimArrow(sx, sy, chr, spd) {
     const keys = chr.playerNum === 1 ? keysP1 : keysP2;
     const cx = chr.x;
@@ -1074,7 +991,6 @@ function aimArrow(sx, sy, chr, spd) {
     if (AIM_ERROR > 0) ang += (Math.random() - 0.5) * 2 * AIM_ERROR;
     return { vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, ang: ang };
 }
-
 function u() {
     const frameNow = performance.now();
     dt = Math.min((frameNow - lastFrameTime) / 16.667, 3);
@@ -1087,13 +1003,10 @@ function u() {
         if (isSplit) {
             updatePlayer(character2, keysP2, 2);
         }
-
         if (character.x < 35) character.x = 35;
         if (isSplit && character2.x < 35) character2.x = 35;
-
         let scroll = 0;
         const scrollMargin = canvas.width * 0.30;
-
         if (!isSplit) {
             if (character.x > scrollMargin && keysP1.right) {
                 scroll = character.x - scrollMargin;
@@ -1103,7 +1016,6 @@ function u() {
             const p1Alive = hp > 0;
             const p2Alive = hp2 > 0;
             let leadingX = 0;
-
             if (p1Alive && p2Alive) {
                 leadingX = Math.max(character.x, character2.x);
             } else if (p1Alive) {
@@ -1111,7 +1023,6 @@ function u() {
             } else if (p2Alive) {
                 leadingX = character2.x;
             }
-
             if (leadingX > scrollMargin) {
                 let desiredScroll = leadingX - scrollMargin;
                 if (p1Alive && p2Alive) {
@@ -1119,7 +1030,6 @@ function u() {
                     const maxAllowedScroll = trailingX - 35;
                     desiredScroll = Math.max(0, Math.min(desiredScroll, maxAllowedScroll));
                 }
-
                 if (desiredScroll > 0) {
                     scroll = desiredScroll;
                     if (p1Alive) character.x -= scroll;
@@ -1127,41 +1037,32 @@ function u() {
                 }
             }
         }
-
         if (character.x > canvas.width - 35) character.x = canvas.width - 35;
         if (isSplit && character2.x > canvas.width - 35) character2.x = canvas.width - 35;
-
         if (scroll > 0 || Math.abs(character.vx) > 0) {
             b -= scroll;
             dist += (scroll > 0 ? scroll : Math.abs(character.vx) * dt) * 0.05;
             updateScoreUI();
         }
-
         m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
         t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
-
         const now = Date.now();
-
         for (let i = ems.length - 1; i >= 0; i--) {
             const e = ems[i];
             e.spd = e.baseSpd;
             e.x -= (e.spd * dt + scroll);
             e.anim += 0.1 * dt;
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
-
             const enemyScreenY = canvas.height - e.y - 35;
-
             if (e.hitCooldown <= 0) {
                 const p1CenterY = canvas.height - character.y - 35;
                 const hitP1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
                               Math.abs(character.x - e.x) < (character.giant ? 45 : 30) &&
                               Math.abs(p1CenterY - enemyScreenY) < 35;
-
                 const p2CenterY = canvas.height - character2.y - 35;
                 const hitP2 = isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0 &&
                               Math.abs(character2.x - e.x) < (character2.giant ? 45 : 30) &&
                               Math.abs(p2CenterY - enemyScreenY) < 35;
-
                 if (hitP1) {
                     dmg(6, character);
                     e.hitCooldown = 50;
@@ -1180,7 +1081,6 @@ const targetChr = validTargets.reduce((best, c) =>
 const sx = e.x;
 const sy = enemyScreenY;
 const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
-
 arws.push({
     x: sx,
     y: sy,
@@ -1189,12 +1089,10 @@ arws.push({
     ang: aim.ang
 });
             }
-
             if (e.x < -150) {
                 ems.splice(i, 1);
             }
         }
-
         for (let i = arws.length - 1; i >= 0; i--) {
             const a = arws[i];
             a.x += (a.vx * dt - scroll);
@@ -1218,7 +1116,6 @@ arws.push({
                 arws.splice(i, 1);
             }
         }
-
         for (let i = fbs.length - 1; i >= 0; i--) {
             const f = fbs[i];
             f.x += f.vx * dt;
@@ -1241,7 +1138,6 @@ arws.push({
                 fbs.splice(i, 1);
             }
         }
-
         const checkLaserHits = (chr) => {
             const mx = aimPt(chr).x, my = aimPt(chr).y;
             const ex = chr.x;
@@ -1264,7 +1160,6 @@ arws.push({
                 }
             }
         };
-
         if (character.isPigLaserActive && hp > 0) {
             checkLaserHits(character);
         }
@@ -1272,9 +1167,7 @@ arws.push({
             checkLaserHits(character2);
         }
     }
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     if (character.isRatActive && hp > 0) {
         ctx.save();
         ctx.font = '32px sans-serif';
@@ -1291,7 +1184,6 @@ arws.push({
         ctx.fillText('🌳 🌳', character2.x + 55, canvas.height - character2.y - 35);
         ctx.restore();
     }
-
     const drawPigLaser = (chr) => {
         const mx = aimPt(chr).x, my = aimPt(chr).y;
         const ex = chr.x;
@@ -1315,19 +1207,16 @@ arws.push({
         ctx.stroke();
         ctx.restore();
     };
-
     if (character.isPigLaserActive && hp > 0) {
         drawPigLaser(character);
     }
     if (isSplit && character2.isPigLaserActive && hp2 > 0) {
         drawPigLaser(character2);
     }
-
     for (let i = magicBeams.length - 1; i >= 0; i--) {
         const b = magicBeams[i];
         const progress = b.duration / b.maxDuration;
         const alpha = Math.min(1, progress * 1.5);
-
         ctx.save();
         ctx.globalAlpha = alpha;
         ctx.shadowBlur = 24;
@@ -1361,13 +1250,11 @@ arws.push({
         ctx.arc(b.startX, b.startY, 8 * progress, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
-
         b.duration -= dt;
         if (b.duration <= 0) {
             magicBeams.splice(i, 1);
         }
     }
-
     for (const a of arws) {
         ctx.save();
         ctx.translate(a.x, a.y);
@@ -1383,7 +1270,6 @@ arws.push({
         ctx.fill();
         ctx.restore();
     }
-
     for (const f of fbs) {
         ctx.save();
         ctx.translate(f.x, f.y);
@@ -1400,12 +1286,10 @@ arws.push({
         ctx.fill();
         ctx.restore();
     }
-
     for (const e of ems) {
         ctx.save();
         const ey = canvas.height - e.y - 20;
         ctx.translate(e.x, ey);
-
         if (e.fly) {
             const wingFlap = Math.sin(e.anim * 6) * 4;
             ctx.font = '34px sans-serif';
@@ -1420,25 +1304,21 @@ arws.push({
         }
         ctx.restore();
     }
-
     if ((!character.invisible || character.activeTalisman === 'snake') && hp > 0) {
         drawHuman(character, isGuest ? "Partner" : "Me");
     }
     if (isSplit && (!character2.invisible || character2.activeTalisman === 'snake') && hp2 > 0) {
         drawHuman(character2, isGuest ? "Me" : "Partner");
     }
-
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
         p.alpha -= p.decay * dt;
-
         if (p.alpha <= 0) {
             particles.splice(i, 1);
             continue;
         }
-
         ctx.save();
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
@@ -1451,17 +1331,14 @@ arws.push({
         ctx.fill();
         ctx.restore();
     }
-
     for (let i = floatTexts.length - 1; i >= 0; i--) {
         const ft = floatTexts[i];
         ft.y += ft.vy * dt;
         ft.opacity -= 0.022 * dt;
-
         if (ft.opacity <= 0) {
             floatTexts.splice(i, 1);
             continue;
         }
-
         ctx.save();
         ctx.globalAlpha = ft.opacity;
         ctx.font = `bold ${ft.size}px 'Segoe UI', sans-serif`;
@@ -1472,11 +1349,9 @@ arws.push({
         ctx.fillText(ft.text, ft.x, ft.y);
         ctx.restore();
     }
-
     requestAnimationFrame(u);
 }
 requestAnimationFrame(u);
-
 function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType) {
     ctx.save();
     ctx.translate(x, y);
@@ -1507,7 +1382,6 @@ function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType) {
     }
     ctx.restore();
 }
-
 function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.save();
     ctx.translate(cx, cy);
@@ -1665,7 +1539,6 @@ function drawHuman(chr, label) {
     const breathe = Math.sin(performance.now() / 500 + chr.playerNum * 2) * 1.2 * (1 - mb);
     const bob = -Math.abs(Math.sin(t)) * 4 * mb;
     let lean = 0.10 * mb;
-
     let hipF, kneeF, hipB, kneeB, shF, elF, shB, elB;
     if (chr.isFlying) {
         lean = 0.5;
