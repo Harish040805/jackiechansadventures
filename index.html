@@ -442,18 +442,22 @@ function startGame() {
     startBtn.style.cursor = 'not-allowed';
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(document.getElementById('intro-speech-text').textContent);
-    utter.onend = () => {
+    const enableNext = () => {
         startBtn.disabled = false;
         startBtn.style.opacity = '1';
         startBtn.style.cursor = 'pointer';
     };
+    utter.onend = enableNext;
+    utter.onerror = enableNext;
     window.speechSynthesis.speak(utter);
 }
-document.getElementById('intro-start-btn').addEventListener('click', () => {
+function showInstructions() {
     window.speechSynthesis.cancel();
     document.getElementById('intro-dialog').style.display = 'none';
     document.getElementById('instructions-dialog').style.display = 'flex';
-});
+}
+document.getElementById('intro-start-btn').addEventListener('click', showInstructions);
+document.getElementById('intro-skip-btn').addEventListener('click', showInstructions);
 document.getElementById('instructions-start-btn').addEventListener('click', () => {
     document.getElementById('instructions-dialog').style.display = 'none';
     introOpen = false;
