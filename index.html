@@ -299,10 +299,7 @@ function initBg() {
     }
 }
 initBg();
-function calcScore(sgk, ek, dist) {
-    const meters = Math.ceil(dist);
-    return Math.ceil(Math.ceil(sgk * 1) + Math.ceil(ek * 1.5) + meters);
-}
+const calcScore = () => sgk * 100 + ek * 150 - Math.ceil(dist);
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
