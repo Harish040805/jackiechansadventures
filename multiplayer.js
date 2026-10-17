@@ -1,18 +1,31 @@
+/* ============================================================
+   Jackie Chan's Adventures - Online 2-Client Layer
+   Load with:  <script type="text/babel" src="multiplayer.js"></script>
+   (after the main game script, and after the PeerJS <script> tag)
+
+   Model: HOST = the person who loaded the game (P1, Blue). The host
+   runs the whole simulation exactly as before. The GUEST (P2, Red)
+   only sends inputs and renders the state snapshots the host streams.
+   ============================================================ */
 (function () {
   'use strict';
+
   const PREFIX = 'jca-';
   const ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const rid = () => Array.from({ length: 6 }, () => ALPHA[Math.floor(Math.random() * ALPHA.length)]).join('');
   const GUEST_TALISMANS = ['dog', 'dragon', 'horse', 'monkey', 'rat', 'rabbit', 'pig', 'ox', 'rooster', 'sheep', 'snake'];
-  let sessionId = rid();
+
+  let sessionId = rid();            // random session ID, created on every load
   let peer = null, peerReady = false;
-  let guestConn = null;
-  let hostConn = null;
+  let guestConn = null;             // host side: the single allowed guest
+  let hostConn = null;              // guest side: connection to host
   let currentHost = '';
   let pendingJoin = null, joinTimer = null, lastSplit = false, lostShown = false;
   let snapTimer = null, inTimer = null;
   const fxQ = [];
   const gk = { l: false, r: false, u: false, d: false };
+
+  /* ---------------- UI ---------------- */
   const style = document.createElement('style');
   style.textContent = `
   #mp-panel{position:fixed;left:20px;top:150px;z-index:200;background:rgba(0,0,0,.8);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
@@ -28,6 +41,7 @@
   #mp-lost{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.9);color:#fff;display:flex;flex-direction:column;gap:16px;justify-content:center;align-items:center;font:22px 'Segoe UI',sans-serif}
   #mp-lost button{font-size:20px;padding:10px 24px;border:0;border-radius:8px;background:#2e86de;color:#fff;cursor:pointer;font-weight:bold}`;
   document.head.appendChild(style);
+
   const panel = document.createElement('div');
   panel.id = 'mp-panel';
   panel.innerHTML = `
@@ -52,6 +66,7 @@
     (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(
       () => setMsg('Link copied!'), () => setMsg(link));
   });
+
   function refresh() {
     $('mp-id').textContent = sessionId;
     let s;
@@ -62,6 +77,8 @@
     else s = '🔒 Locked — activate the 🐅 Tiger talisman to let a friend join.';
     $('mp-state').textContent = s;
   }
+
+  /* ---------------- Peer / session ---------------- */
   function createPeer() {
     if (typeof Peer === 'undefined') { $('mp-state').textContent = '⚠️ PeerJS failed to load (online play unavailable)'; return; }
     peer = new Peer(PREFIX + sessionId, { debug: 0 });
@@ -77,6 +94,8 @@
     peer.on('disconnected', () => { try { peer.reconnect(); } catch (e) {} });
     peer.on('connection', onIncoming);
   }
+
+  /* ---------------- HOST side ---------------- */
   function onIncoming(conn) {
     conn.on('open', () => {
       let reason = null;
@@ -101,6 +120,7 @@
     conn.on('close', () => { if (conn === guestConn) dropGuest('Player 2 left the game'); });
     conn.on('error', () => { if (conn === guestConn) dropGuest('Player 2 connection lost'); });
   }
+
   function dropGuest(msg) {
     guestConn = null; remoteP2 = false;
     document.body.classList.remove('remote-p2');
@@ -115,6 +135,7 @@
     dropGuest(reason);
     setTimeout(() => { try { c.close(); } catch (e) {} }, 400);
   }
+
   function onGuestMsg(d) {
     if (!d || isGameOver) return;
     if (d.t === 'in') {
@@ -133,6 +154,7 @@
       if (isSplit && character2.isDragonShooting && hp2 > 0) shootDragonFireball(character2);
     }
   }
+
   const r1 = n => Math.round(n * 10) / 10;
   function packChar(c) {
     const now = Date.now(), act = Object.keys(c.activeTalismans || {}), en = {};
@@ -159,11 +181,15 @@
       });
     } catch (e) {}
   }
+
+  // Forward visual effects (sparks / floating text / banners) to the guest
   const _sp = addSparks, _ft = addFloatText, _bn = showChiBanner;
   const fxOn = () => guestConn && guestConn.open && !isGuest && fxQ.length < 150;
   addSparks = function (x, y, c, n) { _sp(x, y, c, n); if (fxOn()) fxQ.push(['s', r1(x), r1(y), c, n]); };
   addFloatText = function (tx, x, y, c, s) { _ft(tx, x, y, c, s); if (fxOn()) fxQ.push(['f', tx, r1(x), r1(y), c, s]); };
   showChiBanner = function (msg) { _bn(msg); if (fxOn()) fxQ.push(['b', msg]); };
+
+  /* ---------------- GUEST side ---------------- */
   function joinSession(raw) {
     if (isGuest || (gameStarted && !isGuest)) return;
     let id = (raw || '').trim();
@@ -190,6 +216,7 @@
     });
     conn.on('error', () => { if (isGuest) showLost('Connection lost'); });
   }
+
   function becomeGuest() {
     isGuest = true; gameStarted = true; isSplit = true; introOpen = false; enemiesActive = false;
     document.body.classList.add('guest');
@@ -200,6 +227,7 @@
     refresh();
     inTimer = setInterval(sendIn, 33);
   }
+
   function showLost(msg) {
     if (lostShown) return; lostShown = true;
     clearInterval(inTimer);
@@ -209,6 +237,7 @@
     d.querySelector('button').onclick = () => { location.href = location.href.split('?')[0]; };
     document.body.appendChild(d);
   }
+
   function applyChar(c, s) {
     c.x = s.x; c.y = s.y; c.vx = s.vx; c.facing = s.f; c.walkCycle = s.w; c.isJumping = s.j;
     c.isFlying = s.fl; c.giant = s.g; c.isDogImmortal = s.d; c.isAstral = s.a; c.invisible = s.inv;
@@ -224,6 +253,7 @@
     s.act.forEach(k => { if (s.en[k] != null) c.talismanEnds[k] = now + s.en[k]; });
     updateTalismanTimers(c);
   }
+
   function applySnap(s) {
     if (canvas.width !== s.W) canvas.width = s.W;
     if (canvas.height !== s.H) canvas.height = s.H;
@@ -238,7 +268,7 @@
     arws = s.a.map(a => ({ x: a[0], y: a[1], ang: a[2] }));
     fbs = s.f.map(a => ({ x: a[0], y: a[1], radius: 10 }));
     magicBeams = s.mb;
-    gAimX = s.ax; gAimY = s.ay;
+    gAimX = s.ax; gAimY = s.ay;   // on the guest this is the HOST's aim (for P1's pig laser)
     s.fx.forEach(f => {
       if (f[0] === 's') _sp(f[1], f[2], f[3] || undefined, f[4] || undefined);
       else if (f[0] === 'f') _ft(f[1], f[2], f[3], f[4] || undefined, f[5] || undefined);
@@ -246,6 +276,7 @@
     });
     if (s.over && !isGameOver) triggerGameOver();
   }
+
   function sendIn() {
     if (!hostConn || !hostConn.open) return;
     try { hostConn.send({ t: 'in', l: gk.l, r: gk.r, u: gk.u, d: gk.d, ax: Math.round(mx), ay: Math.round(my) }); } catch (e) {}
@@ -259,8 +290,11 @@
     mx = e.clientX * canvas.width / Math.max(1, window.innerWidth);
     my = e.clientY * canvas.height / Math.max(1, window.innerHeight - 100);
   };
+
+  /* ---------------- Input interception (capture phase) ---------------- */
   const KM = { ArrowLeft: 'l', a: 'l', A: 'l', ArrowRight: 'r', d: 'r', D: 'r', ArrowUp: 'u', w: 'u', W: 'u', ArrowDown: 'd', s: 'd', S: 'd' };
   const hostBlocked = k => k.length === 1 && 'adwseADWSE'.indexOf(k) >= 0;
+
   window.addEventListener('keydown', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (isGuest) {
@@ -273,6 +307,7 @@
       e.stopImmediatePropagation();
     } else if (remoteP2 && hostBlocked(e.key)) e.stopImmediatePropagation();
   }, true);
+
   window.addEventListener('keyup', e => {
     if (e.target && e.target.tagName === 'INPUT') return;
     if (isGuest) {
@@ -281,13 +316,16 @@
       e.stopImmediatePropagation();
     } else if (remoteP2 && hostBlocked(e.key)) e.stopImmediatePropagation();
   }, true);
+
   window.addEventListener('blur', () => {
     if (isGuest) { gk.l = gk.r = gk.u = gk.d = false; sendIn(); }
   });
+
   window.addEventListener('mousemove', e => {
     if (!isGuest) return;
     toBuf(e); e.stopImmediatePropagation();
   }, true);
+
   window.addEventListener('click', e => {
     if (!isGuest) return;
     if (e.target.closest('#go,#mp-panel,#mp-lost')) return;
@@ -305,6 +343,8 @@
     toBuf(e);
     hostConn.send({ t: 'click', ax: Math.round(mx), ay: Math.round(my) });
   }, true);
+
+  /* ---------------- Boot ---------------- */
   setInterval(() => {
     if (!isGuest && isSplit !== lastSplit) {
       lastSplit = isSplit;
@@ -313,8 +353,11 @@
     }
     $('mp-join').style.display = (gameStarted && !isGuest) ? 'none' : 'block';
   }, 200);
+
   createPeer();
   refresh();
+
+  // Invite link support: ?join=ABC123
   const qp = (location.search.match(/[?&]join=([A-Za-z0-9-]+)/) || [])[1];
   if (qp) { inputEl.value = qp.toUpperCase().replace(/^JCA-/, ''); pendingJoin = inputEl.value; setMsg('Connecting to network…'); }
 })();
