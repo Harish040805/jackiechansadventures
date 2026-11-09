@@ -9,7 +9,10 @@
     <link rel="stylesheet" href="jackiechansadventurescss.css">
 </head>
 <body>
-    <div id="react-start-root"></div>
+    <div id="start-overlay" class="start-overlay-class">
+        <img src="https://raw.githubusercontent.com/Harish040805/jackiechansadventures/main/jackiechancoverpage.jpg" class="coverimage" alt="Jackie Chan Adventures" />
+        <button id="start-btn" class="start-game-class">▶️ Start Adventure</button>
+    </div>
     <div id="g">
         <div class="sky sky1"></div>
         <div class="sky sky2"></div>
@@ -77,7 +80,7 @@
       <div class="instr-section">
         <h3>🐾 Talismans</h3>
         <p>Press <span class="key-badge">1</span>–<span class="key-badge">0</span>, <span class="key-badge">-</span> or click the buttons at the bottom. Press again to turn one off. Several can be active at once, and each has a timer (except Dragon and Ox, which stay on until you turn them off).</p>
-        <p>🐕 Invulnerable · 🐉 Fireballs · 🐴 Heal +20 HP · 🐒 Shape Transform to Ninja · 🐀 Giving Movement for Trees · 🐇 Super Speed · 🐷 Eye Laser · 🐂 Giant (Half Damage) · 🐓 Flight · 🐑 Astral Spirit · 🐍 Invisibility · 🦎/🐡 One Shot Magic Laser</p>
+        <p>🐕 Invulnerable · 🐉 Fireballs · 🐴 Heals +20 HP · 🐒 Shape Transform to Ninja · 🐀 Tree Guardians · 🐇 Super Speed · 🐷 Eye Laser · 🐂 Giant (Half Damage) · 🐓 Flight · 🐑 Astral Spirit · 🐍 Invisibility · 🦎/🐡 One Shot Magic Laser</p>
       </div>
       <div class="instr-section">
         <h3>🐅 2-Player Co-Op</h3>
@@ -130,7 +133,7 @@
       </div>
     </div>
 </div>
-<script type="text/babel">
+<script>
 const g = document.getElementById('g');
 const canvas = document.getElementById('simCanvas');
 const ctx = canvas.getContext('2d');
@@ -273,7 +276,6 @@ const character2 = {
     invisible: false,
     light: false
 };
-let lastMagicLaserTime = 0;
 let dt = 1;
 let lastFrameTime = performance.now();
 function initBg() {
@@ -296,7 +298,7 @@ function initBg() {
     }
 }
 initBg();
-const calcScore = () => sgk * 100 + ek * 150 - Math.ceil(dist);
+const calcScore = () => sgk * 100 + ek * 150 ;
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
@@ -308,6 +310,17 @@ function updateScoreUI(force = false) {
     if (hudSgs) hudSgs.textContent = sgk * 100;
     if (hudEs) hudEs.textContent = ek * 150;
     if (hudDc) hudDc.textContent = currentDist;
+}
+function registerKill(e, ey, sparkColor, sparkCount = 12) {
+    addSparks(e.x, ey, sparkColor, sparkCount);
+    if (e.fly) {
+        ek++;
+        addFloatText("+150", e.x, ey - 15, '#ffd700', 18);
+    } else {
+        sgk++;
+        addFloatText("+100", e.x, ey - 15, '#ffd700', 18);
+    }
+    updateScoreUI(true);
 }
 function updateHpBar(barEl, val) {
     if (!barEl) return;
@@ -371,22 +384,10 @@ function addHealingParticles(targetChr) {
         });
     }
 }
-function StartOverlay({ onStart }) {
-    const [visible, setVisible] = React.useState(true); 
-    if (!visible) return null; 
-    const handleStart = () => {
-        setVisible(false); 
-        onStart(); 
-    }; 
-    return (
-        <div id="start-overlay" className="start-overlay-class"> 
-                <img src = "https://raw.githubusercontent.com/Harish040805/jackiechansadventures/main/jackiechancoverpage.jpg" className = "coverimage" alt = "Jackie Chan Adventures" />
-                <button onClick={handleStart} className="start-game-class">▶️ Start Adventure</button>
-        </div>
-    );
-}
-const reactStartRoot = ReactDOM.createRoot(document.getElementById('react-start-root'));
-reactStartRoot.render(<StartOverlay onStart={startGame} />);
+document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('start-overlay').style.display = 'none';
+    startGame();
+});
 let gt = 0;
 let nextSpawnAt = 0;
 function resetGameState() {
@@ -466,7 +467,7 @@ function triggerGameOver() {
 }
 function dmg(amount, targetP) {
     if (!gameStarted || isGameOver) return;
-    if (targetP.isDogImmortal || targetP.isRatActive) return;
+    if (targetP.isDogImmortal) return;
     const finalDmg = targetP.giant ? Math.ceil(amount * 0.5) : amount;
     addSparks(targetP.x, canvas.height - targetP.y - 35, '#ff4757', 6);
     addFloatText(`-${finalDmg}`, targetP.x, canvas.height - targetP.y - 50, '#ff4757', 16);
@@ -633,9 +634,11 @@ function updateTalismanTimers(chr) {
     }
 }
 function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
+    const alive = caster.playerNum === 1 ? hp > 0 : hp2 > 0;
+    if (!alive || isGameOver) return;
     const now = Date.now();
-    if (now - lastMagicLaserTime < 400) return;
-    lastMagicLaserTime = now;
+    if (now - (caster.lastLaserTime || 0) < 400) return;   // per-player cooldown
+    caster.lastLaserTime = now;
     showChiBanner(incantation);
     addFloatText(incantation, caster.x, canvas.height - caster.y - 75, beamColor, 18);
     const startX = caster.x;
@@ -644,10 +647,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     const endX = facing > 0 ? canvas.width + 120 : -120;
     const endY = startY;
     magicBeams.push({
-        startX: startX,
-        startY: startY,
-        endX: endX,
-        endY: endY,
+        startX, startY, endX, endY,
         color: beamColor,
         glowColor: '#00ff66',
         duration: 20,
@@ -658,20 +658,15 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
         const e = ems[j];
         const ey = canvas.height - e.y - 35;
         const inFront = facing > 0 ? (e.x >= startX - 25) : (e.x <= startX + 25);
-        const verticalDist = Math.abs(ey - startY);
-        if (inFront && verticalDist < (e.height * 0.5 + 24)) {
-            addSparks(e.x, ey, beamColor, 15);
-            addFloatText("+150", e.x, ey - 15, '#ffd700', 18);
-            if (e.fly) { ek++; } else { sgk++; }
+        if (inFront && Math.abs(ey - startY) < (e.height * 0.5 + 24)) {
+            registerKill(e, ey, beamColor, 15);
             ems.splice(j, 1);
-            updateScoreUI(true);
         }
     }
     for (let j = arws.length - 1; j >= 0; j--) {
         const a = arws[j];
         const inFront = facing > 0 ? (a.x >= startX - 25) : (a.x <= startX + 25);
-        const verticalDist = Math.abs(a.y - startY);
-        if (inFront && verticalDist < 25) {
+        if (inFront && Math.abs(a.y - startY) < 25) {
             addSparks(a.x, a.y, beamColor, 6);
             arws.splice(j, 1);
         }
@@ -865,7 +860,7 @@ window.addEventListener('mousemove', (e) => {
 });
 window.addEventListener('click', (e) => {
     if (!gameStarted || isGameOver || introOpen) return;
-    if (e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go') || e.target.closest('#intro-dialog')) return;
+    if (e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go') || e.target.closest('#intro-dialog') || e.target.closest('#instructions-dialog') || e.target.closest('#mp-panel') || e.target.closest('#mp-lost')) return;
     if (character.isDragonShooting && hp > 0) {
         shootDragonFireball(character);
     }
@@ -979,6 +974,58 @@ function aimArrow(sx, sy, chr, spd) {
     if (AIM_ERROR > 0) ang += (Math.random() - 0.5) * 2 * AIM_ERROR;
     return { vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, ang: ang };
 }
+function treeGuardPts(chr) {
+    const y = canvas.height - chr.y - 35;
+    return [{ x: chr.x - 65, y }, { x: chr.x + 65, y }];
+}
+function updateGuardians(chr, alive) {
+    if (!chr.isRatActive || !alive) return;
+    for (const p of treeGuardPts(chr)) {
+        for (let j = ems.length - 1; j >= 0; j--) {
+            const e = ems[j];
+            const ey = canvas.height - e.y - 35;
+            if (Math.abs(e.x - p.x) < 32 + e.width * 0.5 && Math.abs(ey - p.y) < 50) {
+                registerKill(e, ey, '#2ed573', 12);
+                ems.splice(j, 1);
+            }
+        }
+        for (let j = arws.length - 1; j >= 0; j--) {
+            const a = arws[j];
+            if (Math.abs(a.x - p.x) < 28 && Math.abs(a.y - p.y) < 50) {
+                addSparks(a.x, a.y, '#2ed573', 5);
+                arws.splice(j, 1);
+            }
+        }
+    }
+}
+function updateSpirit(chr, alive) {
+    if (!chr.isAstral || !alive) { chr.spirit = null; return; }
+    const homeX = chr.x + chr.facing * 50;
+    const homeY = canvas.height - chr.y - 100;
+    if (!chr.spirit) chr.spirit = { x: homeX, y: homeY };
+    const sp = chr.spirit;
+    const cy = canvas.height - chr.y - 35;
+    let target = null, best = 520;
+    for (const e of ems) {
+        const d = Math.hypot(e.x - chr.x, (canvas.height - e.y - 35) - cy);
+        if (d < best) { best = d; target = e; }
+    }
+    const tx = target ? target.x : homeX;
+    const ty = target ? canvas.height - target.y - 35 : homeY;
+    const dx = tx - sp.x, dy = ty - sp.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const step = Math.min(len, (target ? 11 : 6) * dt);
+    sp.x += (dx / len) * step;
+    sp.y += (dy / len) * step;
+    for (let j = ems.length - 1; j >= 0; j--) {
+        const e = ems[j];
+        const ey = canvas.height - e.y - 35;
+        if (Math.hypot(sp.x - e.x, sp.y - ey) < 30 + e.width * 0.5) {
+            registerKill(e, ey, '#a29bfe', 14);
+            ems.splice(j, 1);
+        }
+    }
+}
 function u() {
     const frameNow = performance.now();
     dt = Math.min((frameNow - lastFrameTime) / 16.667, 3);
@@ -1027,14 +1074,22 @@ function u() {
         }
         if (character.x > canvas.width - 35) character.x = canvas.width - 35;
         if (isSplit && character2.x > canvas.width - 35) character2.x = canvas.width - 35;
-        if (scroll > 0 || Math.abs(character.vx) > 0) {
+        if (scroll > 0) {
             b -= scroll;
-            dist += (scroll > 0 ? scroll : Math.abs(character.vx) * dt) * 0.05;
+            dist += scroll * 0.05;
             updateScoreUI();
         }
         m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
         t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
         const now = Date.now();
+        updateGuardians(character, hp > 0);
+        updateSpirit(character, hp > 0);
+        if (isSplit) {
+            updateGuardians(character2, hp2 > 0);
+            updateSpirit(character2, hp2 > 0);
+        } else {
+            character2.spirit = null;
+        }
         for (let i = ems.length - 1; i >= 0; i--) {
             const e = ems[i];
             e.spd = e.baseSpd;
@@ -1113,11 +1168,8 @@ arws.push({
                 const e = ems[j];
                 const ey = canvas.height - e.y - 35;
                 if (Math.hypot(f.x - e.x, f.y - ey) < (f.radius + e.width * 0.5)) {
-                    addSparks(e.x, ey, '#ff9f43', 14);
-                    addFloatText("+150", e.x, ey - 15, '#ffd700', 16);
-                    if (e.fly) { ek++; } else { sgk++; }
+                    registerKill(e, ey, '#ff9f43', 14);
                     ems.splice(j, 1);
-                    updateScoreUI(true);
                     hitEnemy = true;
                     break;
                 }
@@ -1141,10 +1193,8 @@ arws.push({
                 const py = ey + u * dy;
                 const distToLine = Math.hypot(e.x - px, eyPos - py);
                 if (distToLine < e.width * 0.6) {
-                    addSparks(e.x, eyPos, '#ff4757', 10);
-                    if (e.fly) { ek++; } else { sgk++; }
+                    registerKill(e, eyPos, '#ff4757', 10);
                     ems.splice(j, 1);
-                    updateScoreUI(true);
                 }
             }
         };
@@ -1156,22 +1206,30 @@ arws.push({
         }
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (character.isRatActive && hp > 0) {
+    for (const chr of [character, character2]) {
+    if (chr === character2 && !isSplit) continue;
+    const alive = chr === character ? hp > 0 : hp2 > 0;
+    if (!alive) continue;
+    if (chr.isRatActive) {
         ctx.save();
-        ctx.font = '32px sans-serif';
+        ctx.font = '40px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🌳 🌳', character.x + 55, canvas.height - character.y - 35);
+        for (const p of treeGuardPts(chr)) ctx.fillText('🌳', p.x, p.y);
         ctx.restore();
     }
-    if (isSplit && character2.isRatActive && hp2 > 0) {
+    if (chr.isAstral && chr.spirit) {
         ctx.save();
-        ctx.font = '32px sans-serif';
+        ctx.font = '34px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🌳 🌳', character2.x + 55, canvas.height - character2.y - 35);
+        ctx.globalAlpha = 0.85;
+        ctx.shadowBlur = 16;
+        ctx.shadowColor = '#a29bfe';
+        ctx.fillText('👻', chr.spirit.x, chr.spirit.y);
         ctx.restore();
     }
+}
     const drawPigLaser = (chr) => {
         const mx = aimPt(chr).x, my = aimPt(chr).y;
         const ex = chr.x;
@@ -1493,14 +1551,6 @@ function drawHuman(chr, label) {
         ctx.fill();
         ctx.restore();
     }
-    if (chr.isAstral) {
-        ctx.save();
-        ctx.font = '32px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.globalAlpha = 0.75;
-        ctx.fillText('👻', chr.facing * 40, -100);
-        ctx.restore();
-    }
     if (chr.invisible && chr.activeTalisman === 'snake') ctx.globalAlpha = 0.35;
     if (chr.isShadowGuard) {
         ctx.save();
@@ -1581,6 +1631,6 @@ function drawHuman(chr, label) {
     ctx.restore();
 }
 </script>
-<script type="text/babel" src="multiplayer.js"></script>
+<script src="multiplayer.js"></script>
 </body>
 </html>
