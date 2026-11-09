@@ -58,7 +58,7 @@
       <div class="intro-box" style="position: relative;">
         <img src="captainblack.png" class="captainblackclass">
         <div class="intro-title">🐉 Jackie Chan's Adventures</div>
-        <p id="intro-speech-text">Jackie! The Dark Hand gang has recently started targeting us. Walter is in need of all the 12 talismans now. You very well know what will happen if those talismans fall into his hands. If it happens, then Shendu will get liberty and that is dangerous for the entire world. To prevent that, the talismans should not go to the hands of the Dark Hand. All the way you go, Shadow Guards will follow you to steal the talismans from you. Protecting the talismans from the Shadow Guards sent by Walter is your job. I have hope in you and at this situation, I can trust only you. Safeguard the talismans from going to the hands of Dark Hand. All the best!</p>
+        <p id="intro-speech-text">Jackie! The Dark Hand gang has recently started targeting us. Walter is in need of all the  talismans now. You very well know what will happen if those talismans fall into his hands. If it happens, then Shendu will get liberty and that is dangerous for the entire world. To prevent that, the talismans should not go to the hands of the Dark Hand. All the way you go, Shadow Guards will follow you to steal the talismans from you. Protecting the talismans from the Shadow Guards sent by Walter is your job. I have hope in you and at this situation, I can trust only you. Safeguard the talismans from going to the hands of Dark Hand. All the best!</p>
         <div class="intro-btn-row">
             <button id="intro-skip-btn" class="skip-game-class">Skip</button>
             <button id="intro-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">➡️ Next</button>
@@ -749,7 +749,7 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
         case 'pig':
             chr.isPigLaserActive = true;
             chr.activeTalismans['pig'] = true;
-            startPlayerTimer(chr, 'pig', 12, () => { chr.isPigLaserActive = false; });
+            startPlayerTimer(chr, 'pig', 10, () => { chr.isPigLaserActive = false; });
             break;
         case 'ox':
             chr.giant = true;
@@ -766,7 +766,7 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
         case 'sheep':
             chr.isAstral = true;
             chr.activeTalismans['sheep'] = true;
-            startPlayerTimer(chr, 'sheep', 12, () => { chr.isAstral = false; });
+            startPlayerTimer(chr, 'sheep', 10, () => { chr.isAstral = false; });
             break;
         case 'snake':
             chr.invisible = true;
