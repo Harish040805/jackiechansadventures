@@ -181,8 +181,8 @@ let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 let isSplit = false;
 let isGuest = false, remoteP2 = false, gAimX = 0, gAimY = 0;
 function aimPt(chr) {
-    if (isGuest) return chr === character2 ? {x: mx, y: my} : {x: gAimX, y: gAimY};
-    return (remoteP2 && chr === character2) ? {x: gAimX, y: gAimY} : {x: mx, y: my};
+    if (isGuest) return chr === character2 ? {x: mx + camX, y: my} : {x: gAimX, y: gAimY};
+    return (remoteP2 && chr === character2) ? {x: gAimX, y: gAimY} : {x: mx + camX, y: my};
 }
 let ems = [];
 let arws = [];
@@ -278,6 +278,9 @@ const character2 = {
 };
 let dt = 1;
 let lastFrameTime = performance.now();
+let camX = 0;
+character.cam = 0;  character.viewW = canvas.width;
+character2.cam = 0; character2.viewW = canvas.width;
 function initBg() {
     m.innerHTML = '';
     t.innerHTML = '';
@@ -448,7 +451,7 @@ function spawnTick() {
     const now = Date.now();
     if (now < nextSpawnAt) return;
     nextSpawnAt = now + getSpawnDelay();
-    spawnE();
+    aliveChars().forEach(spawnE);
 }
 function triggerGameOver() {
     isGameOver = true;
@@ -513,10 +516,10 @@ function healPlayer(chr, amount) {
     chr.light = true;
     setTimeout(() => { chr.light = false; }, 400);
 }
-function spawnE() {
+function spawnE(owner) {
     if (!gameStarted || isGameOver) return;
     const isFly = Math.random() > 0.45;
-    const startX = window.innerWidth + 80 + (Math.random() * 160);
+    const startX = owner.cam + owner.viewW + 80 + (Math.random() * 160);
     const startY = isFly ? Math.random() * 180 + 130 : 0;
     const baseSpeed = Math.random() * 1.2 + 2.4;
     ems.push({
@@ -644,7 +647,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     const startX = caster.x;
     const startY = canvas.height - caster.y - 35;
     const facing = caster.facing >= 0 ? 1 : -1;
-    const endX = facing > 0 ? canvas.width + 120 : -120;
+    const endX = facing > 0 ? caster.cam + caster.viewW + 120 : caster.cam - 120;
     const endY = startY;
     magicBeams.push({
         startX, startY, endX, endY,
@@ -657,7 +660,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     for (let j = ems.length - 1; j >= 0; j--) {
         const e = ems[j];
         const ey = canvas.height - e.y - 35;
-        const inFront = facing > 0 ? (e.x >= startX - 25) : (e.x <= startX + 25);
+        const inFront = facing > 0 ? (e.x >= startX - 25 && e.x <= endX) : (e.x <= startX + 25 && e.x >= endX);
         if (inFront && Math.abs(ey - startY) < (e.height * 0.5 + 24)) {
             registerKill(e, ey, beamColor, 15);
             ems.splice(j, 1);
@@ -665,7 +668,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     }
     for (let j = arws.length - 1; j >= 0; j--) {
         const a = arws[j];
-        const inFront = facing > 0 ? (a.x >= startX - 25) : (a.x <= startX + 25);
+        const inFront = facing > 0 ? (a.x >= startX - 25 && a.x <= endX) : (a.x <= startX + 25 && a.x >= endX);
         if (inFront && Math.abs(a.y - startY) < 25) {
             addSparks(a.x, a.y, beamColor, 6);
             arws.splice(j, 1);
@@ -1026,6 +1029,40 @@ function updateSpirit(chr, alive) {
         }
     }
 }
+function aliveChars() {
+    const a = [];
+    if (hp > 0) a.push(character);
+    if (isSplit && hp2 > 0) a.push(character2);
+    return a;
+}
+function viewBounds() {
+    const a = aliveChars();
+    const l = a.length ? a : [character];
+    return {
+        lo: Math.min(...l.map(c => c.cam)),
+        hi: Math.max(...l.map(c => c.cam + c.viewW))
+    };
+}
+function updateCam(chr) {
+    chr.cam = Math.max(chr.cam, chr.x - chr.viewW * 0.30);
+    if (chr.x < chr.cam + 35) chr.x = chr.cam + 35;
+}
+function updateViewCam() {
+    if (isGuest) {
+        [character, character2].forEach(c => {
+            c.viewW = canvas.width;
+            c.cam = Math.max(c.cam, c.x - c.viewW * 0.30);
+        });
+    }
+    const me = isGuest ? character2 : character;
+    const other = isGuest ? character : character2;
+    const meAlive = isGuest ? hp2 > 0 : hp > 0;
+    const otherAlive = isGuest ? hp > 0 : (isSplit && hp2 > 0);
+    camX = (!meAlive && otherAlive) ? other.cam : me.cam;   // dead player watches the partner
+    b = -camX;
+    m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
+    t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
+}
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
     const lean = chr.leanNow || 0;
@@ -1051,47 +1088,12 @@ function u() {
         }
         if (character.x < 35) character.x = 35;
         if (isSplit && character2.x < 35) character2.x = 35;
-        let scroll = 0;
-        const scrollMargin = canvas.width * 0.30;
-        if (!isSplit) {
-            if (character.x > scrollMargin && keysP1.right) {
-                scroll = character.x - scrollMargin;
-                character.x = scrollMargin;
-            }
-        } else {
-            const p1Alive = hp > 0;
-            const p2Alive = hp2 > 0;
-            let leadingX = 0;
-            if (p1Alive && p2Alive) {
-                leadingX = Math.max(character.x, character2.x);
-            } else if (p1Alive) {
-                leadingX = character.x;
-            } else if (p2Alive) {
-                leadingX = character2.x;
-            }
-            if (leadingX > scrollMargin) {
-                let desiredScroll = leadingX - scrollMargin;
-                if (p1Alive && p2Alive) {
-                    const trailingX = Math.min(character.x, character2.x);
-                    const maxAllowedScroll = trailingX - 35;
-                    desiredScroll = Math.max(0, Math.min(desiredScroll, maxAllowedScroll));
-                }
-                if (desiredScroll > 0) {
-                    scroll = desiredScroll;
-                    if (p1Alive) character.x -= scroll;
-                    if (p2Alive) character2.x -= scroll;
-                }
-            }
-        }
-        if (character.x > canvas.width - 35) character.x = canvas.width - 35;
-        if (isSplit && character2.x > canvas.width - 35) character2.x = canvas.width - 35;
-        if (scroll > 0) {
-            b -= scroll;
-            dist += scroll * 0.05;
-            updateScoreUI();
-        }
-        m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
-        t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
+        character.viewW = canvas.width;
+        updateCam(character);
+        if (isSplit) updateCam(character2);
+        const lead = Math.max(0, ...aliveChars().map(c => c.cam));
+        if (lead * 0.05 > dist) { dist = lead * 0.05; updateScoreUI(); }
+        const vb = viewBounds();
         const now = Date.now();
         updateGuardians(character, hp > 0);
         updateSpirit(character, hp > 0);
@@ -1104,7 +1106,7 @@ function u() {
         for (let i = ems.length - 1; i >= 0; i--) {
             const e = ems[i];
             e.spd = e.baseSpd;
-            e.x -= (e.spd * dt + scroll);
+            e.x -= e.spd * dt;
             e.anim += 0.1 * dt;
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
             const enemyScreenY = canvas.height - e.y - 35;
@@ -1128,28 +1130,24 @@ function u() {
             const validTargets = [];
             if (!character.invisible && !character.isShadowGuard && hp > 0) validTargets.push(character);
             if (isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0) validTargets.push(character2);
-            if (validTargets.length > 0 && now - e.lt > 2600 && e.x > 320 && e.x < canvas.width + 20) {
-                e.lt = now;
-const targetChr = validTargets.reduce((best, c) =>
-    Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best);
-const sx = e.x;
-const sy = enemyScreenY;
-const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
-arws.push({
-    x: sx,
-    y: sy,
-    vx: aim.vx,
-    vy: aim.vy,
-    ang: aim.ang
-});
-            }
-            if (e.x < -150) {
+            if (validTargets.length > 0 && now - e.lt > 2600) {
+    const targetChr = validTargets.reduce((best, c) =>
+        Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best);
+    if (e.x > targetChr.cam + 320 && e.x < targetChr.cam + targetChr.viewW + 20) {
+        e.lt = now;
+        const sx = e.x;
+        const sy = enemyScreenY;
+        const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
+        arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang });
+    }
+}
+            if (e.x < vb.lo - 150) {
                 ems.splice(i, 1);
             }
         }
         for (let i = arws.length - 1; i >= 0; i--) {
             const a = arws[i];
-            a.x += (a.vx * dt - scroll);
+            a.x += a.vx * dt;
             a.y += a.vy * dt;
             const hit1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
                          Math.abs(character.x - a.x) < 22 &&
@@ -1166,7 +1164,7 @@ arws.push({
                 arws.splice(i, 1);
                 continue;
             }
-            if (a.x < -30 || a.x > canvas.width + 30 || a.y < -30 || a.y > canvas.height + 30) {
+            if (a.x < vb.lo - 30 || a.x > vb.hi + 30 || a.y < -30 || a.y > canvas.height + 30) {
                 arws.splice(i, 1);
             }
         }
@@ -1185,7 +1183,7 @@ arws.push({
                     break;
                 }
             }
-            if (hitEnemy || f.x < 0 || f.x > canvas.width || f.y < 0 || f.y > canvas.height) {
+            if (hitEnemy || f.x < vb.lo || f.x > vb.hi || f.y < 0 || f.y > canvas.height) {
                 fbs.splice(i, 1);
             }
         }
@@ -1217,7 +1215,10 @@ arws.push({
             checkLaserHits(character2);
         }
     }
+    updateViewCam();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(-camX, 0);
     for (const chr of [character, character2]) {
     if (chr === character2 && !isSplit) continue;
     const alive = chr === character ? hp > 0 : hp2 > 0;
@@ -1408,6 +1409,7 @@ arws.push({
         ctx.fillText(ft.text, ft.x, ft.y);
         ctx.restore();
     }
+    ctx.restore();
     requestAnimationFrame(u);
 }
 requestAnimationFrame(u);
