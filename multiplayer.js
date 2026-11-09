@@ -189,6 +189,9 @@
   function onGuestMsg(d) {
     if (!d || isGameOver) return;
     if (d.t === 'in') {
+      if (+d.vw > 300 && +d.vw < 10000) { 
+        character2.viewW = +d.vw; 
+      }
       const wasUp = keysP2.up;
       keysP2.left = !!d.l; keysP2.right = !!d.r; keysP2.up = !!d.u; keysP2.down = !!d.d;
       gAimX = +d.ax || 0; gAimY = +d.ay || 0;
@@ -226,7 +229,7 @@
         e: ems.map(e => [e.id || (e.id = entId++), r1(e.x), r1(e.y), e.fly ? 1 : 0, Math.round(e.anim * 100) / 100]),
         a: arws.map(a => [a.id || (a.id = entId++), r1(a.x), r1(a.y), Math.round(a.ang * 100) / 100]),
         f: fbs.map(f => [f.id || (f.id = entId++), r1(f.x), r1(f.y)]),
-        mb: magicBeams, ax: Math.round(mx), ay: Math.round(my),
+        mb: magicBeams, ax: Math.round(mx + camX), ay: Math.round(my),
         fx: fxQ.splice(0, 80), over: isGameOver
       });
     } catch (e) {}
@@ -343,15 +346,13 @@
   }
   function applySnap(s) {
     hostW = s.W; hostH = s.H;
-    const kx = canvas.width / s.W;
+    const kx = 1;
     const gx = x => x * kx;
     const gy = y => canvas.height - (s.H - y);
-    hp = s.hp; hp2 = s.hp2; sgk = s.sgk; ek = s.ek; dist = s.dist; b = s.b;
+    hp = s.hp; hp2 = s.hp2; sgk = s.sgk; ek = s.ek; dist = s.dist;
     hpV.textContent = Math.round(hp); hp2V.textContent = Math.round(hp2);
     updateHpBar(hp1Bar, hp); updateHpBar(hp2Bar, hp2);
     updateScoreUI();
-    m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
-    t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
     applyChar(character, s.c1, kx); applyChar(character2, s.c2, kx);
     [[character, s.c1], [character2, s.c2]].forEach(([c, sc]) => {
       if (sc.sp) {
@@ -388,12 +389,12 @@
     requestAnimationFrame(smoothLoop);
   })(performance.now());
   function hostAim() {
-    const hw = hostW || canvas.width, hh = hostH || canvas.height;
-    return { ax: Math.round(mx * hw / canvas.width), ay: Math.round(hh - (canvas.height - my)) };
+    const hh = hostH || canvas.height;
+    return { ax: Math.round(mx + camX), ay: Math.round(hh - (canvas.height - my)) };
   }
   function sendIn() {
     if (!hostConn || !hostConn.open) return;
-    try { hostConn.send(Object.assign({ t: 'in', l: gk.l, r: gk.r, u: gk.u, d: gk.d }, hostAim())); } catch (e) {}
+    try { hostConn.send(Object.assign({ t: 'in', l: gk.l, r: gk.r, u: gk.u, d: gk.d, vw: canvas.width }, hostAim())); } catch (e) {}
   }
   function guestLaser() {
     if (!hostConn || !hostConn.open || isGameOver || hp2 <= 0) return;
