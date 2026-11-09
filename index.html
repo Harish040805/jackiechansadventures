@@ -1178,10 +1178,23 @@ arws.push({
                 fbs.splice(i, 1);
             }
         }
+        function eyePos(chr) {
+            const S = 0.42 * (chr.giant ? 1.5 : 1);
+            const lean = chr.leanNow || 0;
+            // eye point in head coordinates, relative to the hip (matches drawJackieHead placement)
+            const hx = 13, hy = -83;
+            const rx = hx * Math.cos(lean) - hy * Math.sin(lean);
+            const ry = hx * Math.sin(lean) + hy * Math.cos(lean);
+            return {
+                x: chr.x + chr.facing * rx * S,
+                y: canvas.height - chr.y + (-68 + ry) * S
+            };
+        }
         const checkLaserHits = (chr) => {
             const mx = aimPt(chr).x, my = aimPt(chr).y;
-            const ex = chr.x;
-            const ey = canvas.height - chr.y - 35;
+            const eye = eyePos(chr);
+            const ex = eye.x;
+            const ey = eye.y;
             const dx = mx - ex;
             const dy = my - ey;
             const lineLen = Math.hypot(dx, dy) || 1;
@@ -1232,8 +1245,9 @@ arws.push({
 }
     const drawPigLaser = (chr) => {
         const mx = aimPt(chr).x, my = aimPt(chr).y;
-        const ex = chr.x;
-        const ey = canvas.height - chr.y - 35;
+        const eye = eyePos(chr);
+        const ex = eye.x;
+        const ey = eye.y;
         ctx.save();
         ctx.shadowBlur = 18;
         ctx.shadowColor = '#ff4757';
@@ -1597,6 +1611,7 @@ function drawHuman(chr, label) {
         elB = -(0.25 + 0.35 * mb);
     }
     const hipY = -68 + bob;
+    chr.leanNow = lean;
     const shoulderY = -46 + breathe;
     ctx.filter = 'brightness(0.75)';
     drawJointLimb(-3, hipY, 34, 34, 17, 14, hipB, kneeB, pants, pants, 'shoe');
