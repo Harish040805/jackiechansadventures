@@ -1026,6 +1026,17 @@ function updateSpirit(chr, alive) {
         }
     }
 }
+function eyePos(chr) {
+    const S = 0.42 * (chr.giant ? 1.5 : 1);
+    const lean = chr.leanNow || 0;
+    const hx = 13, hy = -83;
+    const rx = hx * Math.cos(lean) - hy * Math.sin(lean);
+    const ry = hx * Math.sin(lean) + hy * Math.cos(lean);
+    return {
+        x: chr.x + chr.facing * rx * S,
+        y: canvas.height - chr.y + (-68 + ry) * S
+    };
+}
 function u() {
     const frameNow = performance.now();
     dt = Math.min((frameNow - lastFrameTime) / 16.667, 3);
@@ -1177,18 +1188,6 @@ arws.push({
             if (hitEnemy || f.x < 0 || f.x > canvas.width || f.y < 0 || f.y > canvas.height) {
                 fbs.splice(i, 1);
             }
-        }
-        function eyePos(chr) {
-            const S = 0.42 * (chr.giant ? 1.5 : 1);
-            const lean = chr.leanNow || 0;
-            // eye point in head coordinates, relative to the hip (matches drawJackieHead placement)
-            const hx = 13, hy = -83;
-            const rx = hx * Math.cos(lean) - hy * Math.sin(lean);
-            const ry = hx * Math.sin(lean) + hy * Math.cos(lean);
-            return {
-                x: chr.x + chr.facing * rx * S,
-                y: canvas.height - chr.y + (-68 + ry) * S
-            };
         }
         const checkLaserHits = (chr) => {
             const mx = aimPt(chr).x, my = aimPt(chr).y;
