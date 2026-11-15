@@ -71,74 +71,14 @@ function moveKey(e) {
     return null;
 }
 const character = {
-    playerNum: 1,
-    name: "P1 (Blue)",
-    x: 120,
-    y: 0,
-    vx: 0,
-    vy: 0,
-    speed: 4.4,
-    baseSpeed: 4.4,
-    acceleration: 2.5,
-    friction: 0.80,
-    gravity: 0.65,
-    jumpForce: 14,
-    isJumping: false,
-    facing: 1,
-    walkCycle: 0,
-    strideFrequency: 0.16,
-    bodyTilt: 0,
-    squish: 1,
-    shirtColor: '#2563eb',
-    pantsColor: '#78350f',
-    activeTalisman: null,
-    talismanTimer: null,
-    talismanTimeLeft: 0,
-    isDogImmortal: false,
-    isDragonShooting: false,
-    isShadowGuard: false,
-    isRatActive: false,
-    isPigLaserActive: false,
-    giant: false,
-    isFlying: false,
-    isAstral: false,
-    invisible: false,
-    light: false
+    playerNum: 1, name: "P1 (Blue)", x: 120, y: 0, vx: 0, vy: 0, speed: 4.4, baseSpeed: 4.4, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
+    strideFrequency: 0.16, bodyTilt: 0, squish: 1, shirtColor: '#2563eb', pantsColor: '#78350f', activeTalisman: null, talismanTimer: null, talismanTimeLeft: 0, isDogImmortal: false, isDragonShooting: false,
+    isShadowGuard: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
 };
-const character2 = {
-    playerNum: 2,
-    name: "P2 (Red)",
-    x: 220,
-    y: 0,
-    vx: 0,
-    vy: 0,
-    speed: 4.4,
-    baseSpeed: 4.4,
-    acceleration: 2.5,
-    friction: 0.80,
-    gravity: 0.65,
-    jumpForce: 14,
-    isJumping: false,
-    facing: 1,
-    walkCycle: 0,
-    strideFrequency: 0.16,
-    bodyTilt: 0,
-    squish: 1,
-    shirtColor: '#dc2626',
-    pantsColor: '#1e3a8a',
-    activeTalisman: null,
-    talismanTimer: null,
-    talismanTimeLeft: 0,
-    isDogImmortal: false,
-    isDragonShooting: false,
-    isShadowGuard: false,
-    isRatActive: false,
-    isPigLaserActive: false,
-    giant: false,
-    isFlying: false,
-    isAstral: false,
-    invisible: false,
-    light: false
+const character2 = { 
+    playerNum: 2, name: "P2 (Red)", x: 220, y: 0, vx: 0, vy: 0, speed: 4.4, baseSpeed: 4.4, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
+    strideFrequency: 0.16, bodyTilt: 0, squish: 1, shirtColor: '#dc2626', pantsColor: '#1e3a8a', activeTalisman: null, talismanTimer: null, talismanTimeLeft: 0, isDogImmortal: false, isDragonShooting: false,
+    isShadowGuard: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
 };
 let dt = 1;
 let lastFrameTime = performance.now();
@@ -209,46 +149,20 @@ function showChiBanner(msg) {
     }, 1400);
 }
 function addFloatText(text, x, y, color = '#2ed573', size = 18) {
-    floatTexts.push({
-        text: text,
-        x: x,
-        y: y,
-        vy: -1.8,
-        opacity: 1.0,
-        color: color,
-        size: size
-    });
+    floatTexts.push({ text: text, x: x, y: y, vy: -1.8, opacity: 1.0, color: color, size: size });
 }
 function addSparks(x, y, color = '#ffcc00', count = 8) {
     for (let i = 0; i < count; i++) {
         const ang = Math.random() * Math.PI * 2;
         const spd = Math.random() * 4 + 1.5;
-        particles.push({
-            x: x,
-            y: y,
-            vx: Math.cos(ang) * spd,
-            vy: Math.sin(ang) * spd,
-            radius: Math.random() * 3 + 2,
-            color: color,
-            alpha: 1.0,
-            decay: Math.random() * 0.04 + 0.03
-        });
+        particles.push({ x: x, y: y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, radius: Math.random() * 3 + 2, color: color, alpha: 1.0, decay: Math.random() * 0.04 + 0.03 });
     }
 }
 function addHealingParticles(targetChr) {
     for (let i = 0; i < 5; i++) {
         const offsetX = (Math.random() - 0.5) * 40;
-        particles.push({
-            x: targetChr.x + offsetX,
-            y: canvas.height - targetChr.y - 10,
-            vx: (Math.random() - 0.5) * 1.5,
-            vy: -(Math.random() * 2.5 + 2.0),
-            radius: Math.random() * 3.5 + 2,
-            color: '#2ed573',
-            alpha: 1.0,
-            decay: 0.03,
-            isSparkle: true
-        });
+        particles.push({ x: targetChr.x + offsetX, y: canvas.height - targetChr.y - 10, vx: (Math.random() - 0.5) * 1.5, vy: -(Math.random() * 2.5 + 2.0), radius: Math.random() * 3.5 + 2, color: '#2ed573',
+            alpha: 1.0, decay: 0.03, isSparkle: true });
     }
 }
 document.getElementById('start-btn').addEventListener('click', () => {
@@ -258,20 +172,7 @@ document.getElementById('start-btn').addEventListener('click', () => {
 let gt = 0;
 let nextSpawnAt = 0;
 function resetGameState() {
-  hp = 100; 
-  hp2 = 100; 
-  isGameOver = false; 
-  sgk = 0; 
-  ek = 0; 
-  dist = 0; 
-  prevScore = -1; 
-  prevDist = -1; 
-  ems = []; 
-  arws = []; 
-  fbs = []; 
-  magicBeams = []; 
-  particles = []; 
-  floatTexts = [];
+  hp = 100; hp2 = 100; isGameOver = false; sgk = 0; ek = 0; dist = 0; prevScore = -1; prevDist = -1; ems = []; arws = []; fbs = []; magicBeams = []; particles = []; floatTexts = [];
   [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
 } 
 function startGame() {
@@ -380,6 +281,24 @@ function healPlayer(chr, amount) {
     chr.light = true;
     setTimeout(() => { chr.light = false; }, 400);
 }
+const GUARD_SCALE = 0.34, GUARD_W = 20, GUARD_H = 32;
+function enemyBox(e) {
+    const h = e.height || GUARD_H, w = e.width || GUARD_W;
+    return {
+        cx: e.x,
+        cy: e.fly ? canvas.height - (e.y + 35) : canvas.height - e.y - h / 2,
+        hw: w / 2,
+        hh: h / 2
+    };
+}
+const enemyCY = e => enemyBox(e).cy;
+function playerBox(chr) {
+    const g = chr.giant ? 1.5 : 1;
+    return { cx: chr.x, cy: canvas.height - chr.y - 24 * g, hw: 12 * g, hh: 24 * g };
+}
+function boxesOverlap(a, b) {
+    return Math.abs(a.cx - b.cx) < a.hw + b.hw && Math.abs(a.cy - b.cy) < a.hh + b.hh;
+}
 function spawnE(owner) {
     if (!gameStarted || isGameOver) return;
     const isFly = Math.random() > 0.45;
@@ -394,9 +313,10 @@ function spawnE(owner) {
         spd: baseSpeed,
         lt: Date.now(),
         hitCooldown: 0,
-        width: isFly ? 40 : 34,
-        height: isFly ? 34 : 48,
+        width: isFly ? 40 : GUARD_W,
+        height: isFly ? 34 : GUARD_H,
         facing: -1,
+        attacking: false,
         anim: Math.random() * 10
     });
 }
@@ -523,7 +443,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     addSparks(startX, startY, beamColor, 12);
     for (let j = ems.length - 1; j >= 0; j--) {
         const e = ems[j];
-        const ey = canvas.height - e.y - 35;
+        const ey = enemyCY(e)
         const inFront = facing > 0 ? (e.x >= startX - 25 && e.x <= endX) : (e.x <= startX + 25 && e.x >= endX);
         if (inFront && Math.abs(ey - startY) < (e.height * 0.5 + 24)) {
             registerKill(e, ey, beamColor, 15);
@@ -700,18 +620,7 @@ window.addEventListener('keydown', (e) => {
         fireStraightLaser(character, "Magic must defeat magic!", '#00ff88');
     }
     const hotkeyMapP1 = {
-        '1': 'dog',
-        '2': 'dragon',
-        '3': 'horse',
-        '4': 'monkey',
-        '5': 'rat',
-        '6': 'rabbit',
-        '7': 'pig',
-        '8': 'ox',
-        '9': 'rooster',
-        '0': 'sheep',
-        '-': 'snake',
-        '=': 'tiger'
+        '1': 'dog', '2': 'dragon', '3': 'horse', '4': 'monkey', '5': 'rat', '6': 'rabbit', '7': 'pig', '8': 'ox', '9': 'rooster', '0': 'sheep', '-': 'snake', '=': 'tiger'
     };
     if (hotkeyMapP1[e.key]) {
         switchTalismanForPlayer(character, hotkeyMapP1[e.key]);
@@ -850,7 +759,7 @@ function updateGuardians(chr, alive) {
     for (const p of treeGuardPts(chr)) {
         for (let j = ems.length - 1; j >= 0; j--) {
             const e = ems[j];
-            const ey = canvas.height - e.y - 35;
+            const ey = enemyCY(e);
             if (Math.abs(e.x - p.x) < 32 + e.width * 0.5 && Math.abs(ey - p.y) < 50) {
                 registerKill(e, ey, '#2ed573', 12);
                 ems.splice(j, 1);
@@ -874,11 +783,11 @@ function updateSpirit(chr, alive) {
     const cy = canvas.height - chr.y - 35;
     let target = null, best = 520;
     for (const e of ems) {
-        const d = Math.hypot(e.x - chr.x, (canvas.height - e.y - 35) - cy);
+        const d = Math.hypot(e.x - chr.x, (enemyCY(e)) - cy);
         if (d < best) { best = d; target = e; }
     }
     const tx = target ? target.x : homeX;
-    const ty = target ? canvas.height - target.y - 35 : homeY;
+    const ty = target ? enemyCY(target) : homeY;
     const dx = tx - sp.x, dy = ty - sp.y;
     const len = Math.hypot(dx, dy) || 1;
     const step = Math.min(len, (target ? 11 : 6) * dt);
@@ -886,7 +795,7 @@ function updateSpirit(chr, alive) {
     sp.y += (dy / len) * step;
     for (let j = ems.length - 1; j >= 0; j--) {
         const e = ems[j];
-        const ey = canvas.height - e.y - 35;
+        const ey = enemyCY(e);
         if (Math.hypot(sp.x - e.x, sp.y - ey) < 30 + e.width * 0.5) {
             registerKill(e, ey, '#a29bfe', 14);
             ems.splice(j, 1);
@@ -970,19 +879,44 @@ function u() {
         for (let i = ems.length - 1; i >= 0; i--) {
             const e = ems[i];
             e.spd = e.baseSpd;
-            e.x -= e.spd * dt;
-            e.anim += 0.1 * dt;
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
-            const enemyScreenY = canvas.height - e.y - 35;
+
+            const validTargets = [];
+            if (!character.invisible && !character.isShadowGuard && hp > 0) validTargets.push(character);
+            if (isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0) validTargets.push(character2);
+
+            if (e.fly) {
+                // bats: unchanged
+                e.x -= e.spd * dt;
+                e.anim += 0.1 * dt;
+            } else {
+                // guards run toward the nearest visible player, stop and punch on contact
+                const prey = validTargets.length
+                    ? validTargets.reduce((best, c) => Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best)
+                    : null;
+                let moving = false;
+                e.attacking = false;
+                if (prey) {
+                    const gap = prey.x - e.x;
+                    e.attacking = boxesOverlap(enemyBox(e), playerBox(prey));
+                    if (Math.abs(gap) > 8) {
+                        e.facing = gap > 0 ? 1 : -1;
+                        moving = !e.attacking;
+                    }
+                } else {
+                    e.facing = -1;      // nobody to chase: keep running left
+                    moving = true;
+                }
+                if (moving) e.x += e.facing * e.spd * dt;
+                if (moving || e.attacking) e.anim += 0.12 * dt;
+            }
+
             if (e.hitCooldown <= 0) {
-                const p1CenterY = canvas.height - character.y - 35;
+                const gb = enemyBox(e);
                 const hitP1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
-                              Math.abs(character.x - e.x) < (character.giant ? 45 : 30) &&
-                              Math.abs(p1CenterY - enemyScreenY) < 35;
-                const p2CenterY = canvas.height - character2.y - 35;
+                              boxesOverlap(gb, playerBox(character));
                 const hitP2 = isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0 &&
-                              Math.abs(character2.x - e.x) < (character2.giant ? 45 : 30) &&
-                              Math.abs(p2CenterY - enemyScreenY) < 35;
+                              boxesOverlap(gb, playerBox(character2));
                 if (hitP1) {
                     dmg(6, character);
                     e.hitCooldown = 50;
@@ -991,21 +925,20 @@ function u() {
                     e.hitCooldown = 50;
                 }
             }
-            const validTargets = [];
-            if (!character.invisible && !character.isShadowGuard && hp > 0) validTargets.push(character);
-            if (isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0) validTargets.push(character2);
-            if (validTargets.length > 0 && now - e.lt > 2600) {
-    const targetChr = validTargets.reduce((best, c) =>
-        Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best);
-    if (e.x > targetChr.cam + 320 && e.x < targetChr.cam + targetChr.viewW + 20) {
-        e.lt = now;
-        const sx = e.x;
-        const sy = enemyScreenY;
-        const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
-        arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang });
-    }
-}
-            if (e.x < vb.lo - 150) {
+
+            if (validTargets.length > 0 && !e.attacking && now - e.lt > 2600) {
+                const targetChr = validTargets.reduce((best, c) =>
+                    Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best);
+                if (e.x > targetChr.cam + 320 && e.x < targetChr.cam + targetChr.viewW + 20) {
+                    e.lt = now;
+                    const sx = e.x;
+                    const sy = enemyCY(e);
+                    const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
+                    arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang });
+                }
+            }
+
+            if (e.x < vb.lo - 150 || (!e.fly && e.x > vb.hi + 400)) {
                 ems.splice(i, 1);
             }
         }
@@ -1039,8 +972,8 @@ function u() {
             let hitEnemy = false;
             for (let j = ems.length - 1; j >= 0; j--) {
                 const e = ems[j];
-                const ey = canvas.height - e.y - 35;
-                if (Math.hypot(f.x - e.x, f.y - ey) < (f.radius + e.width * 0.5)) {
+                const ey = enemyCY(e);
+                if (Math.abs(f.x - e.x) < e.width * 0.5 + f.radius && Math.abs(f.y - ey) < e.height * 0.5 + f.radius) {
                     registerKill(e, ey, '#ff9f43', 14);
                     ems.splice(j, 1);
                     hitEnemy = true;
@@ -1061,12 +994,12 @@ function u() {
             const lineLen = Math.hypot(dx, dy) || 1;
             for (let j = ems.length - 1; j >= 0; j--) {
                 const e = ems[j];
-                const eyPos = canvas.height - e.y - 35;
+                const eyPos = enemyCY(e);
                 const u = Math.max(0, Math.min(1, ((e.x - ex) * dx + (eyPos - ey) * dy) / (lineLen * lineLen)));
                 const px = ex + u * dx;
                 const py = ey + u * dy;
                 const distToLine = Math.hypot(e.x - px, eyPos - py);
-                if (distToLine < e.width * 0.6) {
+                if (distToLine < Math.max(e.width, e.height) * 0.6) {
                     registerKill(e, eyPos, '#ff4757', 10);
                     ems.splice(j, 1);
                 }
@@ -1212,19 +1145,16 @@ function u() {
     }
     for (const e of ems) {
         ctx.save();
-        const ey = canvas.height - e.y - 20;
-        ctx.translate(e.x, ey);
         if (e.fly) {
+            ctx.translate(e.x, canvas.height - e.y - 20);
             const wingFlap = Math.sin(e.anim * 6) * 4;
             ctx.font = '34px sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('🦇', 0, wingFlap);
         } else {
-            ctx.font = '38px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🥷', 0, 0);
+            ctx.translate(e.x, canvas.height - e.y);
+            drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.attacking ? 'attack' : 'run');
         }
         ctx.restore();
     }
@@ -1277,7 +1207,7 @@ function u() {
     requestAnimationFrame(u);
 }
 requestAnimationFrame(u);
-function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType) {
+function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType, endColor) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(a1);
@@ -1293,14 +1223,14 @@ function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType) {
     ctx.fill();
     ctx.translate(0, len2);
     if (endType === 'shoe') {
-        ctx.fillStyle = '#1c1917';
+        ctx.fillStyle = endColor || '#1c1917';
         ctx.beginPath();
-        ctx.roundRect(-w2 / 2 - 1, -3, w2 + 11, 12, 5); 
+        ctx.roundRect(-w2 / 2 - 1, -3, w2 + 11, 12, 5);
         ctx.fill();
-        ctx.fillStyle = '#e7e5e4';                      
+        ctx.fillStyle = endColor || '#e7e5e4';
         ctx.fillRect(-w2 / 2 - 1, 6, w2 + 11, 3);
     } else {
-        ctx.fillStyle = '#f0c08a';
+        ctx.fillStyle = endColor || '#f0c08a';
         ctx.beginPath();
         ctx.arc(0, 2, 5.5, 0, Math.PI * 2);
         ctx.fill();
@@ -1432,12 +1362,9 @@ function drawHuman(chr, label) {
     }
     if (chr.invisible && chr.activeTalisman === 'snake') ctx.globalAlpha = 0.35;
     if (chr.isShadowGuard) {
-        ctx.save();
-        ctx.font = chr.giant ? '54px sans-serif' : '38px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('🥷', 0, -35);
-        ctx.restore();
+        const moving = Math.abs(chr.vx) > 0.2;
+        const state = (chr.isJumping || chr.isFlying || chr.y > 0) ? 'air' : (moving ? 'run' : 'idle');
+        drawShadowGuardBody(chr.walkCycle, 0.42 * (chr.giant ? 1.5 : 1), chr.facing, state);
         ctx.restore();
         return;
     }
@@ -1508,5 +1435,92 @@ function drawHuman(chr, label) {
     ctx.restore();
     drawJointLimb(3, hipY, 34, 34, 18, 15, hipF, kneeF, pants, pants, 'shoe');
     ctx.filter = 'none';
+    ctx.restore();
+}
+function drawShadowGuardBody(walk, scale, facing, state) {
+    const suit = '#2b2840', suitDark = '#1a182b', gear = '#0f0e18';
+    const sash = '#b91c1c', skin = '#f0c08a';
+    const sw = Math.sin(walk), cw = Math.cos(walk);
+    let hipF, kneeF, hipB, kneeB, shF, elF, shB, elB, lean, bob = 0;
+
+    if (state === 'run') {
+        lean = 0.24;
+        bob = -Math.abs(sw) * 5;
+        hipF = -sw * 0.95;  kneeF = Math.max(0, cw) * 1.3 + 0.1;
+        hipB =  sw * 0.95;  kneeB = Math.max(0, -cw) * 1.3 + 0.1;
+        shF =  sw * 1.0;    elF = -1.2;
+        shB = -sw * 1.0;    elB = -1.2;
+    } else if (state === 'attack') {
+        const punch = Math.sin(walk * 1.5);
+        lean = 0.18;
+        hipF = -0.45; kneeF = 0.35; hipB = 0.4; kneeB = 0.3;
+        shF = -1.45 + punch * 0.25; elF = -0.15;
+        shB = -0.5 - punch * 0.25;  elB = -1.0;
+    } else if (state === 'air') {
+        lean = 0.06;
+        hipF = -0.8; kneeF = 1.3; hipB = 0.35; kneeB = 0.6;
+        shF = -1.2; elF = -0.6; shB = 0.6; elB = -0.4;
+    } else { // idle
+        const br = Math.sin(performance.now() / 500) * 0.04;
+        lean = 0.04;
+        hipF = 0.05; kneeF = 0.05; hipB = -0.05; kneeB = 0.05;
+        shF = 0.1 + br; elF = -0.4; shB = -0.1 - br; elB = -0.4;
+    }
+
+    const hipY = -68 + bob, shoulderY = -46;
+    const flap = Math.sin(walk * 1.3) * 5;
+
+    ctx.save();
+    ctx.scale(facing * scale, scale);
+
+    // back leg
+    drawJointLimb(-3, hipY, 34, 34, 16, 13, hipB, kneeB, suitDark, suitDark, 'shoe', gear);
+
+    ctx.save();
+    ctx.translate(0, hipY);
+    ctx.rotate(lean);
+
+    // back arm
+    drawJointLimb(0, shoulderY, 22, 20, 11, 9, shB, elB, suitDark, suitDark, 'hand', gear);
+
+    // hips + torso
+    ctx.fillStyle = suit;
+    ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-19, -54, 38, 56, 9); ctx.fill();
+
+    // sash + flapping tail
+    ctx.fillStyle = sash;
+    ctx.fillRect(-19, -4, 38, 8);
+    ctx.beginPath();
+    ctx.moveTo(-17, -2); ctx.lineTo(-36, 4 + flap); ctx.lineTo(-33, 11 + flap); ctx.lineTo(-15, 4);
+    ctx.closePath(); ctx.fill();
+
+    // hood
+    ctx.fillStyle = suit;
+    ctx.beginPath(); ctx.arc(2, -72, 19, 0, Math.PI * 2); ctx.fill();
+
+    // headband + tail
+    ctx.fillStyle = sash;
+    ctx.fillRect(-17, -84, 38, 6);
+    ctx.beginPath();
+    ctx.moveTo(-16, -83); ctx.lineTo(-34, -79 + flap); ctx.lineTo(-30, -73 + flap); ctx.lineTo(-15, -78);
+    ctx.closePath(); ctx.fill();
+
+    // eye slit + eyes
+    ctx.fillStyle = skin;
+    ctx.beginPath(); ctx.roundRect(2, -75, 19, 10, 4); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(9, -70, 3.2, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16.5, -70, 3.2, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(10.3, -70, 1.6, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(17.8, -70, 1.6, 0, Math.PI * 2); ctx.fill();
+
+    // front arm
+    drawJointLimb(0, shoulderY, 22, 20, 12, 10, shF, elF, suit, suit, 'hand', gear);
+    ctx.restore();
+
+    // front leg
+    drawJointLimb(3, hipY, 34, 34, 17, 14, hipF, kneeF, suit, suit, 'shoe', gear);
     ctx.restore();
 }
