@@ -302,7 +302,9 @@ function boxesOverlap(a, b) {
 function spawnE(owner) {
     if (!gameStarted || isGameOver) return;
     const isFly = Math.random() > 0.45;
-    const startX = owner.cam + owner.viewW + 80 + (Math.random() * 160);
+    const startX = isFly
+        ? owner.cam + owner.viewW + 80 + Math.random() * 160
+        : owner.cam + owner.viewW * (0.55 + Math.random() * 0.35);
     const startY = isFly ? Math.random() * 180 + 130 : 0;
     const baseSpeed = Math.random() * 1.2 + 2.4;
     ems.push({
@@ -315,10 +317,12 @@ function spawnE(owner) {
         hitCooldown: 0,
         width: isFly ? 40 : GUARD_W,
         height: isFly ? 34 : GUARD_H,
-        facing: -1,
+        facing: owner.x > startX ? 1 : -1,
         attacking: false,
+        rise: isFly ? 1 : 0,          // 0 = underground, 1 = fully out
         anim: Math.random() * 10
     });
+    if (!isFly) addSparks(startX, canvas.height - 3, '#4a3b6b', 12);
 }
 function getTalismanDisplayName(name) {
     switch (name) {
@@ -880,7 +884,15 @@ function u() {
             const e = ems[i];
             e.spd = e.baseSpd;
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
-
+            if (!e.fly && e.rise < 1) {
+                // still emerging: no moving, no attacking, no damage
+                e.rise = Math.min(1, e.rise + dt / 50);     // about 0.8 s
+                if (Math.random() < 0.3 * dt) {
+                    addSparks(e.x + (Math.random() - 0.5) * 26, canvas.height - 3, '#4a3b6b', 3);
+                }
+                if (e.x < vb.lo - 150) ems.splice(i, 1);
+                continue;
+            }
             const validTargets = [];
             if (!character.invisible && !character.isShadowGuard && hp > 0) validTargets.push(character);
             if (isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0) validTargets.push(character2);
@@ -1115,16 +1127,29 @@ function u() {
     for (const a of arws) {
         ctx.save();
         ctx.translate(a.x, a.y);
-        ctx.rotate(a.ang);
-        ctx.fillStyle = '#4b4b4b';
-        ctx.fillRect(-12, -2, 24, 4);
-        ctx.fillStyle = '#ff4757';
+        ctx.rotate(performance.now() / 45 + a.x * 0.02);   // spinning
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#e0f2f7';
+        const grad = ctx.createLinearGradient(-13, -13, 13, 13);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.5, '#b0bec5');
+        grad.addColorStop(1, '#78909c');
+        ctx.fillStyle = grad;
         ctx.beginPath();
-        ctx.moveTo(12, -5);
-        ctx.lineTo(20, 0);
-        ctx.lineTo(12, 5);
+        for (let k = 0; k < 8; k++) {
+            const r = k % 2 === 0 ? 13 : 4.5;
+            const ang = k * Math.PI / 4;
+            const px = Math.cos(ang) * r, py = Math.sin(ang) * r;
+            if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
         ctx.closePath();
         ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#546e7a';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = '#37474f';
+        ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
         ctx.restore();
     }
     for (const f of fbs) {
@@ -1153,8 +1178,27 @@ function u() {
             ctx.textBaseline = 'middle';
             ctx.fillText('🦇', 0, wingFlap);
         } else {
-            ctx.translate(e.x, canvas.height - e.y);
-            drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.attacking ? 'attack' : 'run');
+            const rise = e.rise === undefined ? 1 : e.rise;
+            const gy = canvas.height - e.y;
+            if (rise < 1) {
+                // dark hole in the ground
+                ctx.save();
+                ctx.globalAlpha = 0.9 - 0.5 * rise;
+                ctx.fillStyle = '#120d22';
+                ctx.beginPath();
+                ctx.ellipse(e.x, gy + 3, 22, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                // only show the part of the guard above the ground line
+                ctx.beginPath();
+                ctx.rect(e.x - 60, gy + 3 - 150, 120, 150);
+                ctx.clip();
+                ctx.translate(e.x, gy + (1 - rise) * 62);
+                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, 'idle');
+            } else {
+                ctx.translate(e.x, gy);
+                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.attacking ? 'attack' : 'run');
+            }
         }
         ctx.restore();
     }
@@ -1507,14 +1551,18 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     ctx.closePath(); ctx.fill();
 
     // eye slit + eyes
-    ctx.fillStyle = skin;
+    ctx.fillStyle = '#0a0a12';
     ctx.beginPath(); ctx.roundRect(2, -75, 19, 10, 4); ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath(); ctx.ellipse(9, -70, 3.2, 2.6, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(16.5, -70, 3.2, 2.6, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.arc(10.3, -70, 1.6, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(17.8, -70, 1.6, 0, Math.PI * 2); ctx.fill();
+    ctx.save();
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#ff0000';
+    ctx.fillStyle = '#ff1a1a';
+    ctx.beginPath(); ctx.ellipse(9, -70, 3.4, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(16.5, -70, 3.4, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    ctx.fillStyle = '#ffb3b3';
+    ctx.beginPath(); ctx.arc(9.8, -70.6, 1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(17.3, -70.6, 1, 0, Math.PI * 2); ctx.fill();
 
     // front arm
     drawJointLimb(0, shoulderY, 22, 20, 12, 10, shF, elF, suit, suit, 'hand', gear);
