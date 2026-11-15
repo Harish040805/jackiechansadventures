@@ -1230,6 +1230,7 @@ function u() {
         ctx.fill();
         ctx.restore();
     }
+    drawBanishObjects();
     for (const e of ems) {
         ctx.save();
         if (e.fly) {
