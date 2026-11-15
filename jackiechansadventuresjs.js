@@ -115,7 +115,7 @@ const BANISH = [
     { e: '🥟', n: 'Tchang Zu',  m: 6400 },
     { e: '🪘', n: 'Po Kong',    m: 12800 }
 ].map(o => ({ ...o, x: o.m * 20 + 450, got: false }));
-const BANISH_Y = 50;   // height above ground
+const BANISH_Y = 100;   // height above ground
 
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
