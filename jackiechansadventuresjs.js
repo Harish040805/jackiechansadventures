@@ -105,6 +105,68 @@ function initBg() {
     }
 }
 initBg();
+const BANISH = [
+    { e: '🗡️', n: 'Shendu',     m: 100 },
+    { e: '🪭', n: 'Xiao Fung',  m: 200 },
+    { e: '🍐', n: 'Bai Tza',    m: 400 },
+    { e: '🌸', n: 'Dai Gui',    m: 800 },
+    { e: '🪷', n: 'Tso Lan',    m: 1600 },
+    { e: '🪈', n: 'Hsi Wu',     m: 3200 },
+    { e: '🥟', n: 'Tchang Zu',  m: 6400 },
+    { e: '🪘', n: 'Po Kong',    m: 12800 }
+].map(o => ({ ...o, x: o.m * 20 + 450, got: false }));
+const BANISH_Y = 35;   // height above ground
+
+function buildBanishUI() {
+    const grid = document.getElementById('bo-grid');
+    grid.innerHTML = '';
+    BANISH.forEach((o, i) => {
+        const d = document.createElement('div');
+        d.className = 'bo-cell';
+        d.title = `${o.n} - ${o.m} m`;
+        d.innerHTML = `<span>${o.e}</span><span id="bo-s${i}">🟡</span>`;
+        grid.appendChild(d);
+    });
+}
+function updateBanishUI() {
+    BANISH.forEach((o, i) => {
+        const s = document.getElementById('bo-s' + i);
+        if (s) s.textContent = o.got ? '🟢' : '🟡';
+    });
+}
+buildBanishUI();
+
+function checkBanishCollect() {
+    const chars = aliveChars();
+    for (const o of BANISH) {
+        if (o.got) continue;
+        const box = { cx: o.x, cy: canvas.height - BANISH_Y, hw: 18, hh: 20 };
+        for (const c of chars) {
+            if (boxesOverlap(box, playerBox(c))) {
+                o.got = true;
+                updateBanishUI();
+                addSparks(o.x, box.cy, '#ffd700', 20);
+                addFloatText(`${o.e} ${o.n}`, o.x, box.cy - 30, '#2ed573', 20);
+                showChiBanner(`${o.e} ${o.n}'s Banishment Object collected!`);
+                break;
+            }
+        }
+    }
+}
+function drawBanishObjects() {
+    const now = performance.now();
+    ctx.save();
+    ctx.font = '36px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = '#ffd700';
+    for (const o of BANISH) {
+        if (o.got || o.x < camX - 60 || o.x > camX + canvas.width + 60) continue;
+        ctx.fillText(o.e, o.x, canvas.height - BANISH_Y + Math.sin(now / 300 + o.m) * 4);
+    }
+    ctx.restore();
+}
 const calcScore = () => sgk * 100 + ek * 150 ;
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
@@ -871,6 +933,7 @@ function u() {
         const lead = Math.max(0, ...aliveChars().map(c => c.cam));
         if (lead * 0.05 > dist) { dist = lead * 0.05; updateScoreUI(); }
         const vb = viewBounds();
+        checkBanishCollect();
         const now = Date.now();
         updateGuardians(character, hp > 0);
         updateSpirit(character, hp > 0);
@@ -885,7 +948,6 @@ function u() {
             e.spd = e.baseSpd;
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
             if (!e.fly && e.rise < 1) {
-                // still emerging: no moving, no attacking, no damage
                 e.rise = Math.min(1, e.rise + dt / 50);     // about 0.8 s
                 if (Math.random() < 0.3 * dt) {
                     addSparks(e.x + (Math.random() - 0.5) * 26, canvas.height - 3, '#4a3b6b', 3);
