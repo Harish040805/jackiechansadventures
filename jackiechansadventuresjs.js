@@ -223,9 +223,9 @@ document.getElementById('start-btn').addEventListener('click', () => {
 let gt = 0;
 let nextSpawnAt = 0;
 function resetGameState() {
-  hp = 100; hp2 = 100; isGameOver = false; let isPaused = false; let pauseStartTime = 0; sgk = 0; ek = 0; dist = 0; prevScore = -1; prevDist = -1; ems = []; arws = []; fbs = []; magicBeams = []; particles = []; 
+  hp = 100; hp2 = 100; isGameOver = false; isPaused = false; pauseStartTime = 0; sgk = 0; ek = 0; dist = 0; prevScore = -1; prevDist = -1; ems = []; arws = []; fbs = []; magicBeams = []; particles = [];
   floatTexts = []; [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
-} 
+}
 function startGame() {
     resetGameState();
     gameStarted = true;
@@ -370,7 +370,7 @@ function boxesOverlap(a, b) {
     return Math.abs(a.cx - b.cx) < a.hw + b.hw && Math.abs(a.cy - b.cy) < a.hh + b.hh;
 }
 function spawnE(owner) {
-    if (!gameStarted || isGameOver) return;
+    if (!gameStarted || isGameOver || isPaused) return;
     const isFly = Math.random() > 0.45;
     const startX = isFly
         ? owner.cam + owner.viewW + 80 + Math.random() * 160
