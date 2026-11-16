@@ -187,7 +187,7 @@
     setTimeout(() => { try { c.close(); } catch (e) {} }, 400);
   }
   function onGuestMsg(d) {
-    if (!d || isGameOver) return;
+    if (!d || isGameOver || isPaused) return;
     if (d.t === 'in') {
       if (+d.vw > 300 && +d.vw < 10000) { 
         character2.viewW = +d.vw; 
@@ -209,7 +209,7 @@
   }
   const r1 = n => Math.round(n * 10) / 10;
   function packChar(c) {
-    const now = Date.now(), act = Object.keys(c.activeTalismans || {}), en = {};
+    const now = isPaused ? pauseStartTime : Date.now(), act = Object.keys(c.activeTalismans || {}), en = {};
     act.forEach(k => { if (c.talismanEnds && c.talismanEnds[k]) en[k] = c.talismanEnds[k] - now; });
     return {
       x: r1(c.x), y: r1(c.y), vx: Math.round(c.vx * 100) / 100, f: c.facing, w: Math.round(c.walkCycle * 100) / 100,
@@ -231,6 +231,7 @@
         a: arws.map(a => [a.id || (a.id = entId++), r1(a.x), r1(a.y), Math.round(a.ang * 100) / 100]),
         f: fbs.map(f => [f.id || (f.id = entId++), r1(f.x), r1(f.y)]),
         mb: magicBeams, ax: Math.round(mx + camX), ay: Math.round(my),
+        pz: isPaused,
         fx: fxQ.splice(0, 80), over: isGameOver
       });
     } catch (e) {}
@@ -346,6 +347,8 @@
     return out;
   }
   function applySnap(s) {
+    isPaused = !!s.pz;
+    document.getElementById('pause-overlay').style.display = isPaused ? 'flex' : 'none';
     hostW = s.W; hostH = s.H;
     const kx = 1;
     const gx = x => x * kx;
