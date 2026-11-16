@@ -234,8 +234,8 @@ document.getElementById('start-btn').addEventListener('click', () => {
 let gt = 0;
 let nextSpawnAt = 0;
 function resetGameState() {
-  hp = 100; hp2 = 100; isGameOver = false; sgk = 0; ek = 0; dist = 0; prevScore = -1; prevDist = -1; ems = []; arws = []; fbs = []; magicBeams = []; particles = []; floatTexts = [];
-  [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
+  hp = 100; hp2 = 100; isGameOver = false; let isPaused = false; let pauseStartTime = 0; sgk = 0; ek = 0; dist = 0; prevScore = -1; prevDist = -1; ems = []; arws = []; fbs = []; magicBeams = []; particles = []; 
+  floatTexts = []; [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
 } 
 function startGame() {
     resetGameState();
@@ -267,6 +267,7 @@ document.getElementById('intro-start-btn').addEventListener('click', showInstruc
 document.getElementById('intro-skip-btn').addEventListener('click', showInstructions);
 document.getElementById('instructions-start-btn').addEventListener('click', () => {
     document.getElementById('instructions-dialog').style.display = 'none';
+    pauseBtn.style.display = 'block';
     introOpen = false;
     enemiesActive = true;
     gt = Date.now();
@@ -293,6 +294,24 @@ function triggerGameOver() {
     document.getElementById('go-es').textContent = ek * 150;
     document.getElementById('go-dc').textContent = Math.floor(dist);
     goSc.textContent = calcScore();
+    pauseBtn.style.display = 'none';
+    pauseOverlay.style.display = 'none';
+    const boList = document.getElementById('go-bo-list');
+    boList.innerHTML = '';
+    let boGot = 0;
+    BANISH.forEach(o => {
+        const s = document.createElement('span');
+        s.textContent = o.e;
+        s.title = o.n;
+        if (o.got) {
+            boGot++;
+        } else {
+            s.style.color = 'transparent';
+            s.style.textShadow = '0 0 0 #000000';
+        }
+        boList.appendChild(s);
+    });
+    document.getElementById('go-bo').textContent = boGot;
     goEl.style.display = 'flex';
 }
 function dmg(amount, targetP) {
@@ -453,6 +472,8 @@ function clearTalismanForPlayer(chr) {
 function startPlayerTimer(chr, tName, sec, onExpire) {
     if (!chr.activeTalismans) chr.activeTalismans = {};
     if (!chr.talismanEnds) chr.talismanEnds = {};
+    if (!chr.talismanCbs) chr.talismanCbs = {};
+    chr.talismanCbs[tName] = onExpire;
     if (chr.activeTalismans[tName]) clearInterval(chr.activeTalismans[tName]);
     chr.talismanEnds[tName] = Date.now() + sec * 1000;
     updatePlayerTalismanUI(chr);
@@ -913,7 +934,65 @@ function eyePos(chr) {
         y: canvas.height - chr.y + (-68 + ry) * S
     };
 }
+const pauseBtn = document.getElementById('pause-btn');
+const pauseOverlay = document.getElementById('pause-overlay');
+
+function freezeTalismans(chr) {
+    chr.pausedTimers = {};
+    const now = Date.now();
+    const ends = chr.talismanEnds || {};
+    const act = chr.activeTalismans || {};
+    Object.keys(act).forEach(k => {
+        if (typeof act[k] !== 'boolean' && ends[k]) {
+            clearTimeout(act[k]);
+            chr.pausedTimers[k] = Math.max(0, ends[k] - now);
+            act[k] = true;   // stays "active" on the UI while paused
+        }
+    });
+}
+function thawTalismans(chr, delta) {
+    const left = chr.pausedTimers || {};
+    Object.keys(left).forEach(k => {
+        if (chr.activeTalismans && chr.activeTalismans[k]) {
+            startPlayerTimer(chr, k, left[k] / 1000, chr.talismanCbs && chr.talismanCbs[k]);
+        }
+    });
+    chr.pausedTimers = {};
+    if (chr.lastLaserTime) chr.lastLaserTime += delta;
+}
+function setPaused(p) {
+    if (p === isPaused || isGuest || !enemiesActive || isGameOver || introOpen) return;
+    if (p) {
+        isPaused = true;
+        pauseStartTime = Date.now();
+        clearInputKeys();
+        freezeTalismans(character);
+        freezeTalismans(character2);
+        try { window.speechSynthesis.pause(); } catch (e) {}
+        document.body.classList.add('paused');
+        pauseOverlay.style.display = 'flex';
+    } else {
+        const delta = Date.now() - pauseStartTime;
+        gt += delta;
+        nextSpawnAt += delta;
+        ems.forEach(e => { e.lt += delta; });
+        thawTalismans(character, delta);
+        thawTalismans(character2, delta);
+        isPaused = false;
+        try { window.speechSynthesis.resume(); } catch (e) {}
+        document.body.classList.remove('paused');
+        pauseOverlay.style.display = 'none';
+    }
+}
+pauseBtn.addEventListener('click', () => { pauseBtn.blur(); setPaused(true); });
+document.getElementById('resume-btn').addEventListener('click', () => setPaused(false));
+document.getElementById('pause-restart-btn').addEventListener('click', () => location.reload());
 function u() {
+    if (isPaused) {
+        lastFrameTime = performance.now();   // no time jump on resume
+        requestAnimationFrame(u);
+        return;
+    }
     const frameNow = performance.now();
     dt = Math.min((frameNow - lastFrameTime) / 16.667, 3);
     lastFrameTime = frameNow;
