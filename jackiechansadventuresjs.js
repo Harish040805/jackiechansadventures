@@ -710,6 +710,10 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
             chr.isRatActive = true;
             chr.activeTalismans['rat'] = true;
             startPlayerTimer(chr, 'rat', 10, () => { chr.isRatActive = false; });
+            if (!(remoteP2 && chr === character2)) {
+                const s = new SpeechSynthesisUtterance("It's action time!");
+                window.speechSynthesis.speak(s);
+            }
             break;
         case 'rabbit':
             chr.speed = 9.0;
