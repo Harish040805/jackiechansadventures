@@ -216,7 +216,8 @@
       j: c.isJumping, fl: c.isFlying, g: c.giant, d: c.isDogImmortal, a: c.isAstral, inv: c.invisible,
       sg: c.isShadowGuard, l: c.light, r: c.isRatActive, p: c.isPigLaserActive, dr: c.isDragonShooting,
       sq: Math.round(c.squish * 100) / 100, act, en,
-      sp: (c.isAstral && c.spirit) ? [r1(c.spirit.x), r1(c.spirit.y)] : null   // sheep spirit position
+      sp: (c.isAstral && c.spirit) ? [r1(c.spirit.x), r1(c.spirit.y)] : null,
+      mo: (c.isRatActive && c.moose) ? [r1(c.moose.x), r1(c.moose.y), c.moose.face] : null
     };
   }
   function sendSnap() {
@@ -360,10 +361,11 @@
     if (s.bo) { s.bo.forEach((v, i) => { if (BANISH[i]) BANISH[i].got = !!v; }); updateBanishUI(); }
     applyChar(character, s.c1, kx); applyChar(character2, s.c2, kx);
     [[character, s.c1], [character2, s.c2]].forEach(([c, sc]) => {
-      if (sc.sp) {
-        c.spTx = gx(sc.sp[0]); c.spTy = gy(sc.sp[1]);
-        if (!c.spirit) c.spirit = { x: c.spTx, y: c.spTy };
-      } else { c.spirit = null; }
+      if (sc.mo) {
+        c.moTx = gx(sc.mo[0]); c.moTy = gy(sc.mo[1]);
+        if (!c.moose) c.moose = { x: c.moTx, y: c.moTy, face: sc.mo[2] };
+        c.moose.face = sc.mo[2];
+      } else { c.moose = null; }
     });
     ems = syncList(ents.e, s.e, r => ({ id: r[0], tx: gx(r[1]), ty: r[2], fly: !!r[3], anim: r[4], facing: r[5] || -1, attacking: !!r[6], rise: r[7] === undefined ? 1 : r[7], moving: !!r[8] }));
     arws = syncList(ents.a, s.a, r => ({ id: r[0], tx: gx(r[1]), ty: gy(r[2]), ang: r[3] }));
@@ -386,6 +388,7 @@
       [character, character2].forEach(c => {
         if (c.tx !== undefined) { c.x += (c.tx - c.x) * k; c.y += (c.ty - c.y) * k; }
         if (c.spirit && c.spTx !== undefined) { c.spirit.x += (c.spTx - c.spirit.x) * k; c.spirit.y += (c.spTy - c.spirit.y) * k; }
+        if (c.moose && c.moTx !== undefined) { c.moose.x += (c.moTx - c.moose.x) * k; c.moose.y += (c.moTy - c.moose.y) * k; }
       });
       [ems, arws, fbs].forEach(list => list.forEach(o => {
         if (o.tx !== undefined) { o.x += (o.tx - o.x) * k; o.y += (o.ty - o.y) * k; }
