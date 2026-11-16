@@ -26,7 +26,7 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .hud-title { font-size: 17px; color: #1e3799; border-bottom: 2px solid #82ccdd; padding-bottom: 3px; margin-bottom: 4px; }
 .instr-box { position: relative; background: rgba(0,0,0,0.9); color: #fff; max-width: 760px; width: 92%; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 6px 20px rgba(0,0,0,0.6); text-align: center; }
 .instr-grid { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 20px; text-align: left; }
-.instr-head { min-height: 110px; display: flex; align-items: center; justify-content: center; padding-right: 130px; }
+.instr-head { min-height: 110px; display: flex; align-items: center; justify-content: center; padding-right: 100px; }
 .instr-head .intro-title { margin-bottom: 0; }
 .instr-scroll { max-height: 92vh; overflow-y: auto; padding: 24px 32px; border-radius: 16px; }
 .instr-section { background: rgba(255,255,255,0.08); border-left: 4px solid #0088ff; border-radius: 8px; padding: 10px 14px; }
