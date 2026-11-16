@@ -247,21 +247,46 @@ function startGame() {
     utter.onerror = enableNext;
     window.speechSynthesis.speak(utter);
 }
+const HTP_SPEECH = "Here is how to play. " +
+  "Movement. Choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up jumps, or flies up with the Rooster talisman. Down flies down. " +
+  "Attacking enemies. Defeat Shadow Guards for one hundred points and Bats for one hundred and fifty points. Press Q for the Pufferfish Chi Laser, which fires straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
+  "Talismans. Press the number keys, the minus key, or click the buttons at the bottom. Press again to turn one off. Several can be active at once, and each has a timer, except Dragon and Ox, which stay on until you turn them off. " +
+  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons tree guardians. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser. " +
+  "Banishment objects. Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Guards or bats. " +
+  "Two player co-op. Press the equals key for the Tiger talisman to open an online session, and share the Session I D. Or paste a friend's Session I D in the Online Co-Op box to join. Press equals again to return to single player. " +
+  "Survive. Dodge the silver blades and avoid touching enemies. The game ends when your health reaches zero. The longer you survive, the faster enemies spawn. All the best!";
+
 function showInstructions() {
     window.speechSynthesis.cancel();
     document.getElementById('intro-dialog').style.display = 'none';
     document.getElementById('instructions-dialog').style.display = 'flex';
+
+    const startBtn = document.getElementById('instructions-start-btn');
+    startBtn.disabled = true;
+    startBtn.style.opacity = '0.5';
+    startBtn.style.cursor = 'not-allowed';
+    const enableStart = () => {
+        startBtn.disabled = false;
+        startBtn.style.opacity = '1';
+        startBtn.style.cursor = 'pointer';
+    };
+    const utter = new SpeechSynthesisUtterance(HTP_SPEECH);
+    utter.onend = enableStart;
+    utter.onerror = enableStart;
+    window.speechSynthesis.speak(utter);
 }
-document.getElementById('intro-start-btn').addEventListener('click', showInstructions);
-document.getElementById('intro-skip-btn').addEventListener('click', showInstructions);
-document.getElementById('instructions-start-btn').addEventListener('click', () => {
+
+function beginPlay() {
+    window.speechSynthesis.cancel();
     document.getElementById('instructions-dialog').style.display = 'none';
     pauseBtn.style.display = 'block';
     introOpen = false;
     enemiesActive = true;
     gt = Date.now();
     nextSpawnAt = Date.now() + 1500;
-});
+}
+document.getElementById('instructions-start-btn').addEventListener('click', beginPlay);
+document.getElementById('instructions-skip-btn').addEventListener('click', beginPlay);
 const getSpawnDelay = () => Math.max(250, 3000 * 0.5 ** ((Date.now() - gt) / 60000));
 function spawnTick() {
     if (!enemiesActive) return;
