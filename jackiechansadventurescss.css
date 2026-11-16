@@ -39,7 +39,6 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .o, .pf, .sl { position: relative; width: 46px; height: 42px; font-size: 21px; background-image: linear-gradient(#a3a3a3, #888, #666); clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); display: flex; justify-content: center; align-items: center; border: 3px solid #444; cursor: pointer; user-select: none; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; }
 .o:hover, .pf:hover, .sl:hover { background-image: linear-gradient(#bfbfbf, #999, #777); transform: scale(1.08); }
 .o.active-talisman, .pf.active-talisman, .sl.active-talisman { background-image: linear-gradient(#ffeaa7, #fdcb6e, #e17055) !important; transform: scale(1.15); filter: drop-shadow(0 0 8px #ffd700); animation: talismanPulse 1.2s infinite alternate ease-in-out; will-change: transform; }
-rgba(0,0,0,0.8); z-index: 150; justify-content: center; align-items: center; }
 .pause-box { display: flex; flex-direction: column; align-items: center; gap: 16px; background: rgba(0,0,0,0.85); color: #fff; padding: 30px 50px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 6px 20px rgba(0,0,0,0.6); min-width: 320px; }
 .pause-box button { width: 100%; margin-top: 0; }
 .power-pill { padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 15px; display: none; align-items: center; gap: 6px; text-shadow: 0 0 6px rgba(0,0,0,0.5); }
@@ -81,7 +80,7 @@ rgba(0,0,0,0.8); z-index: 150; justify-content: center; align-items: center; }
 #m { position: absolute; bottom: 100px; left: 0; width: 100vw; height: 350px; white-space: nowrap; will-change: transform; }
 #pause-btn { display: none; position: absolute; bottom: 110px; right: 20px; z-index: 20; padding: 8px 16px; font-size: 15px; font-weight: bold; color: #fff; background: rgba(0,0,0,0.65); border: 2px solid rgba(255,255,255,0.6); border-radius: 10px; cursor: pointer; }
 #pause-btn:hover { background: rgba(0,0,0,0.85); }
-#pause-overlay { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: 
+#pause-overlay { display: none; position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 150; justify-content: center; align-items: center; }
 #p1-col { display: flex; flex-direction: column; gap: 6px; }
 #p1-power-badge { background: rgba(30, 64, 175, 0.9); color: #ffd700; border: 2px solid #60a5fa; box-shadow: 0 0 12px rgba(96, 165, 250, 0.5); }
 #p2-power-badge { background: rgba(185, 28, 28, 0.9); color: #ffd700; border: 2px solid #f87171; box-shadow: 0 0 12px rgba(248, 113, 113, 0.5); }
