@@ -1708,7 +1708,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     const hairCol = '#0b0b12';
     ctx.fillStyle = skin;
     ctx.strokeStyle = ink;
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(-14, -6);
     ctx.bezierCurveTo(-16, 6, -10, 18, 0, 22);
@@ -1806,7 +1806,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.fill();
     ctx.strokeStyle = '#31313b';
     ctx.lineCap = 'round';
-    ctx.lineWidth = 2.2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(-7, -20);  ctx.quadraticCurveTo(0, -27, 11, -24);
     ctx.moveTo(5, -19);   ctx.quadraticCurveTo(13, -27, 23, -21);
