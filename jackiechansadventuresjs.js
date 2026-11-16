@@ -1655,7 +1655,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.moveTo(-9, -3); ctx.lineTo(-5, -3); ctx.lineTo(-5, 7); ctx.lineTo(-9, 5);
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = '#2f55d0';
+    ctx.strokeStyle = '#31313b';
     ctx.lineCap = 'round';
     ctx.lineWidth = 2.2;
     ctx.beginPath();
