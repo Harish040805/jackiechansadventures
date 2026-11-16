@@ -304,7 +304,7 @@ function triggerGameOver() {
     goEl.style.display = 'flex';
 }
 function dmg(amount, targetP) {
-    if (!gameStarted || isGameOver) return;
+    if (!gameStarted || isGameOver || isPaused) return;
     if (targetP.isDogImmortal) return;
     const finalDmg = targetP.giant ? Math.ceil(amount * 0.5) : amount;
     addSparks(targetP.x, canvas.height - targetP.y - 35, '#ff4757', 6);
@@ -497,6 +497,7 @@ function updateTalismanTimers(chr) {
     }
 }
 function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
+    if (isPaused) return;
     const alive = caster.playerNum === 1 ? hp > 0 : hp2 > 0;
     if (!alive || isGameOver) return;
     const now = Date.now();
@@ -679,6 +680,11 @@ function sayHip() {
 window.addEventListener('keydown', (e) => {
     if (!gameStarted || isGameOver || introOpen) return;
     if (e.target && e.target.tagName === 'INPUT') return;
+    if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+        if (!e.repeat) setPaused(!isPaused);
+        return;
+    }
+    if (isPaused) return;
     const dir = moveKey(e);
     if (dir) {
         keysP1[dir] = true;
@@ -711,8 +717,8 @@ window.addEventListener('mousemove', (e) => {
     my = e.clientY;
 });
 window.addEventListener('click', (e) => {
-    if (!gameStarted || isGameOver || introOpen) return;
-    if (e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go') || e.target.closest('#intro-dialog') || e.target.closest('#instructions-dialog') || e.target.closest('#mp-panel') || e.target.closest('#mp-lost')) return;
+    if (!gameStarted || isGameOver || introOpen || isPaused) return;
+    if (e.target.closest('#pause-btn') || e.target.closest('#pause-overlay') || e.target.closest('.ui-c') || e.target.closest('#start-overlay') || e.target.closest('#go') || e.target.closest('#intro-dialog') || e.target.closest('#instructions-dialog') || e.target.closest('#mp-panel') || e.target.closest('#mp-lost')) return;
     if (character.isDragonShooting && hp > 0) {
         shootDragonFireball(character);
     }
@@ -721,6 +727,7 @@ window.addEventListener('click', (e) => {
     }
 });
 function shootDragonFireball(chr) {
+    if (isPaused) return;
     const mx = aimPt(chr).x, my = aimPt(chr).y;
     const sx = chr.x;
     const sy = canvas.height - chr.y - 35;
