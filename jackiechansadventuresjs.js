@@ -134,6 +134,8 @@ function checkBanishCollect() {
             if (boxesOverlap(box, playerBox(c))) {
                 o.got = true;
                 updateBanishUI();
+                updateScoreUI(true);
+                addFloatText(`+${BO_POINTS}`, o.x, box.cy - 55, '#ffd700', 18);
                 addSparks(o.x, box.cy, '#ffd700', 20);
                 addFloatText(`${o.e} ${o.n}`, o.x, box.cy - 30, '#2ed573', 20);
                 showChiBanner(`${o.e} ${o.n}'s Banishment Object collected!`);
@@ -156,10 +158,14 @@ function drawBanishObjects() {
     }
     ctx.restore();
 }
-const calcScore = () => sgk * 100 + ek * 150 ;
+const BO_POINTS = 500;
+const boCount = () => BANISH.filter(o => o.got).length;
+const calcScore = () => sgk * 100 + ek * 150 + boCount() * BO_POINTS;
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
+    const hudBo = document.getElementById('hud-bo');
+    const hudBos = document.getElementById('hud-bos');
     if (!force && currentScore === prevScore && currentDist === prevDist) return;
     prevScore = currentScore;
     prevDist = currentDist;
@@ -168,6 +174,8 @@ function updateScoreUI(force = false) {
     if (hudSgs) hudSgs.textContent = sgk * 100;
     if (hudEs) hudEs.textContent = ek * 150;
     if (hudDc) hudDc.textContent = currentDist;
+    if (hudBo) hudBo.textContent = boCount();
+    if (hudBos) hudBos.textContent = boCount() * BO_POINTS;
 }
 function registerKill(e, ey, sparkColor, sparkCount = 12) {
     addSparks(e.x, ey, sparkColor, sparkCount);
@@ -308,6 +316,7 @@ function triggerGameOver() {
     document.getElementById('go-sgs').textContent = sgk * 100;
     document.getElementById('go-es').textContent = ek * 150;
     document.getElementById('go-dc').textContent = Math.floor(dist);
+    document.getElementById('go-bos').textContent = boCount() * BO_POINTS;
     goSc.textContent = calcScore();
     pauseBtn.style.display = 'none';
     pauseOverlay.style.display = 'none';
