@@ -122,7 +122,80 @@ function updateBanishUI() {
     });
 }
 buildBanishUI();
-
+const WATER = (() => {
+    let s = 20240805;
+    const rnd = () => {
+        s = (s + 0x6D2B79F5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const bai = BANISH[2];
+    const list = [];
+    let x = 1500;
+    const end = BANISH[7].x + 2000;
+    while (x < end) {
+        x += (40 + rnd() * 80) * 20;
+        const w = (20 + rnd() * 10) * 20;
+        if (x + w > bai.x - 900 && x < bai.x + 900) continue;
+        list.push({ x1: x, x2: x + w });
+        x += w;
+    }
+    list.push({ x1: bai.x - 300, x2: bai.x + 300 });
+    list.sort((a, b) => a.x1 - b.x1);
+    return list;
+})();
+const WATER_DPS = 3;
+function inWater(chr) {
+    if (chr.y > 2) return false;
+    for (const w of WATER) {
+        if (chr.x > w.x1 && chr.x < w.x2) return true;
+        if (w.x1 > chr.x) break;
+    }
+    return false;
+}
+function waterDamage(chr) {
+    if (chr.isDogImmortal) return;
+    const amt = WATER_DPS * dt * 16.667 / 1000;
+    if (chr === character && hp > 0) {
+        hp = Math.max(0, hp - amt);
+        hpV.textContent = Math.round(hp);
+        updateHpBar(hp1Bar, hp);
+        if (hp <= 0) character.invisible = true;
+    } else if (chr === character2 && hp2 > 0) {
+        hp2 = Math.max(0, hp2 - amt);
+        hp2V.textContent = Math.round(hp2);
+        updateHpBar(hp2Bar, hp2);
+        if (hp2 <= 0) character2.invisible = true;
+    }
+    if (Math.random() < 0.08 * dt) addSparks(chr.x + (Math.random() - 0.5) * 30, canvas.height - 10, '#7dd3fc', 2);
+    if (isSplit ? (hp <= 0 && hp2 <= 0) : hp <= 0) triggerGameOver();
+}
+function drawWater(alpha) {
+    const now = performance.now();
+    const h = 18, top = canvas.height - h;
+    for (const w of WATER) {
+        if (w.x2 < camX - 50) continue;
+        if (w.x1 > camX + canvas.width + 50) break;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        const grad = ctx.createLinearGradient(0, top, 0, canvas.height);
+        grad.addColorStop(0, '#38bdf8');
+        grad.addColorStop(1, '#0369a1');
+        ctx.fillStyle = grad;
+        ctx.fillRect(w.x1, top, w.x2 - w.x1, h);
+        ctx.strokeStyle = '#e0f7ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const a = Math.max(w.x1, camX - 10), z = Math.min(w.x2, camX + canvas.width + 10);
+        for (let xx = a; xx <= z; xx += 12) {
+            const yy = top + Math.sin(xx / 18 + now / 250) * 2;
+            if (xx === a) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+}
 function checkBanishCollect() {
     const chars = aliveChars();
     for (const o of BANISH) {
@@ -1043,6 +1116,9 @@ function u() {
         if (lead * 0.05 > dist) { dist = lead * 0.05; updateScoreUI(); }
         const vb = viewBounds();
         checkBanishCollect();
+        if (!introOpen) {
+            aliveChars().forEach(c => { if (inWater(c)) waterDamage(c); });
+        }
         const now = Date.now();
         updateGuardians(character, hp > 0);
         updateSpirit(character, hp > 0);
@@ -1358,6 +1434,7 @@ function u() {
         ctx.fill();
         ctx.restore();
     }
+    drawWater(0.9);
     drawBanishObjects();
     for (const e of ems) {
         ctx.save();
@@ -1397,6 +1474,7 @@ function u() {
     if (isSplit && (!character2.invisible || character2.activeTalisman === 'snake') && hp2 > 0) {
         drawHuman(character2, isGuest ? "Me" : "Partner");
     }
+    drawWater(0.3);
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx * dt;
