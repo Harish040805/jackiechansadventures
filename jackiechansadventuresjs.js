@@ -1676,7 +1676,7 @@ const INK = '#1b1410';
 function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType, endColor) {
     ctx.save();
     ctx.translate(x, y);
-    ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 2;
+    ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 1;
     ctx.rotate(a1);
     ctx.fillStyle = c1;
     ctx.beginPath(); ctx.roundRect(-w1 / 2, -4, w1, len1 + 8, w1 / 2.5); ctx.fill(); ctx.stroke();
