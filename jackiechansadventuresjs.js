@@ -331,7 +331,7 @@ const HTP_SPEECH = "Aiyaa! Jackie! Captain black have informed me for your safet
   "For movement, choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up or W jumps, or flies up with the Rooster talisman. Down or S flies down. " +
   "One more thing! Defeat Shadow Guards for one hundred points and Bats for one hundred and fifty points. Press Q for the Pufferfish Chi Laser, which fires straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
   "One more thing! To use the talismans, press the number keys, the minus key or click the buttons at the bottom. Press again to turn one off. Several can be active at once and each has a timer. One more thing! Dragon and Ox, alone stay on until you turn them off. " +
-  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons tree guardians. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser whi Chi magic. " +
+  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser whi Chi magic. " +
   "One more thing! Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. For Shendu, it's the sword, Xiao Fung, it's the fan, Bai Tza, its the gourd fruit. For Dai Gui, it's the flower and for Tsa Lan, its the lotus flower. For Hsi Wu, it's the flute. For Tchang Zu, it's the castanets. Atlast, for the mountain demon Po Kong, its the drums. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Guards or bats. " +
   "One more thing! Press the equals key for the Tiger talisman to open an online session and share the Session I D. Or paste a friend's Session I D in the Online Co-Op box to join. Press equals again to return to single player. " +
   "One more thing! Dodge the silver blades and avoid touching enemies. The game ends when your health reaches zero. The longer you survive, the faster enemies spawn. All the best!";
@@ -508,7 +508,7 @@ function getTalismanDisplayName(name) {
         case 'dragon': return '🐉 Dragon (Fireblast)';
         case 'horse': return '🐴 Horse (Noble Healing)';
         case 'monkey': return '🐒 Monkey (Ninja Disguise)';
-        case 'rat': return '🐀 Rat (Tree Guardians)';
+        case 'rat': return '🐀 Rat (Super Moose)';
         case 'rabbit': return '🐇 Rabbit (Super Speed)';
         case 'pig': return '🐷 Pig (Thermal Eye Laser)';
         case 'ox': return '🐂 Ox (Giant Strength)';
@@ -557,6 +557,7 @@ function clearTalismanForPlayer(chr) {
     chr.isDragonShooting = false;
     chr.isShadowGuard = false;
     chr.isRatActive = false;
+    chr.moose = null;
     chr.isPigLaserActive = false;
     chr.giant = false;
     chr.isFlying = false;
@@ -941,29 +942,161 @@ function aimArrow(sx, sy, chr, spd) {
     if (AIM_ERROR > 0) ang += (Math.random() - 0.5) * 2 * AIM_ERROR;
     return { vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, ang: ang };
 }
-function treeGuardPts(chr) {
-    const y = canvas.height - chr.y - 35;
-    return [{ x: chr.x - 65, y }, { x: chr.x + 65, y }];
-}
-function updateGuardians(chr, alive) {
-    if (!chr.isRatActive || !alive) return;
-    for (const p of treeGuardPts(chr)) {
-        for (let j = ems.length - 1; j >= 0; j--) {
-            const e = ems[j];
-            const ey = enemyCY(e);
-            if (Math.abs(e.x - p.x) < 32 + e.width * 0.5 && Math.abs(ey - p.y) < 50) {
-                registerKill(e, ey, '#2ed573', 12);
-                ems.splice(j, 1);
-            }
-        }
-        for (let j = arws.length - 1; j >= 0; j--) {
-            const a = arws[j];
-            if (Math.abs(a.x - p.x) < 28 && Math.abs(a.y - p.y) < 50) {
-                addSparks(a.x, a.y, '#2ed573', 5);
-                arws.splice(j, 1);
-            }
+const MOOSE_VB = { x: 88, y: 8, w: 262, h: 402 };
+const MOOSE_H = 70;
+const MOOSE_W = MOOSE_H * MOOSE_VB.w / MOOSE_VB.h;
+const MOOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MOOSE_VB.x} ${MOOSE_VB.y} ${MOOSE_VB.w} ${MOOSE_VB.h}" width="${MOOSE_VB.w}" height="${MOOSE_VB.h}">
+<style>
+.outline{stroke:#36260d;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.seam{fill:none;stroke:#36260d;stroke-width:1.5;stroke-linecap:round;opacity:.75}
+.yellow-fill{fill:#f9d857}.yellow-shade{fill:#d6ad2d}
+.blue-fill{fill:#467399}.blue-dark{fill:#2c4c68}
+.red-fill{fill:#be2a33}.red-dark{fill:#85181e}
+.antler-fill{fill:#94762e}.antler-dark{fill:#6b531b}
+.buckle-fill{fill:#99b8ce}.buckle-shade{fill:#7495ad}
+</style>
+<defs>
+<clipPath id="clip-snout"><path d="M 118,142 C 110,122 135,105 168,108 C 198,110 218,124 214,146 C 210,168 182,178 152,174 C 126,170 123,156 118,142 Z"/></clipPath>
+<clipPath id="clip-head"><path d="M 148,125 C 145,82 162,55 198,56 C 232,57 250,82 248,122 L 245,152 C 242,168 220,178 192,176 L 155,155 Z"/></clipPath>
+<clipPath id="clip-torso"><path d="M 138,178 C 165,164 215,162 248,175 C 266,212 278,256 274,290 C 272,308 248,316 208,316 C 164,316 126,308 128,286 C 129,252 130,210 138,178 Z"/></clipPath>
+<clipPath id="clip-cape"><path d="M 222,165 C 262,162 296,188 312,238 C 326,282 329,332 326,362 C 308,368 282,365 260,358 L 244,295 Z"/></clipPath>
+</defs>
+<g id="cape">
+<path class="red-fill outline" d="M 222,165 C 262,162 296,188 312,238 C 326,282 329,332 326,362 C 308,368 282,365 260,358 L 244,295 Z"/>
+<g clip-path="url(#clip-cape)">
+<path class="red-dark" d="M 249,250 C 272,262 286,315 284,368 L 249,365 Z"/>
+<path class="seam" d="M 256,258 C 276,275 284,320 282,365"/>
+<path class="red-dark" d="M 289,175 C 316,215 326,290 319,365 L 334,365 L 329,180 Z"/>
+</g>
+<path class="outline" fill="none" d="M 222,165 C 262,162 296,188 312,238 C 326,282 329,332 326,362 C 308,368 282,365 260,358 L 244,295 Z"/>
+</g>
+<g id="antler-left">
+<path class="antler-dark outline" d="M 118,22 C 134,20 146,35 145,56 C 145,62 152,65 156,58 C 164,56 170,68 164,84 C 158,98 150,104 158,112 L 146,120 C 134,110 112,102 104,88 Z"/>
+<path class="antler-fill outline" d="M 148,116 C 135,105 112,104 102,88 C 92,72 95,42 108,28 C 118,17 132,20 136,36 C 138,48 136,60 142,62 C 148,64 152,52 158,56 C 164,60 162,78 152,92 C 146,100 152,106 158,110 Z"/>
+</g>
+<g id="arm-left">
+<path class="yellow-fill outline" d="M 116,226 C 104,234 100,252 110,262 C 120,271 136,265 142,252 Z"/>
+<path class="yellow-shade" d="M 128,235 C 136,244 132,260 118,264 C 130,265 140,258 142,248 Z"/>
+<path class="blue-fill outline" d="M 142,184 C 123,192 112,208 108,226 C 120,233 134,236 144,234 Z"/>
+</g>
+<g id="legs">
+<path class="yellow-fill outline" d="M 142,298 L 143,368 C 144,388 160,398 180,396 C 196,394 203,382 203,365 L 203,302 Z"/>
+<path class="yellow-shade" d="M 190,304 L 190,372 C 190,386 182,394 172,396 C 190,397 202,386 202,368 L 202,304 Z"/>
+<path class="outline" fill="none" d="M 142,298 L 143,368 C 144,388 160,398 180,396 C 196,394 203,382 203,365 L 203,302 Z"/>
+<path class="yellow-fill outline" d="M 198,304 L 199,375 C 200,396 218,406 238,402 C 254,398 260,384 260,365 L 258,298 Z"/>
+<path class="yellow-shade" d="M 244,300 L 245,372 C 245,388 236,398 224,402 C 244,403 259,390 259,368 L 258,300 Z"/>
+<path class="seam" d="M 242,307 C 244,335 244,372 238,400"/>
+<path class="outline" fill="none" d="M 198,304 L 199,375 C 200,396 218,406 238,402 C 254,398 260,384 260,365 L 258,298 Z"/>
+</g>
+<g id="torso">
+<path class="blue-fill outline" d="M 138,178 C 165,164 215,162 248,175 C 266,212 278,256 274,290 C 272,308 248,316 208,316 C 164,316 126,308 128,286 C 129,252 130,210 138,178 Z"/>
+<g clip-path="url(#clip-torso)">
+<path class="blue-dark" d="M 236,170 C 250,215 256,268 248,318 L 282,318 L 270,170 Z"/>
+<path class="red-fill outline" d="M 124,250 C 168,263 228,263 276,248 L 278,267 C 228,282 168,282 123,269 Z"/>
+<path class="red-dark" d="M 243,253 L 278,246 L 279,269 L 245,274 Z"/>
+<rect class="red-fill outline" x="144" y="253" width="7" height="20" rx="1"/>
+<rect class="red-fill outline" x="216" y="255" width="7" height="20" rx="1"/>
+<rect class="red-dark outline" x="252" y="251" width="7" height="20" rx="1"/>
+</g>
+<path class="outline" fill="none" d="M 138,178 C 165,164 215,162 248,175 C 266,212 278,256 274,290 C 272,308 248,316 208,316 C 164,316 126,308 128,286 C 129,252 130,210 138,178 Z"/>
+<ellipse class="buckle-fill outline" cx="184" cy="267" rx="17" ry="12.5"/>
+<path class="buckle-shade" d="M 193,257 C 200,261 200,273 191,277 C 196,274 198,263 193,257 Z"/>
+<path class="red-fill outline" d="M 147,204 C 151,193 168,192 180,199 L 185,203 L 191,199 C 204,192 221,194 225,206 C 215,204 204,206 197,211 L 185,206 L 174,211 C 166,205 155,203 147,204 Z"/>
+</g>
+<g id="collar"><path class="red-fill outline" d="M 198,169 C 215,156 244,158 262,172 C 254,180 232,180 212,174 Z"/></g>
+<g id="arm-right">
+<path class="yellow-fill outline" d="M 252,238 C 248,254 256,272 272,274 C 288,276 298,262 294,242 L 288,230 Z"/>
+<path class="yellow-shade" d="M 280,232 C 286,248 282,266 268,272 C 284,275 296,262 293,242 L 288,230 Z"/>
+<path class="outline" fill="none" d="M 252,238 C 248,254 256,272 272,274 C 288,276 298,262 294,242 L 288,230 Z"/>
+<path class="blue-fill outline" d="M 238,182 C 258,180 276,194 292,232 C 278,242 258,244 244,238 C 238,218 235,198 238,182 Z"/>
+<path class="blue-dark" d="M 262,190 C 274,204 282,220 286,234 L 292,231 C 280,202 270,192 262,190 Z"/>
+<path class="outline" fill="none" d="M 238,182 C 258,180 276,194 292,232 C 278,242 258,244 244,238 C 238,218 235,198 238,182 Z"/>
+</g>
+<g id="head-group">
+<path class="yellow-fill outline" d="M 148,125 C 145,82 162,55 198,56 C 232,57 250,82 248,122 L 245,152 C 242,168 220,178 192,176 L 155,155 Z"/>
+<g clip-path="url(#clip-head)">
+<path class="yellow-shade" d="M 225,58 C 242,78 242,135 224,175 L 254,175 L 254,58 Z"/>
+<path class="seam" d="M 192,56 C 189,68 188,78 188,88"/>
+<path class="outline" fill="none" d="M 168,77 Q 175,73 182,76"/>
+<path class="outline" fill="none" d="M 198,75 Q 205,72 212,76"/>
+<path class="blue-fill outline" d="M 142,92 C 172,82 218,82 252,94 L 250,122 C 216,130 172,128 142,120 Z"/>
+<path class="blue-dark" d="M 228,86 L 228,128 L 254,126 L 254,88 Z"/>
+<path class="outline" fill="none" d="M 142,92 C 172,82 218,82 252,94 L 250,122 C 216,130 172,128 142,120 Z"/>
+</g>
+<ellipse fill="#ffffff" class="outline" cx="173" cy="105" rx="4.2" ry="6.5" transform="rotate(-8 173 105)"/>
+<ellipse fill="#ffffff" class="outline" cx="203" cy="105" rx="4.2" ry="6.5" transform="rotate(6 203 105)"/>
+<path class="outline" fill="none" d="M 148,125 C 145,82 162,55 198,56 C 232,57 250,82 248,122 L 245,152 C 242,168 220,178 192,176 L 155,155 Z"/>
+<path class="outline" fill="none" d="M 205,158 C 218,162 228,156 232,145"/>
+<path class="outline" fill="none" d="M 228,143 Q 233,144 235,148"/>
+<path class="yellow-fill outline" d="M 118,142 C 110,122 135,105 168,108 C 198,110 218,124 214,146 C 210,168 182,178 152,174 C 126,170 123,156 118,142 Z"/>
+<g clip-path="url(#clip-snout)">
+<path class="yellow-shade" d="M 196,112 C 208,128 204,158 172,174 L 218,176 L 218,112 Z"/>
+<path class="seam" d="M 164,108 C 156,128 156,154 162,175"/>
+</g>
+<path class="outline" fill="none" d="M 118,142 C 110,122 135,105 168,108 C 198,110 218,124 214,146 C 210,168 182,178 152,174 C 126,170 123,156 118,142 Z"/>
+<ellipse fill="#36260d" cx="144" cy="133" rx="2.8" ry="4.5" transform="rotate(12 144 133)"/>
+<ellipse fill="#36260d" cx="174" cy="132" rx="2.8" ry="4.5" transform="rotate(-10 174 132)"/>
+</g>
+<g id="ear-right">
+<path class="yellow-fill outline" d="M 244,104 C 256,105 268,116 272,130 C 262,136 250,136 242,130 Z"/>
+<path class="yellow-shade" d="M 244,124 C 254,128 264,128 271,126 L 272,130 C 262,136 250,136 242,130 Z"/>
+<path class="outline" fill="none" d="M 244,104 C 256,105 268,116 272,130 C 262,136 250,136 242,130 Z"/>
+</g>
+<g id="antler-right">
+<path class="antler-dark outline" d="M 294,18 C 314,15 338,34 342,60 C 345,84 332,104 304,112 C 288,116 274,114 265,122 L 254,112 C 264,100 274,92 268,78 C 262,64 266,50 275,50 C 282,50 284,60 290,58 C 296,56 286,36 294,18 Z"/>
+<path class="antler-fill outline" d="M 252,110 C 262,98 272,92 264,76 C 256,60 262,46 270,48 C 276,50 278,60 285,58 C 292,56 282,36 290,22 C 298,10 322,22 332,46 C 340,68 332,94 304,104 C 286,110 272,108 262,118 Z"/>
+</g>
+</svg>`;
+const mooseImg = new Image();
+mooseImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(MOOSE_SVG);
+function updateMoose(chr, alive) {
+    if (!chr.isRatActive || !alive) { chr.moose = null; return; }
+    const homeX = chr.x - chr.facing * 55;
+    const homeY = canvas.height - chr.y - 60;
+    if (!chr.moose) chr.moose = { x: homeX, y: homeY, face: chr.facing };
+    const mo = chr.moose;
+    const cy = canvas.height - chr.y - 35;
+    let target = null, best = 520;
+    for (const e of ems) {
+        const d = Math.hypot(e.x - chr.x, enemyCY(e) - cy);
+        if (d < best) { best = d; target = e; }
+    }
+    const tx = target ? target.x : homeX;
+    const ty = target ? enemyCY(target) : homeY;
+    const dx = tx - mo.x, dy = ty - mo.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const step = Math.min(len, (target ? 11 : 6) * dt);
+    if (Math.abs(dx) > 2) mo.face = dx > 0 ? 1 : -1;
+    mo.x += (dx / len) * step;
+    mo.y += (dy / len) * step;
+    mo.y = Math.min(mo.y, canvas.height - MOOSE_H / 2 - 3);
+    for (let j = ems.length - 1; j >= 0; j--) {
+        const e = ems[j];
+        const ey = enemyCY(e);
+        if (Math.abs(mo.x - e.x) < MOOSE_W / 2 + e.width * 0.5 + 8 &&
+            Math.abs(mo.y - ey) < MOOSE_H / 2 + e.height * 0.5 + 8) {
+            registerKill(e, ey, '#f9d857', 14);
+            ems.splice(j, 1);
         }
     }
+    for (let j = arws.length - 1; j >= 0; j--) {
+        const a = arws[j];
+        if (Math.abs(a.x - mo.x) < MOOSE_W / 2 + 10 && Math.abs(a.y - mo.y) < MOOSE_H / 2 + 10) {
+            addSparks(a.x, a.y, '#f9d857', 5);
+            arws.splice(j, 1);
+        }
+    }
+}
+function drawMoose(mo) {
+    if (!mooseImg.complete || !mooseImg.naturalWidth) return;
+    const bob = Math.sin(performance.now() / 180) * 3;
+    ctx.save();
+    ctx.translate(mo.x, mo.y + bob);
+    ctx.scale(mo.face === 1 ? -1 : 1, 1);
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = '#f9d857';
+    ctx.drawImage(mooseImg, -MOOSE_W / 2, -MOOSE_H / 2, MOOSE_W, MOOSE_H);
+    ctx.restore();
 }
 function updateSpirit(chr, alive) {
     if (!chr.isAstral || !alive) { chr.spirit = null; return; }
@@ -1121,13 +1254,14 @@ function u() {
             aliveChars().forEach(c => { if (inWater(c)) waterDamage(c); });
         }
         const now = Date.now();
-        updateGuardians(character, hp > 0);
+        updateMoose(character, hp > 0);
         updateSpirit(character, hp > 0);
         if (isSplit) {
-            updateGuardians(character2, hp2 > 0);
+            updateMoose(character2, hp2 > 0);
             updateSpirit(character2, hp2 > 0);
         } else {
             character2.spirit = null;
+            character2.moose = null;
         }
         for (let i = ems.length - 1; i >= 0; i--) {
             const e = ems[i];
@@ -1299,14 +1433,7 @@ function u() {
     if (chr === character2 && !isSplit) continue;
     const alive = chr === character ? hp > 0 : hp2 > 0;
     if (!alive) continue;
-    if (chr.isRatActive) {
-        ctx.save();
-        ctx.font = '40px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        for (const p of treeGuardPts(chr)) ctx.fillText('🌳', p.x, p.y);
-        ctx.restore();
-    }
+    if (chr.isRatActive && chr.moose) drawMoose(chr.moose);
     if (chr.isAstral && chr.spirit) {
         ctx.save();
         ctx.font = '34px sans-serif';
