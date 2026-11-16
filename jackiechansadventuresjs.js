@@ -103,9 +103,7 @@ const BANISH = [
     { e: '🪈', n: 'Hsi Wu',     m: 3200 },
     { e: '🥟', n: 'Tchang Zu',  m: 6400 },
     { e: '🪘', n: 'Po Kong',    m: 12800 }
-].map(o => ({ ...o, x: o.m * 20 + 450, got: false }));
-const BANISH_Y = 150;
-
+].map((o, i) => ({ ...o, x: o.m * 20 + 450, y: [150, 200, 30, 30, 300, 250, 250, 100][i], got: false }));
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
     grid.innerHTML = '';
@@ -129,7 +127,7 @@ function checkBanishCollect() {
     const chars = aliveChars();
     for (const o of BANISH) {
         if (o.got) continue;
-        const box = { cx: o.x, cy: canvas.height - BANISH_Y, hw: 18, hh: 20 };
+        const box = { cx: o.x, cy: canvas.height - o.y, hw: 18, hh: 20 };
         for (const c of chars) {
             if (boxesOverlap(box, playerBox(c))) {
                 o.got = true;
@@ -154,7 +152,7 @@ function drawBanishObjects() {
     ctx.shadowColor = '#ffd700';
     for (const o of BANISH) {
         if (o.got || o.x < camX - 60 || o.x > camX + canvas.width + 60) continue;
-        ctx.fillText(o.e, o.x, canvas.height - BANISH_Y + Math.sin(now / 300 + o.m) * 4);
+        ctx.fillText(o.e, o.x, canvas.height - o.y + Math.sin(now / 300 + o.m) * 4);
     }
     ctx.restore();
 }
@@ -420,6 +418,7 @@ function spawnE(owner) {
         spd: baseSpeed,
         lt: Date.now(),
         hitCooldown: 0,
+        hits: 0,
         width: isFly ? 40 : GUARD_W,
         height: isFly ? 34 : GUARD_H,
         facing: owner.x > startX ? 1 : -1,
@@ -1116,7 +1115,7 @@ function u() {
                     const sx = e.x;
                     const sy = enemyCY(e);
                     const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
-                    arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang });
+                    arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang, owner: e });
                 }
             }
 
@@ -1140,6 +1139,26 @@ function u() {
                 continue;
             } else if (hit2) {
                 dmg(5, character2);
+                arws.splice(i, 1);
+                continue;
+            }
+            let bladeHit = false;
+            for (let j = ems.length - 1; j >= 0; j--) {
+                const en = ems[j];
+                if (en === a.owner || (!en.fly && en.rise < 1)) continue;
+                const eb = enemyBox(en);
+                if (Math.abs(a.x - eb.cx) < eb.hw + 10 && Math.abs(a.y - eb.cy) < eb.hh + 10) {
+                    en.hits = (en.hits || 0) + 1;
+                    addSparks(a.x, a.y, '#b0bec5', 6);
+                    if (en.hits >= (en.fly ? 2 : 3)) {
+                        addSparks(en.x, eb.cy, '#ff9f43', 14);
+                        ems.splice(j, 1);
+                    }
+                    bladeHit = true;
+                    break;
+                }
+            }
+            if (bladeHit) {
                 arws.splice(i, 1);
                 continue;
             }
