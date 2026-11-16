@@ -28,7 +28,7 @@ const hudDc = document.getElementById('hud-dc');
 const goEl = document.getElementById('go');
 const goSc = document.getElementById('go-sc');
 const chiBanner = document.getElementById('chi-banner');
-let hp = 100, hp2 = 100, isGameOver = false, gameStarted = false, enemiesActive = false, introOpen = false, enemyInterval = null, sgk = 0, ek = 0, dist = 0, prevScore = -1, prevDist = -1, b = 0;
+let hp = 100, hp2 = 100, isGameOver = false, isPaused = false, pauseStartTime = 0, gameStarted = false, enemiesActive = false, introOpen = false, enemyInterval = null, sgk = 0, ek = 0, dist = 0, prevScore = -1, prevDist = -1, b = 0;
 const lw = 1800;
 let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 let isSplit = false;
@@ -537,7 +537,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     }
 }
 function switchTalismanForPlayer(chr, name) {
-    if (!gameStarted || isGameOver) return;
+    if (!gameStarted || isGameOver || isPaused) return;
     const pNum = chr.playerNum;
     if (pNum === 1 && hp <= 0) return;
     if (pNum === 2 && hp2 <= 0) return;
