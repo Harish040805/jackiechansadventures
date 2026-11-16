@@ -1657,14 +1657,16 @@ function u() {
         if (ft.opacity <= 0) {
             floatTexts.splice(i, 1);
             continue;
-        }
+        }        
         ctx.save();
         ctx.globalAlpha = ft.opacity;
-        ctx.font = `bold ${ft.size}px 'Segoe UI', sans-serif`;
-        ctx.fillStyle = ft.color;
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = '#000';
+        ctx.font = `${ft.size + 6}px Bangers, 'Segoe UI', sans-serif`;
         ctx.textAlign = 'center';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = INK;
+        ctx.strokeText(ft.text, ft.x, ft.y);
+        ctx.fillStyle = ft.color;
         ctx.fillText(ft.text, ft.x, ft.y);
         ctx.restore();
     }
@@ -1672,33 +1674,27 @@ function u() {
     requestAnimationFrame(u);
 }
 requestAnimationFrame(u);
+const INK = '#1b1410';
 function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType, endColor) {
     ctx.save();
     ctx.translate(x, y);
+    ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 3.5;
     ctx.rotate(a1);
     ctx.fillStyle = c1;
-    ctx.beginPath();
-    ctx.roundRect(-w1 / 2, -4, w1, len1 + 8, w1 / 2.5);
-    ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-w1 / 2, -4, w1, len1 + 8, w1 / 2.5); ctx.fill(); ctx.stroke();
     ctx.translate(0, len1);
     ctx.rotate(a2);
     ctx.fillStyle = c2;
-    ctx.beginPath();
-    ctx.roundRect(-w2 / 2, -4, w2, len2 + 4, w2 / 2.5);
-    ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-w2 / 2, -4, w2, len2 + 4, w2 / 2.5); ctx.fill(); ctx.stroke();
     ctx.translate(0, len2);
     if (endType === 'shoe') {
         ctx.fillStyle = endColor || '#1c1917';
-        ctx.beginPath();
-        ctx.roundRect(-w2 / 2 - 1, -3, w2 + 11, 12, 5);
-        ctx.fill();
+        ctx.beginPath(); ctx.roundRect(-w2 / 2 - 1, -3, w2 + 11, 12, 5); ctx.fill(); ctx.stroke();
         ctx.fillStyle = endColor || '#e7e5e4';
         ctx.fillRect(-w2 / 2 - 1, 6, w2 + 11, 3);
     } else {
         ctx.fillStyle = endColor || '#f0c08a';
-        ctx.beginPath();
-        ctx.arc(0, 2, 5.5, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(0, 2, 5.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     }
     ctx.restore();
 }
@@ -1712,7 +1708,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     const hairCol = '#0b0b12';
     ctx.fillStyle = skin;
     ctx.strokeStyle = ink;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2.2;
     ctx.beginPath();
     ctx.moveTo(-14, -6);
     ctx.bezierCurveTo(-16, 6, -10, 18, 0, 22);
@@ -1833,6 +1829,13 @@ function drawHuman(chr, label) {
         ctx.fillText(label, 0, chr.giant ? -135 : -95);
         ctx.restore();
     }
+    ctx.save();
+    ctx.globalAlpha = Math.max(0.12, 0.35 - chr.y / 900);
+    ctx.fillStyle = '#0b2a14';
+    ctx.beginPath();
+    ctx.ellipse(0, chr.y + 2, (chr.giant ? 40 : 26) * Math.max(0.5, 1 - chr.y / 500), 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
     if (chr.isDogImmortal) {
         ctx.save();
         ctx.strokeStyle = '#ffd700';
@@ -1900,10 +1903,13 @@ function drawHuman(chr, label) {
     ctx.filter = 'brightness(0.75)';
     drawJointLimb(0, shoulderY, 22, 20, 12, 10, shB, elB, shirt, skin, 'hand');
     ctx.filter = baseFilter;
+    ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 3.5;
     ctx.fillStyle = pants;
-    ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill(); ctx.stroke();
     ctx.fillStyle = shirt;
-    ctx.beginPath(); ctx.roundRect(-19, -54 + breathe, 38, 56, 9); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-19, -54 + breathe, 38, 56, 9); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(10,20,50,0.22)';
+    ctx.beginPath(); ctx.roundRect(6, -54 + breathe, 13, 56, [0, 9, 9, 0]); ctx.fill();
     ctx.fillStyle = '#292524'; ctx.fillRect(-18, -2, 36, 5);
     ctx.fillStyle = '#d4a017'; ctx.fillRect(-3, -2, 6, 5);
     ctx.fillStyle = skinShade;
@@ -1961,16 +1967,17 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     ctx.translate(0, hipY);
     ctx.rotate(lean);
     drawJointLimb(0, shoulderY, 22, 20, 11, 9, shB, elB, suitDark, suitDark, 'hand', gear);
+    ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 3.5;
     ctx.fillStyle = suit;
-    ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(-19, -54, 38, 56, 9); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(-19, -54, 38, 56, 9); ctx.fill(); ctx.stroke();
     ctx.fillStyle = sash;
     ctx.fillRect(-19, -4, 38, 8);
     ctx.beginPath();
     ctx.moveTo(-17, -2); ctx.lineTo(-36, 4 + flap); ctx.lineTo(-33, 11 + flap); ctx.lineTo(-15, 4);
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = suit;
-    ctx.beginPath(); ctx.arc(2, -72, 19, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(2, -72, 19, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.fillStyle = sash;
     ctx.fillRect(-17, -84, 38, 6);
     ctx.beginPath();
