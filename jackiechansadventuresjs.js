@@ -1053,35 +1053,42 @@ const MOOSE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${MOOSE_VB.x
 </svg>`;
 const mooseImg = new Image();
 mooseImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(MOOSE_SVG);
+function nearestTwo(chr) {
+    const cy = canvas.height - chr.y - 35;
+    return ems
+        .map(e => ({ e, d: Math.hypot(e.x - chr.x, enemyCY(e) - cy) }))
+        .filter(o => o.d < 520)
+        .sort((a, b) => a.d - b.d)
+        .slice(0, 2)
+        .map(o => o.e);
+}
 function updateMoose(chr, alive) {
     if (!chr.isRatActive || !alive) { chr.moose = null; return; }
     const homeX = chr.x - chr.facing * 55;
     const homeY = canvas.height - chr.y - 60;
     if (!chr.moose) chr.moose = { x: homeX, y: homeY, face: chr.facing };
     const mo = chr.moose;
-    const cy = canvas.height - chr.y - 35;
-    let target = null, best = 520;
-    for (const e of ems) {
-        const d = Math.hypot(e.x - chr.x, enemyCY(e) - cy);
-        if (d < best) { best = d; target = e; }
-    }
+    const targets = nearestTwo(chr);
+    const target = targets[0] || null;
     const tx = target ? target.x : homeX;
     const ty = target ? enemyCY(target) : homeY;
     const dx = tx - mo.x, dy = ty - mo.y;
     const len = Math.hypot(dx, dy) || 1;
-    const step = Math.min(len, (target ? 11 : 6) * dt);
+    const step = Math.min(len, (target ? 16 : 6) * dt);
     if (Math.abs(dx) > 2) mo.face = dx > 0 ? 1 : -1;
     mo.x += (dx / len) * step;
     mo.y += (dy / len) * step;
     mo.y = Math.min(mo.y, canvas.height - MOOSE_H / 2 - 3);
-    for (let j = ems.length - 1; j >= 0; j--) {
-        const e = ems[j];
-        const ey = enemyCY(e);
-        if (Math.abs(mo.x - e.x) < MOOSE_W / 2 + e.width * 0.5 + 8 &&
-            Math.abs(mo.y - ey) < MOOSE_H / 2 + e.height * 0.5 + 8) {
-            registerKill(e, ey, '#f9d857', 14);
-            ems.splice(j, 1);
-        }
+    if (target &&
+        Math.abs(mo.x - target.x) < MOOSE_W / 2 + target.width * 0.5 + 8 &&
+        Math.abs(mo.y - enemyCY(target)) < MOOSE_H / 2 + target.height * 0.5 + 8) {
+        targets.forEach(e => {                       // closest 2 fall together
+            const i = ems.indexOf(e);
+            if (i >= 0) {
+                registerKill(e, enemyCY(e), '#f9d857', 14);
+                ems.splice(i, 1);
+            }
+        });
     }
     for (let j = arws.length - 1; j >= 0; j--) {
         const a = arws[j];
@@ -1109,10 +1116,24 @@ function updateSpirit(chr, alive) {
     if (!chr.spirit) chr.spirit = { x: homeX, y: homeY };
     const sp = chr.spirit;
     const cy = canvas.height - chr.y - 35;
-    let target = null, best = 520;
-    for (const e of ems) {
-        const d = Math.hypot(e.x - chr.x, (enemyCY(e)) - cy);
-        if (d < best) { best = d; target = e; }
+    const teamMode = chr.isRatActive && chr.moose;   // Moose + Spirit together
+    let target = null;
+    if (teamMode) {
+        // Moose owns the 2 closest enemies, so the Spirit takes the FARTHEST visible one
+        const skip = nearestTwo(chr);
+        let far = -1;
+        for (const e of ems) {
+            if (skip.includes(e)) continue;
+            if (e.x < chr.cam - 40 || e.x > chr.cam + chr.viewW + 40) continue;
+            const d = Math.hypot(e.x - chr.x, enemyCY(e) - cy);
+            if (d > far) { far = d; target = e; }
+        }
+    } else {
+        let best = 520;
+        for (const e of ems) {
+            const d = Math.hypot(e.x - chr.x, enemyCY(e) - cy);
+            if (d < best) { best = d; target = e; }
+        }
     }
     const tx = target ? target.x : homeX;
     const ty = target ? enemyCY(target) : homeY;
@@ -1123,6 +1144,7 @@ function updateSpirit(chr, alive) {
     sp.y += (dy / len) * step;
     for (let j = ems.length - 1; j >= 0; j--) {
         const e = ems[j];
+        if (teamMode && e !== target) continue;   // in team mode it only kills its own target
         const ey = enemyCY(e);
         if (Math.hypot(sp.x - e.x, sp.y - ey) < 30 + e.width * 0.5) {
             registerKill(e, ey, '#a29bfe', 14);
