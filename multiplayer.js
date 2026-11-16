@@ -289,7 +289,7 @@
     clearTalismanForPlayer(character);
     clearTalismanForPlayer(character2);
     character.shirtColor = '#dc2626'; character.pantsColor = '#1e3a8a';
-    character2.shirtColor = '#2563eb'; character2.pantsColor = '#78350f';
+    character2.shirtColor = '#5d7da4'; character2.pantsColor = '#c09e56';
     character.invisible = false; character2.invisible = false;
     keysP1.left = keysP1.right = keysP1.up = keysP1.down = false;
     $('hp1-label').firstChild.nodeValue = '\u2764\uFE0F Partner (Red) \u00a0 \u00a0';
