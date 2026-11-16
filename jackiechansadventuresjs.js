@@ -275,7 +275,8 @@ function showInstructions() {
     utter.onerror = enableStart;
     window.speechSynthesis.speak(utter);
 }
-
+document.getElementById('intro-start-btn').addEventListener('click', showInstructions);
+document.getElementById('intro-skip-btn').addEventListener('click', showInstructions);
 function beginPlay() {
     window.speechSynthesis.cancel();
     document.getElementById('instructions-dialog').style.display = 'none';
