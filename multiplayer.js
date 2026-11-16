@@ -409,6 +409,10 @@
     try { const s = new SpeechSynthesisUtterance('Magic must defeat magic!'); window.speechSynthesis.speak(s); } catch (e) {}
     hostConn.send({ t: 'laser' });
   }
+  function guestMooseSpeak() {
+    if (character2.activeTalismans && character2.activeTalismans.rat) return;  // already on, so this press turns it off
+    try { const s = new SpeechSynthesisUtterance("It's action time!"); window.speechSynthesis.speak(s); } catch (e) {}
+  }
   const toBuf = e => {
     mx = e.clientX * canvas.width / Math.max(1, window.innerWidth);
     my = e.clientY * canvas.height / Math.max(1, window.innerHeight - 100);
@@ -425,6 +429,7 @@
     } else if ((e.key === 'e' || e.key === 'E' || e.key === 'q' || e.key === 'Q') && !e.repeat) {
       guestLaser();
     } else if (HK[e.key] && !e.repeat) {
+      if (HK[e.key] === 'rat') guestMooseSpeak();
       if (hostConn && hostConn.open && !isGameOver) hostConn.send({ t: 'tal', name: HK[e.key] });
     }
     e.stopImmediatePropagation();
@@ -456,9 +461,11 @@
       const name = btn.getAttribute('data-t');
       if (!name || name === 'tiger') return;
       if (name === 'lizard' || name === 'pufferfish') guestLaser();
-      else hostConn.send({ t: 'tal', name });
+      else {
+        if (name === 'rat') guestMooseSpeak();
+        hostConn.send({ t: 'tal', name });
+      }
       return;
-    }
     if (e.target.closest('.ui-c')) return;
     toBuf(e);
     hostConn.send(Object.assign({ t: 'click' }, hostAim()));
