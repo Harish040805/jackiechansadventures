@@ -1663,8 +1663,6 @@ function u() {
         ctx.font = `${ft.size + 6}px Bangers, 'Segoe UI', sans-serif`;
         ctx.textAlign = 'center';
         ctx.lineJoin = 'round';
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = INK;
         ctx.strokeText(ft.text, ft.x, ft.y);
         ctx.fillStyle = ft.color;
         ctx.fillText(ft.text, ft.x, ft.y);
