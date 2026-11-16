@@ -84,9 +84,12 @@
     </div>
 <div id="instructions-dialog">
   <div class="instr-box">
-    <img src="captainblack.png" class="captainblackclass">
-    <div class="intro-title">📜 How to Play</div>
-    <div class="instr-grid">
+    <img src="uncle.png" class="captainblackclass">
+      <div class="instr-scroll">
+      <div class="instr-head">
+        <div class="intro-title">📜 How to Play</div>
+      </div>
+      <div class="instr-grid">
       <div class="instr-section">
         <h3>🏃 Movement</h3>
         <p>Choose <span class="key-badge">Arrows or WASD</span> in the Controls box on the left. <span class="key-badge">Left/Right (A/D)</span> move, <span class="key-badge">Up (W)</span> jumps or flies up with Rooster, <span class="key-badge">Down (S)</span> flies down.</p>
@@ -113,7 +116,11 @@
         <p>Dodge the silver blades and avoid touching enemies. The game ends when your HP reaches 0. The longer you survive, the faster enemies spawn!</p>
       </div>
     </div>
-    <button id="instructions-start-btn" class="start-game-class">🎮 Start Game</button>
+    <div class="intro-btn-row">
+        <button id="instructions-skip-btn" class="skip-game-class">Skip</button>
+        <button id="instructions-start-btn" class="start-game-class" disabled style="opacity: 0.5; cursor: not-allowed;">🎮 Start Game</button>
+    </div>
+    </div>
   </div>
 </div>
     <div id="m"></div>
