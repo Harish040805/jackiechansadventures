@@ -1749,7 +1749,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
         ctx.restore();
         ctx.strokeStyle = ink;
         ctx.lineCap = 'round';
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(ex - rx - 0.5, ey - ry * 0.1);
         ctx.quadraticCurveTo(ex, ey - ry * 0.55, ex + rx + 0.5, ey - ry * 0.1);
