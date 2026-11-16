@@ -227,7 +227,7 @@
         hp, hp2, sgk, ek, dist: Math.round(dist * 100) / 100, b: r1(b),
         bo: BANISH.map(o => o.got ? 1 : 0),
         c1: packChar(character), c2: packChar(character2),
-        e: ems.map(e => [e.id || (e.id = entId++), r1(e.x), r1(e.y), e.fly ? 1 : 0, Math.round(e.anim * 100) / 100, e.facing || -1, e.attacking ? 1 : 0, Math.round((e.rise === undefined ? 1 : e.rise) * 100) / 100]),
+        e: ems.map(e => [e.id || (e.id = entId++), r1(e.x), r1(e.y), e.fly ? 1 : 0, Math.round(e.anim * 100) / 100, e.facing || -1, e.attacking ? 1 : 0, Math.round((e.rise === undefined ? 1 : e.rise) * 100) / 100, e.moving ? 1 : 0]),
         a: arws.map(a => [a.id || (a.id = entId++), r1(a.x), r1(a.y), Math.round(a.ang * 100) / 100]),
         f: fbs.map(f => [f.id || (f.id = entId++), r1(f.x), r1(f.y)]),
         mb: magicBeams, ax: Math.round(mx + camX), ay: Math.round(my),
@@ -365,7 +365,7 @@
         if (!c.spirit) c.spirit = { x: c.spTx, y: c.spTy };
       } else { c.spirit = null; }
     });
-    ems = syncList(ents.e, s.e, r => ({ id: r[0], tx: gx(r[1]), ty: r[2], fly: !!r[3], anim: r[4], facing: r[5] || -1, attacking: !!r[6], rise: r[7] === undefined ? 1 : r[7] }));
+    ems = syncList(ents.e, s.e, r => ({ id: r[0], tx: gx(r[1]), ty: r[2], fly: !!r[3], anim: r[4], facing: r[5] || -1, attacking: !!r[6], rise: r[7] === undefined ? 1 : r[7], moving: !!r[8] }));
     arws = syncList(ents.a, s.a, r => ({ id: r[0], tx: gx(r[1]), ty: gy(r[2]), ang: r[3] }));
     fbs = syncList(ents.f, s.f, r => ({ id: r[0], tx: gx(r[1]), ty: gy(r[2]), radius: 10 }));
     magicBeams = s.mb.map(bm => Object.assign({}, bm, { startX: gx(bm.startX), endX: gx(bm.endX), startY: gy(bm.startY), endY: gy(bm.endY) }));
