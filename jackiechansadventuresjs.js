@@ -1555,7 +1555,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.scale(s, s);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-    const ink = '#4a2a14';
+    const ink = '#31313b';
     const hairCol = '#0b0b12';
     ctx.fillStyle = skin;
     ctx.strokeStyle = ink;
