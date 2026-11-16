@@ -327,7 +327,7 @@ function startGame() {
     utter.onerror = enableNext;
     window.speechSynthesis.speak(utter);
 }
-const HTP_SPEECH = "Here is how to play. " +
+const HTP_SPEECH = "Aiyaa! Jackie! Captain black have informed me for your safety! Take the talismans, my pufferfish and lizard for your protection. One more thing! Bring all of them back safely and correctly! Don't lose anything! Here is how to play. " +
   "For movement, choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up or W jumps, or flies up with the Rooster talisman. Down or S flies down. " +
   "One more thing! Defeat Shadow Guards for one hundred points and Bats for one hundred and fifty points. Press Q for the Pufferfish Chi Laser, which fires straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
   "One more thing! To use the talismans, press the number keys, the minus key or click the buttons at the bottom. Press again to turn one off. Several can be active at once and each has a timer. One more thing! Dragon and Ox, alone stay on until you turn them off. " +
