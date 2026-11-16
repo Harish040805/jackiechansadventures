@@ -130,18 +130,19 @@ const WATER = (() => {
         t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
-    const bai = BANISH[2];
+    const wet = [BANISH[2], BANISH[4]];
+    const dry = [BANISH[0], BANISH[3], BANISH[7]];
     const list = [];
     let x = 1500;
     const end = BANISH[7].x + 2000;
     while (x < end) {
         x += (40 + rnd() * 80) * 20;
         const w = (20 + rnd() * 10) * 20;
-        if (x + w > bai.x - 900 && x < bai.x + 900) continue;
+        if (wet.concat(dry).some(o => x + w > o.x - 900 && x < o.x + 900)) continue;
         list.push({ x1: x, x2: x + w });
         x += w;
     }
-    list.push({ x1: bai.x - 300, x2: bai.x + 300 });
+    wet.forEach(o => list.push({ x1: o.x - 300, x2: o.x + 300 }));
     list.sort((a, b) => a.x1 - b.x1);
     return list;
 })();
