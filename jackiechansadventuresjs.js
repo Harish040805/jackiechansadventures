@@ -173,7 +173,7 @@ function waterDamage(chr) {
 }
 function drawWater(alpha) {
     const now = performance.now();
-    const h = 18, top = canvas.height - h;
+    const h = 3, top = canvas.height - h;
     for (const w of WATER) {
         if (w.x2 < camX - 50) continue;
         if (w.x1 > camX + canvas.width + 50) break;
