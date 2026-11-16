@@ -1082,13 +1082,14 @@ function u() {
                     e.attacking = boxesOverlap(enemyBox(e), playerBox(prey));
                     if (Math.abs(gap) > 8) {
                         e.facing = gap > 0 ? 1 : -1;
-                        moving = !e.attacking;
+                        moving = !e.attacking && !(prey.y > 0 && Math.abs(gap) < 40);
                     }
                 } else {
                     e.facing = -1;
                     moving = true;
                 }
                 if (moving) e.x += e.facing * e.spd * dt;
+                e.moving = moving;
                 if (moving || e.attacking) e.anim += 0.12 * dt;
             }
 
@@ -1385,7 +1386,7 @@ function u() {
                 drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, 'idle');
             } else {
                 ctx.translate(e.x, gy);
-                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.attacking ? 'attack' : 'run');
+                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.attacking ? 'attack' : (e.moving ? 'run' : 'idle'));
             }
         }
         ctx.restore();
