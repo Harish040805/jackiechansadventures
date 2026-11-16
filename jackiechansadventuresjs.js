@@ -104,7 +104,7 @@ const BANISH = [
     { e: '🥟', n: 'Tchang Zu',  m: 6400 },
     { e: '🪘', n: 'Po Kong',    m: 12800 }
 ].map(o => ({ ...o, x: o.m * 20 + 450, got: false }));
-const BANISH_Y = 150;   // height above ground
+const BANISH_Y = 150;
 
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
@@ -389,7 +389,7 @@ function spawnE(owner) {
         height: isFly ? 34 : GUARD_H,
         facing: owner.x > startX ? 1 : -1,
         attacking: false,
-        rise: isFly ? 1 : 0,          // 0 = underground, 1 = fully out
+        rise: isFly ? 1 : 0,
         anim: Math.random() * 10
     });
     if (!isFly) addSparks(startX, canvas.height - 3, '#4a3b6b', 12);
@@ -501,7 +501,7 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     const alive = caster.playerNum === 1 ? hp > 0 : hp2 > 0;
     if (!alive || isGameOver) return;
     const now = Date.now();
-    if (now - (caster.lastLaserTime || 0) < 400) return;   // per-player cooldown
+    if (now - (caster.lastLaserTime || 0) < 400) return;
     caster.lastLaserTime = now;
     showChiBanner(incantation);
     addFloatText(incantation, caster.x, canvas.height - caster.y - 75, beamColor, 18);
@@ -914,7 +914,7 @@ function updateViewCam() {
     const other = isGuest ? character : character2;
     const meAlive = isGuest ? hp2 > 0 : hp > 0;
     const otherAlive = isGuest ? hp > 0 : (isSplit && hp2 > 0);
-    camX = (!meAlive && otherAlive) ? other.cam : me.cam;   // dead player watches the partner
+    camX = (!meAlive && otherAlive) ? other.cam : me.cam;
     b = -camX;
     m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
@@ -942,7 +942,7 @@ function freezeTalismans(chr) {
         if (typeof act[k] !== 'boolean' && ends[k]) {
             clearTimeout(act[k]);
             chr.pausedTimers[k] = Math.max(0, ends[k] - now);
-            act[k] = true;   // stays "active" on the UI while paused
+            act[k] = true;
         }
     });
 }
@@ -985,7 +985,7 @@ document.getElementById('resume-btn').addEventListener('click', () => setPaused(
 document.getElementById('pause-restart-btn').addEventListener('click', () => location.reload());
 function u() {
     if (isPaused) {
-        lastFrameTime = performance.now();   // no time jump on resume
+        lastFrameTime = performance.now();
         requestAnimationFrame(u);
         return;
     }
@@ -1023,7 +1023,7 @@ function u() {
             e.spd = e.baseSpd;
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
             if (!e.fly && e.rise < 1) {
-                e.rise = Math.min(1, e.rise + dt / 50);     // about 0.8 s
+                e.rise = Math.min(1, e.rise + dt / 50);
                 if (Math.random() < 0.3 * dt) {
                     addSparks(e.x + (Math.random() - 0.5) * 26, canvas.height - 3, '#4a3b6b', 3);
                 }
@@ -1035,11 +1035,9 @@ function u() {
             if (isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0) validTargets.push(character2);
 
             if (e.fly) {
-                // bats: unchanged
                 e.x -= e.spd * dt;
                 e.anim += 0.1 * dt;
             } else {
-                // guards run toward the nearest visible player, stop and punch on contact
                 const prey = validTargets.length
                     ? validTargets.reduce((best, c) => Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best)
                     : null;
@@ -1053,7 +1051,7 @@ function u() {
                         moving = !e.attacking;
                     }
                 } else {
-                    e.facing = -1;      // nobody to chase: keep running left
+                    e.facing = -1;
                     moving = true;
                 }
                 if (moving) e.x += e.facing * e.spd * dt;
@@ -1264,7 +1262,7 @@ function u() {
     for (const a of arws) {
         ctx.save();
         ctx.translate(a.x, a.y);
-        ctx.rotate(performance.now() / 45 + a.x * 0.02);   // spinning
+        ctx.rotate(performance.now() / 45 + a.x * 0.02);
         ctx.shadowBlur = 8;
         ctx.shadowColor = '#e0f2f7';
         const grad = ctx.createLinearGradient(-13, -13, 13, 13);
@@ -1319,7 +1317,6 @@ function u() {
             const rise = e.rise === undefined ? 1 : e.rise;
             const gy = canvas.height - e.y;
             if (rise < 1) {
-                // dark hole in the ground
                 ctx.save();
                 ctx.globalAlpha = 0.9 - 0.5 * rise;
                 ctx.fillStyle = '#120d22';
@@ -1327,7 +1324,6 @@ function u() {
                 ctx.ellipse(e.x, gy + 3, 22, 6, 0, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
-                // only show the part of the guard above the ground line
                 ctx.beginPath();
                 ctx.rect(e.x - 60, gy + 3 - 150, 120, 150);
                 ctx.clip();
@@ -1642,53 +1638,36 @@ function drawShadowGuardBody(walk, scale, facing, state) {
         lean = 0.06;
         hipF = -0.8; kneeF = 1.3; hipB = 0.35; kneeB = 0.6;
         shF = -1.2; elF = -0.6; shB = 0.6; elB = -0.4;
-    } else { // idle
+    } else {
         const br = Math.sin(performance.now() / 500) * 0.04;
         lean = 0.04;
         hipF = 0.05; kneeF = 0.05; hipB = -0.05; kneeB = 0.05;
         shF = 0.1 + br; elF = -0.4; shB = -0.1 - br; elB = -0.4;
     }
-
     const hipY = -68 + bob, shoulderY = -46;
     const flap = Math.sin(walk * 1.3) * 5;
-
     ctx.save();
     ctx.scale(facing * scale, scale);
-
-    // back leg
     drawJointLimb(-3, hipY, 34, 34, 16, 13, hipB, kneeB, suitDark, suitDark, 'shoe', gear);
-
     ctx.save();
     ctx.translate(0, hipY);
     ctx.rotate(lean);
-
-    // back arm
     drawJointLimb(0, shoulderY, 22, 20, 11, 9, shB, elB, suitDark, suitDark, 'hand', gear);
-
-    // hips + torso
     ctx.fillStyle = suit;
     ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill();
     ctx.beginPath(); ctx.roundRect(-19, -54, 38, 56, 9); ctx.fill();
-
-    // sash + flapping tail
     ctx.fillStyle = sash;
     ctx.fillRect(-19, -4, 38, 8);
     ctx.beginPath();
     ctx.moveTo(-17, -2); ctx.lineTo(-36, 4 + flap); ctx.lineTo(-33, 11 + flap); ctx.lineTo(-15, 4);
     ctx.closePath(); ctx.fill();
-
-    // hood
     ctx.fillStyle = suit;
     ctx.beginPath(); ctx.arc(2, -72, 19, 0, Math.PI * 2); ctx.fill();
-
-    // headband + tail
     ctx.fillStyle = sash;
     ctx.fillRect(-17, -84, 38, 6);
     ctx.beginPath();
     ctx.moveTo(-16, -83); ctx.lineTo(-34, -79 + flap); ctx.lineTo(-30, -73 + flap); ctx.lineTo(-15, -78);
     ctx.closePath(); ctx.fill();
-
-    // eye slit + eyes
     ctx.fillStyle = '#0a0a12';
     ctx.beginPath(); ctx.roundRect(2, -75, 19, 10, 4); ctx.fill();
     ctx.save();
@@ -1701,12 +1680,8 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     ctx.fillStyle = '#ffb3b3';
     ctx.beginPath(); ctx.arc(9.8, -70.6, 1, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(17.3, -70.6, 1, 0, Math.PI * 2); ctx.fill();
-
-    // front arm
     drawJointLimb(0, shoulderY, 22, 20, 12, 10, shF, elF, suit, suit, 'hand', gear);
     ctx.restore();
-
-    // front leg
     drawJointLimb(3, hipY, 34, 34, 17, 14, hipF, kneeF, suit, suit, 'shoe', gear);
     ctx.restore();
 }
