@@ -103,7 +103,7 @@ const BANISH = [
     { e: '🪈', n: 'Hsi Wu',     m: 3200 },
     { e: '🥟', n: 'Tchang Zu',  m: 6400 },
     { e: '🪘', n: 'Po Kong',    m: 12800 }
-].map((o, i) => ({ ...o, x: o.m * 20 + 450, y: [150, 400, 30, 30, 650, 550, 550, 300][i], got: false }));
+].map((o, i) => ({ ...o, x: o.m * 20 + 450, y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
     grid.innerHTML = '';
