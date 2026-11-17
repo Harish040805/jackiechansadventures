@@ -25,20 +25,6 @@
   const ents = { e: new Map(), a: new Map(), f: new Map() };
   const fxQ = [];
   const gk = { l: false, r: false, u: false, d: false };
-  const style = document.createElement('style');
-  style.textContent = `
-  #mp-panel{position:absolute;left:20px;top:100px;z-index:50;background:rgba(0,0,0,.85);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
-  #mp-panel .mp-h{font-weight:bold;font-size:14px;margin-top:4px;user-select:none}
-  #mp-panel b#mp-id{color:#ffd700;font-family:monospace;font-size:16px;letter-spacing:2px}
-  #mp-panel button{background:#2e86de;color:#fff;border:0;border-radius:6px;padding:3px 9px;cursor:pointer;font-weight:bold}
-  #mp-panel button.sel{background:#16a34a}
-  #mp-panel input{width:150px;padding:3px 6px;border-radius:6px;border:1px solid #888;text-transform:uppercase}
-  #mp-state,#mp-msg{font-size:12px;color:#cfe8ff;margin-top:3px}
-  #mp-host{margin-top:6px}
-  #mp-join{margin-top:8px;border-top:1px solid rgba(255,255,255,.2);padding-top:6px}
-  body.remote-p2 #b2{display:none !important}
-  #mp-lost{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.9);color:#fff;display:flex;flex-direction:column;gap:16px;justify-content:center;align-items:center;font:22px 'Segoe UI',sans-serif}
-  #mp-lost button{font-size:20px;padding:10px 24px;border:0;border-radius:8px;background:#2e86de;color:#fff;cursor:pointer;font-weight:bold}`;
   document.head.appendChild(style);
   const panel = document.createElement('div');
   panel.id = 'mp-panel';
