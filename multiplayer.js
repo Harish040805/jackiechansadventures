@@ -451,7 +451,7 @@
     if (!isGuest) return;
     toBuf(e); e.stopImmediatePropagation();
   }, true);
-  window.addEventListener('click', e => {
+window.addEventListener('click', e => {
     if (!isGuest) return;
     if (e.target.closest('#go,#mp-panel,#mp-lost')) return;
     e.stopImmediatePropagation();
@@ -466,10 +466,11 @@
         hostConn.send({ t: 'tal', name });
       }
       return;
+    }
     if (e.target.closest('.ui-c')) return;
     toBuf(e);
     hostConn.send(Object.assign({ t: 'click' }, hostAim()));
-  }, true);
+}, true);  
   setInterval(() => {
     if (!isGuest && isSplit !== lastSplit) {
       lastSplit = isSplit;
