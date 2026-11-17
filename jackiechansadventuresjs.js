@@ -31,6 +31,7 @@ const chiBanner = document.getElementById('chi-banner');
 let hp = 100, hp2 = 100, isGameOver = false, isPaused = false, pauseStartTime = 0, gameStarted = false, enemiesActive = false, introOpen = false, enemyInterval = null, sgk = 0, ek = 0, dist = 0, prevScore = -1, prevDist = -1, b = 0;
 const lw = 1800;
 const hasSnake = c => !!(c.activeTalismans && c.activeTalismans.snake);
+const SNAKE_ALPHA = 0.12;
 let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 let isSplit = false;
 let isGuest = false, remoteP2 = false, gAimX = 0, gAimY = 0;
@@ -1365,10 +1366,10 @@ function u() {
             const a = arws[i];
             a.x += a.vx * dt;
             a.y += a.vy * dt;
-            const hit1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
+            const hit1 = !character.isShadowGuard && hp > 0 &&
                          Math.abs(character.x - a.x) < 22 &&
                          Math.abs((canvas.height - character.y - 35) - a.y) < 25;
-            const hit2 = isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0 &&
+            const hit2 = isSplit && !character2.isShadowGuard && hp2 > 0 &&
                          Math.abs(character2.x - a.x) < 22 &&
                          Math.abs((canvas.height - character2.y - 35) - a.y) < 25;
             if (hit1) {
@@ -1846,7 +1847,7 @@ function drawHuman(chr, label) {
         ctx.fill();
         ctx.restore();
     }
-    if (chr.invisible && hasSnake(chr)) ctx.globalAlpha = 0.35;
+    if (chr.invisible && hasSnake(chr)) ctx.globalAlpha = SNAKE_ALPHA;
     if (chr.isShadowGuard) {
         const moving = Math.abs(chr.vx) > 0.2;
         const state = (chr.isJumping || chr.isFlying || chr.y > 0) ? 'air' : (moving ? 'run' : 'idle');
