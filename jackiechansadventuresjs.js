@@ -125,6 +125,20 @@ function updateBanishUI() {
     });
 }
 buildBanishUI();
+const maskLayer = document.getElementById('mask-layer');
+const MASK_X = [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000];
+const MASK_Y = 30, MASK_SCALE = 0.25;
+MASK_X.forEach((x, i) => {
+    const mk = document.getElementById('m' + (i + 1));
+    if (!mk) return;
+    const slot = document.createElement('div');
+    slot.className = 'mask-slot';
+    slot.style.left = x + 'px';
+    slot.style.bottom = MASK_Y + 'px';
+    slot.style.transform = `translate(-50%, 50%) scale(${MASK_SCALE})`;
+    slot.appendChild(mk);
+    maskLayer.appendChild(slot);
+});
 const WATER = (() => {
     let s = 20240805;
     const rnd = () => {
@@ -1186,6 +1200,7 @@ function updateViewCam() {
     b = -camX;
     m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
+    maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
 }
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
