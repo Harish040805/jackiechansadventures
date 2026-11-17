@@ -30,6 +30,7 @@ const goSc = document.getElementById('go-sc');
 const chiBanner = document.getElementById('chi-banner');
 let hp = 100, hp2 = 100, isGameOver = false, isPaused = false, pauseStartTime = 0, gameStarted = false, enemiesActive = false, introOpen = false, enemyInterval = null, sgk = 0, ek = 0, dist = 0, prevScore = -1, prevDist = -1, b = 0;
 const lw = 1800;
+const hasSnake = c => !!(c.activeTalismans && c.activeTalismans.snake);
 let mx = window.innerWidth / 2, my = window.innerHeight / 2;
 let isSplit = false;
 let isGuest = false, remoteP2 = false, gAimX = 0, gAimY = 0;
@@ -77,12 +78,13 @@ character2.cam = 0; character2.viewW = canvas.width;
 function initBg() {
     m.innerHTML = '';
     t.innerHTML = '';
-    for (let i = 0; i < 5; i++) {
+    const cnt = Math.ceil(window.innerWidth / 600) + 4;
+    for (let i = 0; i < cnt; i++) {
         const mItem = document.createElement('div');
         mItem.className = 'm-item';
         m.appendChild(mItem);
     }
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < cnt; i++) {
         const tGrp = document.createElement('div');
         tGrp.className = 'tree-group';
         tGrp.innerHTML = `
@@ -331,7 +333,7 @@ const HTP_SPEECH = "Aiyaa! Jackie! Captain black have informed me for your safet
   "For movement, choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up or W jumps, or flies up with the Rooster talisman. Down or S flies down. " +
   "One more thing! Defeat Shadow Guards for one hundred points and Bats for one hundred and fifty points. Press Q for the Pufferfish Chi Laser, which fires straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
   "One more thing! To use the talismans, press the number keys, the minus key or click the buttons at the bottom. Press again to turn one off. Several can be active at once and each has a timer. One more thing! Dragon and Ox, alone stay on until you turn them off. " +
-  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser whi Chi magic. " +
+  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser with Chi magic. " +
   "One more thing! Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. For Shendu, it's the sword, Xiao Fung, it's the fan, Bai Tza, its the gourd fruit. For Dai Gui, it's the flower and for Tsa Lan, its the lotus flower. For Hsi Wu, it's the flute. For Tchang Zu, it's the castanets. Atlast, for the mountain demon Po Kong, its the drums. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Guards or bats. " +
   "One more thing! Press the equals key for the Tiger talisman to open an online session and share the Session I D. Or paste a friend's Session I D in the Online Co-Op box to join. Press equals again to return to single player. " +
   "One more thing! Dodge the silver blades and avoid touching enemies. The game ends when your health reaches zero. The longer you survive, the faster enemies spawn. All the best!";
@@ -443,14 +445,12 @@ function healPlayer(chr, amount) {
             hp = Math.min(100, hp + amount);
             hpV.textContent = Math.round(hp);
             updateHpBar(hp1Bar, hp);
-            if (hp > 0) character.invisible = false;
         }
     } else {
         if (hp2 < 100) {
             hp2 = Math.min(100, hp2 + amount);
             hp2V.textContent = Math.round(hp2);
             updateHpBar(hp2Bar, hp2);
-            if (hp2 > 0) character2.invisible = false;
         }
     }
     addHealingParticles(chr);
@@ -1622,10 +1622,10 @@ function u() {
         }
         ctx.restore();
     }
-    if ((!character.invisible || character.activeTalisman === 'snake') && hp > 0) {
+    if ((!character.invisible || hasSnake(character)) && hp > 0) {
         drawHuman(character, isGuest ? "Partner" : "Me");
     }
-    if (isSplit && (!character2.invisible || character2.activeTalisman === 'snake') && hp2 > 0) {
+    if (isSplit && (!character2.invisible || hasSnake(character2)) && hp2 > 0) {
         drawHuman(character2, isGuest ? "Me" : "Partner");
     }
     drawWater(0.3);
@@ -1846,7 +1846,7 @@ function drawHuman(chr, label) {
         ctx.fill();
         ctx.restore();
     }
-    if (chr.invisible && chr.activeTalisman === 'snake') ctx.globalAlpha = 0.35;
+    if (chr.invisible && hasSnake(chr)) ctx.globalAlpha = 0.35;
     if (chr.isShadowGuard) {
         const moving = Math.abs(chr.vx) > 0.2;
         const state = (chr.isJumping || chr.isFlying || chr.y > 0) ? 'air' : (moving ? 'run' : 'idle');
