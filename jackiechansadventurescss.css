@@ -10,6 +10,7 @@ body.guest #pause-overlay button { display: none; }
 body.guest #p1-power-badge { background: rgba(185, 28, 28, 0.9); border-color: #f87171; box-shadow: 0 0 12px rgba(248, 113, 113, 0.5); }
 body.guest #p2-power-badge { background: rgba(30, 64, 175, 0.9); border-color: #60a5fa; box-shadow: 0 0 12px rgba(96, 165, 250, 0.5); }
 body.paused *, body.paused *::after { animation-play-state: paused !important; }
+body.remote-p2 #b2 { display: none !important; }
 canvas { display: block; position: absolute; bottom: 100px; left: 0; width: 100vw; height: calc(100vh - 100px); pointer-events: none; z-index: 3; }
 hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25); }
 .b { display: flex; flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 6px 0; background-image: linear-gradient(#16C716, #19B319, #22A122); box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); gap: 40px; }
