@@ -456,7 +456,7 @@ window.addEventListener('click', e => {
     if (e.target.closest('.ui-c')) return;
     toBuf(e);
     hostConn.send(Object.assign({ t: 'click' }, hostAim()));
-}, true);  
+}, true);
   setInterval(() => {
     if (!isGuest && isSplit !== lastSplit) {
       lastSplit = isSplit;
