@@ -126,19 +126,60 @@ function updateBanishUI() {
 }
 buildBanishUI();
 const maskLayer = document.getElementById('mask-layer');
-const MASK_X = [300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000];
-const MASK_Y = 30, MASK_SCALE = 0.25;
-MASK_X.forEach((x, i) => {
-    const mk = document.getElementById('m' + (i + 1));
+const MASK_Y = 30, MASK_SCALE = 0.2, MASK_POINTS = 500;
+const MASKS = [1000, 6400, 12000, 24000, 45000, 90000, 110000, 180000, 220000, 330000]
+    .map((x, i) => ({ id: i + 1, x, y: MASK_Y, got: false, el: null }));
+MASKS.forEach(o => {
+    const mk = document.getElementById('m' + o.id);
     if (!mk) return;
     const slot = document.createElement('div');
     slot.className = 'mask-slot';
-    slot.style.left = x + 'px';
-    slot.style.bottom = MASK_Y + 'px';
+    slot.style.left = o.x + 'px';
+    slot.style.bottom = o.y + 'px';
     slot.style.transform = `translate(-50%, 50%) scale(${MASK_SCALE})`;
     slot.appendChild(mk);
     maskLayer.appendChild(slot);
+    o.el = slot;
 });
+const mkCount = () => MASKS.filter(o => o.got).length;
+function buildMaskUI() {
+    const grid = document.getElementById('mk-grid');
+    grid.innerHTML = '';
+    MASKS.forEach((o, i) => {
+        const d = document.createElement('div');
+        d.className = 'bo-cell mk-cell';
+        d.title = `Mask ${o.id} - ${Math.round(o.x / 20)} m`;
+        d.innerHTML = `<span>🎭</span><span id="mk-s${i}">🟡</span>`;
+        grid.appendChild(d);
+    });
+}
+function updateMaskUI() {
+    MASKS.forEach((o, i) => {
+        const s = document.getElementById('mk-s' + i);
+        if (s) s.textContent = o.got ? '🟢' : '🟡';
+        if (o.el) o.el.style.display = o.got ? 'none' : '';
+    });
+}
+buildMaskUI();
+function checkMaskCollect() {
+    const chars = aliveChars();
+    for (const o of MASKS) {
+        if (o.got) continue;
+        const box = { cx: o.x, cy: canvas.height - o.y, hw: 18, hh: 20 };
+        for (const c of chars) {
+            if (boxesOverlap(box, playerBox(c))) {
+                o.got = true;
+                updateMaskUI();
+                updateScoreUI(true);
+                addFloatText(`+${MASK_POINTS}`, o.x, box.cy - 55, '#ffd700', 18);
+                addSparks(o.x, box.cy, '#ffd700', 20);
+                addFloatText(`🎭 Mask ${o.id}`, o.x, box.cy - 30, '#2ed573', 20);
+                showChiBanner(`🎭 Mask ${o.id} collected!`);
+                break;
+            }
+        }
+    }
+}
 const WATER = (() => {
     let s = 20240805;
     const rnd = () => {
@@ -148,7 +189,7 @@ const WATER = (() => {
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
     const wet = [BANISH[2], BANISH[4]];
-    const dry = [BANISH[0], BANISH[3], BANISH[7]];
+    const dry = [BANISH[0], BANISH[3], BANISH[7], ...MASKS];
     const list = [];
     let x = 1500;
     const end = BANISH[7].x + 2000;
@@ -249,7 +290,7 @@ function drawBanishObjects() {
 }
 const BO_POINTS = 500;
 const boCount = () => BANISH.filter(o => o.got).length;
-const calcScore = () => sgk * 100 + ek * 150 + boCount() * BO_POINTS;
+const calcScore = () => sgk * 100 + ek * 150 + boCount() * BO_POINTS + mkCount() * MASK_POINTS;
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
@@ -406,6 +447,8 @@ function triggerGameOver() {
     document.getElementById('go-es').textContent = ek * 150;
     document.getElementById('go-dc').textContent = Math.floor(dist);
     document.getElementById('go-bos').textContent = boCount() * BO_POINTS;
+    document.getElementById('go-mk').textContent = mkCount();
+    document.getElementById('go-mks').textContent = mkCount() * MASK_POINTS;
     goSc.textContent = calcScore();
     pauseBtn.style.display = 'none';
     pauseOverlay.style.display = 'none';
@@ -1292,6 +1335,7 @@ function u() {
         if (lead * 0.05 > dist) { dist = lead * 0.05; updateScoreUI(); }
         const vb = viewBounds();
         checkBanishCollect();
+        checkMaskCollect();
         if (!introOpen) {
             aliveChars().forEach(c => { if (inWater(c)) waterDamage(c); });
         }
