@@ -1913,7 +1913,7 @@ function drawHuman(chr, label) {
     ctx.beginPath();
     ctx.moveTo(-9, -54 + breathe); ctx.lineTo(9, -54 + breathe); ctx.lineTo(0, -38 + breathe);
     ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = 'rgba(0, 0, 40, 0.5)';
+    ctx.strokeStyle = '#1e40af';
     ctx.lineWidth = 3.5;
     ctx.lineJoin = 'round';
     ctx.beginPath();
