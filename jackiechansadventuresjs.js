@@ -1338,8 +1338,10 @@ function u() {
                         moving = !e.attacking && !(prey.y > 0 && Math.abs(gap) < 40);
                     }
                 } else {
-                    e.facing = -1;
-                    moving = true;
+                    const bump = aliveChars().find(c => !c.isShadowGuard && boxesOverlap(enemyBox(e), playerBox(c)));
+                    e.attacking = !!bump;
+                    e.facing = bump ? (bump.x > e.x ? 1 : -1) : -1;
+                    moving = !bump;
                 }
                 if (moving) e.x += e.facing * e.spd * dt;
                 e.moving = moving;
@@ -1348,9 +1350,9 @@ function u() {
 
             if (e.hitCooldown <= 0) {
                 const gb = enemyBox(e);
-                const hitP1 = !character.invisible && !character.isShadowGuard && hp > 0 &&
+                const hitP1 = !character.isShadowGuard && hp > 0 &&
                               boxesOverlap(gb, playerBox(character));
-                const hitP2 = isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0 &&
+                const hitP2 = isSplit && !character2.isShadowGuard && hp2 > 0 &&
                               boxesOverlap(gb, playerBox(character2));
                 if (hitP1) {
                     dmg(6, character);
