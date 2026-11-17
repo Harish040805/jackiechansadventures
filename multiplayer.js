@@ -25,7 +25,6 @@
   const ents = { e: new Map(), a: new Map(), f: new Map() };
   const fxQ = [];
   const gk = { l: false, r: false, u: false, d: false };
-  document.head.appendChild(style);
   const panel = document.createElement('div');
   panel.id = 'mp-panel';
   panel.innerHTML = `
