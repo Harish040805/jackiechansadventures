@@ -27,7 +27,7 @@
   const gk = { l: false, r: false, u: false, d: false };
   const style = document.createElement('style');
   style.textContent = `
-  #mp-panel{position:fixed;left:20px;top:180px;z-index:10;background:rgba(0,0,0,.8);color:#fff;font:13px 'Segoe UI',sans-serif;padding:8px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
+  #mp-panel{position:absolute;left:20px;top:100px;z-index:50;background:rgba(0,0,0,.85);color:#fff;font:13px 'Segoe UI',sans-serif;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.25);width:260px;line-height:1.5}
   #mp-panel .mp-h{font-weight:bold;font-size:14px;margin-top:4px;user-select:none}
   #mp-panel b#mp-id{color:#ffd700;font-family:monospace;font-size:16px;letter-spacing:2px}
   #mp-panel button{background:#2e86de;color:#fff;border:0;border-radius:6px;padding:3px 9px;cursor:pointer;font-weight:bold}
