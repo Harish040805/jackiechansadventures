@@ -363,6 +363,8 @@ function updateScoreUI(force = false) {
     const currentDist = Math.floor(dist);
     const hudBo = document.getElementById('hud-bo');
     const hudBos = document.getElementById('hud-bos');
+    const hudMk = document.getElementById('hud-mk');
+    const hudMks = document.getElementById('hud-mks');
     if (!force && currentScore === prevScore && currentDist === prevDist) return;
     prevScore = currentScore;
     prevDist = currentDist;
@@ -373,6 +375,8 @@ function updateScoreUI(force = false) {
     if (hudDc) hudDc.textContent = currentDist;
     if (hudBo) hudBo.textContent = boCount();
     if (hudBos) hudBos.textContent = boCount() * BO_POINTS;
+    if (hudMk) hudMk.textContent = mkCount();
+    if (hudMks) hudMks.textContent = mkCount() * MASK_POINTS;
 }
 function registerKill(e, ey, sparkColor, sparkCount = 12) {
     addSparks(e.x, ey, sparkColor, sparkCount);
