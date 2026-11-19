@@ -233,7 +233,7 @@ const GROUND = (() => {
     fill(400000);
     return out;
 })();
-const GCOL = { G: ['#2e9e4f', '#4ade80'], BN: ['#7a5230', '#8b5a2b'], BZ: ['#cd7f32', '#e0a050'] };
+const GCOL = { G: ['#2e9e4f', '#466929'], BN: ['#ae9b71', '#8b5a2b'], BZ: ['#cd7f32', '#e0a050'] };
 let gStart = 0, lastGX = null;
 function groundGradient() {
     if (lastGX === camX) return null;
