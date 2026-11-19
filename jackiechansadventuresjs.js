@@ -2036,11 +2036,11 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     const flap = Math.sin(walk * 1.3) * 5;
     ctx.save();
     ctx.scale(facing * scale, scale);
-    drawJointLimb(-3, hipY, 34, 34, 16, 13, hipB, kneeB, suitDark, suitDark, 'shoe', gear);
+    drawJointLimb(-3, hipY, 34, 34, 16, 13, hipB, kneeB, suitLimb, suitLimb, 'shoe', gear);
     ctx.save();
     ctx.translate(0, hipY);
     ctx.rotate(lean);
-    drawJointLimb(0, shoulderY, 22, 20, 11, 9, shB, elB, suitDark, suitDark, 'hand', gear);
+    drawJointLimb(0, shoulderY, 22, 20, 11, 9, shB, elB, suitLimb, suitLimb, 'hand', gear);
     ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 3.5;
     ctx.fillStyle = suit;
     ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill(); ctx.stroke();
@@ -2069,8 +2069,8 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     ctx.fillStyle = '#ffb3b3';
     ctx.beginPath(); ctx.arc(9.8, -70.6, 1, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(17.3, -70.6, 1, 0, Math.PI * 2); ctx.fill();
-    drawJointLimb(0, shoulderY, 22, 20, 12, 10, shF, elF, suit, suit, 'hand', gear);
+    drawJointLimb(0, shoulderY, 22, 20, 12, 10, shF, elF, suitLimb, suitLimb, 'hand', gear);
     ctx.restore();
-    drawJointLimb(3, hipY, 34, 34, 17, 14, hipF, kneeF, suit, suit, 'shoe', gear);
+    drawJointLimb(3, hipY, 34, 34, 17, 14, hipF, kneeF, suitLimb, suitLimb, 'shoe', gear);
     ctx.restore();
 }
