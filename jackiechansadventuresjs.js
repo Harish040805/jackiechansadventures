@@ -1206,7 +1206,7 @@ function updateMoose(chr, alive) {
     const ty = target ? enemyCY(target) : homeY;
     const dx = tx - mo.x, dy = ty - mo.y;
     const len = Math.hypot(dx, dy) || 1;
-    const step = Math.min(len, (target ? 16 : 6) * dt);
+    const step = Math.min(len, (target ? 16 : 6) * (chr.speed / chr.baseSpeed) * dt);
     if (Math.abs(dx) > 2) mo.face = dx > 0 ? 1 : -1;
     mo.x += (dx / len) * step;
     mo.y += (dy / len) * step;
@@ -1271,7 +1271,7 @@ function updateSpirit(chr, alive) {
     const ty = target ? enemyCY(target) : homeY;
     const dx = tx - sp.x, dy = ty - sp.y;
     const len = Math.hypot(dx, dy) || 1;
-    const step = Math.min(len, (target ? 11 : 6) * dt);
+    const step = Math.min(len, (target ? 11 : 6) * (chr.speed / chr.baseSpeed) * dt);
     sp.x += (dx / len) * step;
     sp.y += (dy / len) * step;
     for (let j = ems.length - 1; j >= 0; j--) {
@@ -1533,7 +1533,7 @@ function u() {
                 if (Math.abs(a.x - eb.cx) < eb.hw + 10 && Math.abs(a.y - eb.cy) < eb.hh + 10) {
                     en.hits = (en.hits || 0) + 1;
                     addSparks(a.x, a.y, '#b0bec5', 6);
-                    if (en.hits >= (en.fly ? 2 : 3)) {
+                    if (en.hits >= (en.fly ? 6 : 9)) {
                         addSparks(en.x, eb.cy, '#ff9f43', 14);
                         ems.splice(j, 1);
                     }
