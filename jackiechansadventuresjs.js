@@ -1936,8 +1936,10 @@ function drawHuman(chr, label) {
     if (chr.giant) ctx.scale(1.5, 1.5);
     const baseFilter = chr.light ? 'brightness(1.5) saturate(1.8)' : 'none';
     ctx.filter = baseFilter;
-    const skin = '#ddbd99', skinShade = '#c98f5a';
-    const shirt = chr.shirtColor, pants = chr.pantsColor;
+    const skinShade = '#c98f5a';
+    const skinHead = hg('#ddbd99', 18), skinArm = hg('#ddbd99', 6);
+    const shirtBody = hg(chr.shirtColor, 19), shirtArm = hg(chr.shirtColor, 7);
+    const pantsBody = hg(chr.pantsColor, 17), pantsLeg = hg(chr.pantsColor, 9);
     const target = Math.abs(chr.vx) > 0.2 ? 1 : 0;
     chr.moveBlend = (chr.moveBlend || 0) + (target - (chr.moveBlend || 0)) * 0.2;
     const mb = chr.moveBlend;
