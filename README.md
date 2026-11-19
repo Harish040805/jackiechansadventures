@@ -1,5 +1,3 @@
-Jackie Chan's Adventures:
-
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
 Occasionally occuring Wooden logs hung from the top using 2 ropes, where Jackie can only burn or cut the ropes & when the wooden logs fall down, can kill Jackie making his health 0% completely & end the game or 🥷 or 🦇, i.e, it must be used cleverly to kill a group of 🥷 rather than killing the player himself. Standing on the logs & falling down with it, where 🥷 are under can kill only 🥷 under the logs & not Jackie. It can kill Jackie only if he is under the logs & the logs fall down.
