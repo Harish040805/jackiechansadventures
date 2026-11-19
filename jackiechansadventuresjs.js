@@ -1283,7 +1283,7 @@ function updateViewCam() {
     const otherAlive = isGuest ? hp > 0 : (isSplit && hp2 > 0);
     camX = (!meAlive && otherAlive) ? other.cam : me.cam;
     b = -camX;
-    document.getElementById('grd').style.backgroundPosition = `${b}px 0`;
+    grdEl.style.backgroundImage = groundGradient();
     m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
     maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
