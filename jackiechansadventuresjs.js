@@ -97,6 +97,27 @@ function initBg() {
     }
 }
 initBg();
+function buildWater() {
+    const old = document.getElementById('water');
+    if (old) old.remove();
+    const w = document.createElement('div');
+    w.id = 'water';
+    const shapes = ['wl-flat', 'wl-lens', 'wl-dash', 'wl-wave'];
+    const cnt = Math.ceil(window.innerWidth / 35);
+    for (let i = 0; i < cnt; i++) {
+        const l = document.createElement('div');
+        l.className = 'wl ' + shapes[Math.floor(Math.random() * shapes.length)] + (Math.random() < 0.5 ? ' wl-left' : '');
+        l.style.top = (Math.random() * 94) + '%';
+        l.style.width = (30 + Math.random() * 110) + 'px';
+        l.style.height = (2 + Math.random() * 2) + 'px';
+        l.style.opacity = 0.35 + Math.random() * 0.55;
+        l.style.animationDuration = (10 + Math.random() * 25) + 's';
+        l.style.animationDelay = (-Math.random() * 35) + 's';
+        w.appendChild(l);
+    }
+    m.parentNode.insertBefore(w, m);
+}
+buildWater();
 const BANISH = [
     { e: '🗡️', n: 'Shendu',     m: 100 },
     { e: '🪭', n: 'Xiao Fung',  m: 200 },
@@ -233,7 +254,7 @@ const GROUND = (() => {
     fill(400000);
     return out;
 })();
-const GCOL = { G: ['#2e9e4f', '#466929'], BN: ['#ae9b71', '#8b5a2b'], BZ: ['#cd7f32', '#e0a050'] };
+const GCOL = { G: ['#2e9e4f', '#466929'], BN: ['#8b5a2b', '#a0652d'], BZ: ['#cd7f32', '#e0a050'] };
 let gStart = 0, lastGX = null;
 function groundGradient() {
     if (lastGX === camX) return null;
@@ -1027,6 +1048,12 @@ let smoothLeftLegAngle2 = 0, smoothRightLegAngle2 = 0;
 let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
 const ARROW_SPEED = 7.5;
 const AIM_ERROR = 0;
+function throwBlade(e, targetChr) {
+    const sx = e.x;
+    const sy = enemyCY(e);
+    const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
+    arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang, owner: e });
+}
 function futureY(chr, keys, t) {
     if (chr.isFlying) {
         const vyFly = (keys.up ? 8 : 0) - (keys.down ? 8 : 0);
@@ -1456,18 +1483,25 @@ function u() {
                 }
             }
 
-            if (validTargets.length > 0 && !e.attacking && now - e.lt > 2600) {
-                const targetChr = validTargets.reduce((best, c) =>
-                    Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best);
-                if (e.x > targetChr.cam + 320 && e.x < targetChr.cam + targetChr.viewW + 20) {
-                    e.lt = now;
-                    const sx = e.x;
-                    const sy = enemyCY(e);
-                    const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
-                    arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang, owner: e });
+            const bladeTarget = validTargets.length > 0
+                ? validTargets.reduce((best, c) => Math.abs(c.x - e.x) < Math.abs(best.x - e.x) ? c : best)
+                : null;
+            if (e.burstLeft > 0) {
+                e.burstT -= dt * 16.667;
+                if (e.burstT <= 0) {
+                    if (bladeTarget) throwBlade(e, bladeTarget);
+                    e.burstLeft--;
+                    e.burstT = 140;
                 }
             }
-
+            if (bladeTarget && !e.attacking && !(e.burstLeft > 0) && now - e.lt > 1400) {
+                if (e.x > bladeTarget.cam + 320 && e.x < bladeTarget.cam + bladeTarget.viewW + 20) {
+                    e.lt = now;
+                    throwBlade(e, bladeTarget);
+                    e.burstLeft = e.fly ? 0 : 2;
+                    e.burstT = 140;
+                }
+            }
             if (e.x < vb.lo - 150 || (!e.fly && e.x > vb.hi + 400)) {
                 ems.splice(i, 1);
             }
