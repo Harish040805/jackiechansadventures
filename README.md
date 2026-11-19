@@ -4,8 +4,6 @@ Jackie Chan's Adventures:
 
 Increase the number of blade attacks done by shadow guards and bats. Make shadow guards throw 3 blades continuously per attack. Let the bat attacks be the same (1 blade per attack).
 
-Change the shape of the mountains in the background wide and flat on top in trapezium shape.
-
 Occasionally occuring Wooden logs hung from the top using 2 ropes, where Jackie can only burn or cut the ropes & when the wooden logs fall down, can kill Jackie making his health 0% completely & end the game or 🥷 or 🦇, i.e, it must be used cleverly to kill a group of 🥷 rather than killing the player himself. Standing on the logs & falling down with it, where 🥷 are under can kill only 🥷 under the logs & not Jackie. It can kill Jackie only if he is under the logs & the logs fall down.
 
 Houses in #fede6d & #847b3d duality with roofs in #b31f30 & #471313 duality occuring occasionally where Jackie or shadow guards can climb on the roofs
