@@ -821,7 +821,7 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
             }
             break;
         case 'rabbit':
-            chr.speed = 13;
+            chr.speed = 20;
             chr.activeTalismans['rabbit'] = true;
             startPlayerTimer(chr, 'rabbit', 10, () => { chr.speed = chr.baseSpeed; });
             break;
