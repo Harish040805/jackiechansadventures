@@ -357,7 +357,7 @@ function drawBanishObjects() {
 }
 const BO_POINTS = 100;
 const boCount = () => BANISH.filter(o => o.got).length;
-const calcScore = () => sgk * 10 + ek * 15 + boCount() * BO_POINTS + mkCount() * MASK_POINTS;
+const calcScore = () => sgk * 10 + ek * 15 + Math.floor(dist) + boCount() * BO_POINTS + mkCount() * MASK_POINTS;
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
