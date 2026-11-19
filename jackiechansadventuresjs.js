@@ -1735,6 +1735,20 @@ function u() {
 }
 requestAnimationFrame(u);
 const INK = '#1b1410';
+function shade(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    let r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    const k = f >= 0 ? 255 : 0, a = Math.abs(f);
+    r = Math.round(r + (k - r) * a); g = Math.round(g + (k - g) * a); b = Math.round(b + (k - b) * a);
+    return `rgb(${r},${g},${b})`;
+}
+function hg(hex, half) {
+    const g = ctx.createLinearGradient(-half, 0, half, 0);
+    g.addColorStop(0, shade(hex, 0.3));
+    g.addColorStop(0.5, hex);
+    g.addColorStop(1, shade(hex, -0.35));
+    return g;
+}
 function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType, endColor) {
     ctx.save();
     ctx.translate(x, y);
@@ -1990,8 +2004,8 @@ function drawHuman(chr, label) {
     ctx.restore();
 }
 function drawShadowGuardBody(walk, scale, facing, state) {
-    const suit = '#2b2840', suitDark = '#1a182b', gear = '#0f0e18';
-    const sash = '#b91c1c', skin = '#f0c08a';
+    const suit = hg('#16161a', 19), suitLimb = hg('#16161a', 7), gear = '#0f0e18';
+    const sash = hg('#c81e1e', 19), skin = '#f0c08a';
     const sw = Math.sin(walk), cw = Math.cos(walk);
     let hipF, kneeF, hipB, kneeB, shF, elF, shB, elB, lean, bob = 0;
 
