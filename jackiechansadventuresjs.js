@@ -234,10 +234,15 @@ const GROUND = (() => {
     return out;
 })();
 const GCOL = { G: ['#2e9e4f', '#4ade80'], BN: ['#7a5230', '#8b5a2b'], BZ: ['#cd7f32', '#e0a050'] };
+let gStart = 0, lastGX = null;
 function groundGradient() {
+    if (lastGX === camX) return null;
+    lastGX = camX;
     const lo = camX - 50, hi = camX + canvas.width + 50, st = [];
-    for (const z of GROUND) {
-        if (z.x2 < lo) continue;
+    while (gStart > 0 && GROUND[gStart].x1 > lo) gStart--;
+    while (gStart < GROUND.length - 1 && GROUND[gStart].x2 < lo) gStart++;
+    for (let i = gStart; i < GROUND.length; i++) {
+        const z = GROUND[i];
         if (z.x1 > hi) break;
         const [base, hl] = GCOL[z.t], L = z.x2 - z.x1;
         st.push(`${base} ${(z.x1 + L * 0.15 - camX).toFixed(1)}px`,
@@ -1283,7 +1288,8 @@ function updateViewCam() {
     const otherAlive = isGuest ? hp > 0 : (isSplit && hp2 > 0);
     camX = (!meAlive && otherAlive) ? other.cam : me.cam;
     b = -camX;
-    grdEl.style.backgroundImage = groundGradient();
+    const gg = groundGradient();
+    if (gg) grdEl.style.backgroundImage = gg;
     m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
     maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
@@ -1977,7 +1983,7 @@ function drawHuman(chr, label) {
     ctx.scale(chr.facing * S, S * chr.squish);
     if (chr.giant) ctx.scale(1.5, 1.5);
     const baseFilter = chr.light ? 'brightness(1.5) saturate(1.8)' : 'none';
-    ctx.filter = baseFilter;
+    if (chr.light) ctx.filter = baseFilter;
     const skinShade = '#c98f5a';
     const skinHead = hg('#ddbd99', 18), skinArm = hg('#ddbd99', 6);
     const shirtBody = hg(chr.shirtColor, 19), shirtArm = hg(chr.shirtColor, 7);
@@ -2012,13 +2018,11 @@ function drawHuman(chr, label) {
     const hipY = -68 + bob;
     chr.leanNow = lean;
     const shoulderY = -46 + breathe;
-    ctx.filter = 'brightness(0.75)';
     drawJointLimb(-3, hipY, 34, 34, 17, 14, hipB, kneeB, pantsLeg, pantsLeg, 'shoe');
     ctx.filter = baseFilter;
     ctx.save();
     ctx.translate(0, hipY);
     ctx.rotate(lean);
-    ctx.filter = 'brightness(0.75)';
     drawJointLimb(0, shoulderY, 22, 20, 12, 10, shB, elB, shirtArm, skinArm, 'hand');
     ctx.filter = baseFilter;
     ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 3.5;
