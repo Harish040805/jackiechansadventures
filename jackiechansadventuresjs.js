@@ -62,12 +62,12 @@ function moveKey(e) {
     return null;
 }
 const character = {
-    playerNum: 1, name: "P1 (Blue)", x: 120, y: 0, vx: 0, vy: 0, speed: 4.4, baseSpeed: 4.4, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
+    playerNum: 1, name: "P1 (Blue)", x: 120, y: 0, vx: 0, vy: 0, speed: 7, baseSpeed: 7, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
     strideFrequency: 0.16, bodyTilt: 0, squish: 1, shirtColor: '#5d7da4', pantsColor: '#c09e56', activeTalisman: null, talismanTimer: null, talismanTimeLeft: 0, isDogImmortal: false, isDragonShooting: false,
     isShadowGuard: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
 };
 const character2 = { 
-    playerNum: 2, name: "P2 (Red)", x: 220, y: 0, vx: 0, vy: 0, speed: 4.4, baseSpeed: 4.4, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
+    playerNum: 2, name: "P2 (Red)", x: 220, y: 0, vx: 0, vy: 0, speed: 7, baseSpeed: 7, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
     strideFrequency: 0.16, bodyTilt: 0, squish: 1, shirtColor: '#dc2626', pantsColor: '#1e3a8a', activeTalisman: null, talismanTimer: null, talismanTimeLeft: 0, isDogImmortal: false, isDragonShooting: false,
     isShadowGuard: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
 };
