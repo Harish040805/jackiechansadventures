@@ -205,6 +205,47 @@ const WATER = (() => {
     return list;
 })();
 const WATER_DPS = 3;
+const grdEl = document.getElementById('grd');
+const GROUND = (() => {
+    let s = 777;
+    const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const forced = WATER.map(w => ({ x1: w.x1 - 200, x2: w.x2 + 200, t: 'G' }));
+    forced.push({ x1: BANISH[3].x - 500, x2: BANISH[3].x + 500, t: 'BN' });
+    forced.sort((a, b) => a.x1 - b.x1);
+    const LEN = { G: [300, 1800], BN: [150, 700], BZ: [100, 400] };
+    const out = [];
+    let x = 0, prev = 'G';
+    const fill = to => {
+        while (x < to) {
+            const t = prev === 'BN' ? (rnd() < 0.5 ? 'G' : 'BZ') : 'BN';
+            const [a, b] = LEN[t];
+            const x2 = Math.min(to, x + a + rnd() * (b - a));
+            out.push({ x1: x, x2, t });
+            x = x2; prev = t;
+        }
+    };
+    for (const z of forced) {
+        if (z.x2 <= x) continue;
+        fill(Math.max(x, z.x1));
+        out.push({ x1: x, x2: z.x2, t: z.t });
+        x = z.x2; prev = z.t;
+    }
+    fill(400000);
+    return out;
+})();
+const GCOL = { G: ['#2e9e4f', '#4ade80'], BN: ['#7a5230', '#8b5a2b'], BZ: ['#cd7f32', '#e0a050'] };
+function groundGradient() {
+    const lo = camX - 50, hi = camX + canvas.width + 50, st = [];
+    for (const z of GROUND) {
+        if (z.x2 < lo) continue;
+        if (z.x1 > hi) break;
+        const [base, hl] = GCOL[z.t], L = z.x2 - z.x1;
+        st.push(`${base} ${(z.x1 + L * 0.15 - camX).toFixed(1)}px`,
+                `${hl} ${(z.x1 + L * 0.5 - camX).toFixed(1)}px`,
+                `${base} ${(z.x1 + L * 0.85 - camX).toFixed(1)}px`);
+    }
+    return `linear-gradient(90deg, ${st.join(',')})`;
+}
 function inWater(chr) {
     if (chr.y > 2) return false;
     for (const w of WATER) {
