@@ -1971,18 +1971,18 @@ function drawHuman(chr, label) {
     chr.leanNow = lean;
     const shoulderY = -46 + breathe;
     ctx.filter = 'brightness(0.75)';
-    drawJointLimb(-3, hipY, 34, 34, 17, 14, hipB, kneeB, pants, pants, 'shoe');
+    drawJointLimb(-3, hipY, 34, 34, 17, 14, hipB, kneeB, pantsLeg, pantsLeg, 'shoe');
     ctx.filter = baseFilter;
     ctx.save();
     ctx.translate(0, hipY);
     ctx.rotate(lean);
     ctx.filter = 'brightness(0.75)';
-    drawJointLimb(0, shoulderY, 22, 20, 12, 10, shB, elB, shirt, skin, 'hand');
+    drawJointLimb(0, shoulderY, 22, 20, 12, 10, shB, elB, shirtArm, skinArm, 'hand');
     ctx.filter = baseFilter;
     ctx.lineJoin = 'round'; ctx.strokeStyle = INK; ctx.lineWidth = 3.5;
-    ctx.fillStyle = pants;
+    ctx.fillStyle = pantsBody;
     ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = shirt;
+    ctx.fillStyle = shirtBody;
     ctx.beginPath(); ctx.roundRect(-19, -54 + breathe, 38, 56, 9); ctx.fill(); ctx.stroke();
     ctx.fillStyle = 'rgba(10,20,50,0.22)';
     ctx.beginPath(); ctx.roundRect(6, -54 + breathe, 13, 56, [0, 9, 9, 0]); ctx.fill();
@@ -1998,10 +1998,10 @@ function drawHuman(chr, label) {
     ctx.beginPath();
     ctx.moveTo(-9, -54 + breathe); ctx.lineTo(0, -38 + breathe); ctx.lineTo(9, -54 + breathe);
     ctx.stroke();
-    drawJackieHead(1, -82 + breathe, 1.15, skin, skinShade);
-    drawJointLimb(0, shoulderY, 22, 20, 13, 11, shF, elF, shirt, skin, 'hand');
+    drawJackieHead(1, -82 + breathe, 1.15, skinHead, skinShade);
+    drawJointLimb(0, shoulderY, 22, 20, 13, 11, shF, elF, shirtArm, skinArm, 'hand');
     ctx.restore();
-    drawJointLimb(3, hipY, 34, 34, 18, 15, hipF, kneeF, pants, pants, 'shoe');
+    drawJointLimb(3, hipY, 34, 34, 18, 15, hipF, kneeF, pantsLeg, pantsLeg, 'shoe');
     ctx.filter = 'none';
     ctx.restore();
 }
