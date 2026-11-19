@@ -147,7 +147,7 @@ function updateBanishUI() {
 }
 buildBanishUI();
 const maskLayer = document.getElementById('mask-layer');
-const MASK_Y = 30, MASK_SCALE = 0.2, MASK_POINTS = 500;
+const MASK_Y = 30, MASK_SCALE = 0.2, MASK_POINTS = 100;
 const MASKS = [1000, 6400, 12000, 24000, 45000, 90000, 110000, 180000, 220000, 330000]
     .map((x, i) => ({ id: i + 1, x, y: MASK_Y, got: false, el: null }));
 MASKS.forEach(o => {
@@ -355,9 +355,9 @@ function drawBanishObjects() {
     }
     ctx.restore();
 }
-const BO_POINTS = 500;
+const BO_POINTS = 100;
 const boCount = () => BANISH.filter(o => o.got).length;
-const calcScore = () => sgk * 100 + ek * 150 + boCount() * BO_POINTS + mkCount() * MASK_POINTS;
+const calcScore = () => sgk * 10 + ek * 15 + boCount() * BO_POINTS + mkCount() * MASK_POINTS;
 function updateScoreUI(force = false) {
     const currentScore = calcScore();
     const currentDist = Math.floor(dist);
@@ -368,8 +368,8 @@ function updateScoreUI(force = false) {
     prevDist = currentDist;
     if (hudSgk) hudSgk.textContent = sgk;
     if (hudEk) hudEk.textContent = ek;
-    if (hudSgs) hudSgs.textContent = sgk * 100;
-    if (hudEs) hudEs.textContent = ek * 150;
+    if (hudSgs) hudSgs.textContent = sgk * 10;
+    if (hudEs) hudEs.textContent = ek * 15;
     if (hudDc) hudDc.textContent = currentDist;
     if (hudBo) hudBo.textContent = boCount();
     if (hudBos) hudBos.textContent = boCount() * BO_POINTS;
@@ -378,10 +378,10 @@ function registerKill(e, ey, sparkColor, sparkCount = 12) {
     addSparks(e.x, ey, sparkColor, sparkCount);
     if (e.fly) {
         ek++;
-        addFloatText("+150", e.x, ey - 15, '#ffd700', 18);
+        addFloatText("+15", e.x, ey - 15, '#ffd700', 18);
     } else {
         sgk++;
-        addFloatText("+100", e.x, ey - 15, '#ffd700', 18);
+        addFloatText("+10", e.x, ey - 15, '#ffd700', 18);
     }
     updateScoreUI(true);
 }
@@ -454,7 +454,7 @@ function startGame() {
 }
 const HTP_SPEECH = "Aiyaa! Jackie! Captain black have informed me for your safety! Take the talismans, my pufferfish and lizard for your protection. One more thing! Bring all of them back safely and correctly! Don't lose anything! Here is how to play. " +
   "For movement, choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up or W jumps, or flies up with the Rooster talisman. Down or S flies down. " +
-  "One more thing! Defeat Shadow Guards for one hundred points and Bats for one hundred and fifty points. Press Q for the Pufferfish Chi Laser, or E for the Lizard Magic Laser. Both fire straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
+  "One more thing! Defeat Shadow Guards for ten points and Bats for fifteen points. Press Q for the Pufferfish Chi Laser, or E for the Lizard Magic Laser. Both fire straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
   "One more thing! To use the talismans, press the number keys, the minus key or click the buttons at the bottom. Press again to turn one off. Several can be active at once and each has a timer. One more thing! Dragon and Ox, alone stay on until you turn them off. " +
   "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser with Chi magic. " +
   "One more thing! Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. For Shendu, it's the sword, Xiao Fung, it's the fan, Bai Tza, its the gourd fruit. For Dai Gui, it's the flower and for Tsa Lan, its the lotus flower. For Hsi Wu, it's the flute. For Tchang Zu, it's the castanets. Atlast, for the mountain demon Po Kong, its the drums. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Guards or bats. " +
@@ -512,8 +512,8 @@ function triggerGameOver() {
     [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
     document.getElementById('go-sgk').textContent = sgk;
     document.getElementById('go-ek').textContent = ek;
-    document.getElementById('go-sgs').textContent = sgk * 100;
-    document.getElementById('go-es').textContent = ek * 150;
+    document.getElementById('go-sgs').textContent = sgk * 10;
+    document.getElementById('go-es').textContent = ek * 15;
     document.getElementById('go-dc').textContent = Math.floor(dist);
     document.getElementById('go-bos').textContent = boCount() * BO_POINTS;
     document.getElementById('go-mk').textContent = mkCount();
