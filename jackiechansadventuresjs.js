@@ -1513,6 +1513,37 @@ function drawFires() {
     }
     ctx.restore();
 }
+const LASER_PAD = 34;
+function laserTip(chr, ex, ey) {
+    const p = aimPt(chr);
+    return { x: p.x, y: p.y };
+}
+function segHitsBox(x1, y1, x2, y2, b, pad) {
+    let t0 = 0, t1 = 1;
+    const dx = x2 - x1, dy = y2 - y1;
+    const p = [-dx, dx, -dy, dy];
+    const q = [
+        x1 - (b.cx - b.hw - pad),
+        (b.cx + b.hw + pad) - x1,
+        y1 - (b.cy - b.hh - pad),
+        (b.cy + b.hh + pad) - y1
+    ];
+    for (let i = 0; i < 4; i++) {
+        if (p[i] === 0) {
+            if (q[i] < 0) return false;
+        } else {
+            const r = q[i] / p[i];
+            if (p[i] < 0) {
+                if (r > t1) return false;
+                if (r > t0) t0 = r;
+            } else {
+                if (r < t0) return false;
+                if (r < t1) t1 = r;
+            }
+        }
+    }
+    return true;
+}
 const winds = [];
 function spawnWind() {
     const len = 200 + Math.random() * 260;
@@ -1760,11 +1791,7 @@ function u() {
             for (let j = ems.length - 1; j >= 0; j--) {
                 const e = ems[j];
                 const eyPos = enemyCY(e);
-                const u = Math.max(0, Math.min(1, ((e.x - ex) * dx + (eyPos - ey) * dy) / (lineLen * lineLen)));
-                const px = ex + u * dx;
-                const py = ey + u * dy;
-                const distToLine = Math.hypot(e.x - px, eyPos - py);
-                if (distToLine < Math.max(e.width, e.height) * 0.6) {
+                if (segHitsBox(ex, ey, mx, my, enemyBox(e), LASER_PAD)) {
                     registerKill(e, eyPos, '#ff4757', 10);
                     ems.splice(j, 1);
                 }
