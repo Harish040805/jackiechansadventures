@@ -230,15 +230,15 @@ const grdEl = document.getElementById('grd');
 const GROUND = (() => {
     let s = 777;
     const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    const forced = WATER.map(w => ({ x1: w.x1 - 200, x2: w.x2 + 200, t: 'G' }));
+    const forced = WATER.map(w => ({ x1: w.x1 - 200, x2: w.x2 + 200, t: 'G', w: true }));
     forced.push({ x1: BANISH[3].x - 500, x2: BANISH[3].x + 500, t: 'BN' });
     forced.sort((a, b) => a.x1 - b.x1);
-    const LEN = { G: [300, 1800], BN: [150, 700], BZ: [100, 400] };
+    const LEN = { G: [600, 2400], BN: [400, 900], BZ: [300, 700] };
     const out = [];
     let x = 0, prev = 'G';
     const fill = to => {
         while (x < to) {
-            const t = prev === 'BN' ? (rnd() < 0.5 ? 'G' : 'BZ') : 'BN';
+            const t = prev === 'G' && rnd() < 0.3 ? (rnd() < 0.6 ? 'BN' : 'BZ') : 'G';
             const [a, b] = LEN[t];
             const x2 = Math.min(to, x + a + rnd() * (b - a));
             out.push({ x1: x, x2, t });
@@ -248,36 +248,28 @@ const GROUND = (() => {
     for (const z of forced) {
         if (z.x2 <= x) continue;
         fill(Math.max(x, z.x1));
-        out.push({ x1: x, x2: z.x2, t: z.t });
+        out.push({ x1: x, x2: z.x2, t: z.t, w: z.w });
         x = z.x2; prev = z.t;
     }
     fill(400000);
     return out;
 })();
-const GCOL = { G: ['#466929', '#2e9e4f'], BN: ['#8b5a2b', '#a0652d'], BZ: ['#cd7f32', '#e0a050'] };
+const GCOL = { G: ['#466929', '#2e9e4f'], BN: ['#6b4423', '#8b5a2b'], BZ: ['#a67c4a', '#c9a066'] };
 let gStart = 0, lastGX = null;
-function mixHex(a, b) {
-    const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
-    const c = s => Math.round((((x >> s) & 255) + ((y >> s) & 255)) / 2);
-    return `rgb(${c(16)},${c(8)},${c(0)})`;
-}
 function groundGradient() {
     if (lastGX === camX) return null;
     lastGX = camX;
-    const lo = camX - 50, hi = camX + canvas.width + 50, st = [];
+    const lo = camX - 2500, hi = camX + canvas.width + 2500, st = [];
     while (gStart > 0 && GROUND[gStart].x1 > lo) gStart--;
     while (gStart < GROUND.length - 1 && GROUND[gStart].x2 < lo) gStart++;
     for (let i = gStart; i < GROUND.length; i++) {
         const z = GROUND[i];
         if (z.x1 > hi) break;
         const [base, hl] = GCOL[z.t], L = z.x2 - z.x1;
-        const prev = GROUND[i - 1] ? GCOL[GROUND[i - 1].t][0] : base;
-        const next = GROUND[i + 1] ? GCOL[GROUND[i + 1].t][0] : base;
-        st.push(`${mixHex(prev, base)} ${(z.x1 - camX).toFixed(1)}px`,
-                `${base} ${(z.x1 + L * 0.35 - camX).toFixed(1)}px`,
+        const a = z.w ? 0 : (z.t === 'G' ? 0.15 : 0.25);
+        st.push(`${base} ${(z.x1 + L * a - camX).toFixed(1)}px`,
                 `${hl} ${(z.x1 + L * 0.5 - camX).toFixed(1)}px`,
-                `${base} ${(z.x1 + L * 0.65 - camX).toFixed(1)}px`,
-                `${mixHex(base, next)} ${(z.x2 - camX).toFixed(1)}px`);
+                `${base} ${(z.x1 + L * (1 - a) - camX).toFixed(1)}px`);
     }
     return `linear-gradient(90deg, ${st.join(',')})`;
 }
