@@ -241,6 +241,15 @@ const FIRES = (() => {
     return list;
 })();
 const WATER_DPS = 3;
+function fireDamage(chr) {
+    if (chr.fireCd > 0) { chr.fireCd -= dt; return; }
+    if (chr.y > 90) return;
+    for (const fx of FIRES) {
+        if (fx < chr.x - 40) continue;
+        if (fx > chr.x + 40) break;
+        if (Math.abs(chr.x - fx) < 30) { dmg(4, chr); chr.fireCd = 30; return; }
+    }
+}
 const grdEl = document.getElementById('grd');
 const GROUND = (() => {
     let s = 777;
@@ -1532,7 +1541,7 @@ function u() {
         checkBanishCollect();
         checkMaskCollect();
         if (!introOpen) {
-            aliveChars().forEach(c => { if (inWater(c)) waterDamage(c); });
+            aliveChars().forEach(c => { if (inWater(c)) waterDamage(c); fireDamage(c); });
         }
         const now = Date.now();
         updateMoose(character, hp > 0);
