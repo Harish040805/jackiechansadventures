@@ -2352,7 +2352,13 @@ function drawHuman(chr, label) {
     ctx.beginPath();
     ctx.moveTo(-9, -54 + breathe); ctx.lineTo(0, -38 + breathe); ctx.lineTo(9, -54 + breathe);
     ctx.stroke();
-    if (headImg.complete && headImg.naturalWidth) ctx.drawImage(headImg, -21, -108 + breathe, 46, 58);
+    if (headImg.complete && headImg.naturalWidth) {
+        ctx.save();
+        ctx.translate(0, -52 + breathe);
+        ctx.rotate(-0.15);
+        ctx.drawImage(headImg, -21, -56, 48, 60);
+        ctx.restore();
+    }
     else drawJackieHead(1, -82 + breathe, 1.15, skinHead, skinShade);
     drawJointLimb(0, shoulderY, 22, 20, 13, 11, shF, elF, shirtArm, skinArm, 'hand');
     ctx.restore();
