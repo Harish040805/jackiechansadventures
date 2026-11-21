@@ -1,7 +1,5 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-Make the shape of jackie body more perfect as per cartoon
-
 Change shadow guard's face as per image in cartoon
 
 Laser from pig talisman color to white with yellow border with spiral or wave effect round line
