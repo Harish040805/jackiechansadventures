@@ -2387,7 +2387,7 @@ const GUARD_FACE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="260" heig
 .m{position:absolute;top:94px;left:24px;width:132px;height:44px;background:linear-gradient(to right,#ccc,#202026);clip-path:polygon(0% 22%,58% 42%,100% 16%,90% 84%,56% 64%,8% 88%);box-shadow:inset 0 -6px 0 #5b6269}
 .el{position:absolute;top:12px;left:16px;width:44px;height:13px;background:linear-gradient(to right,#110000,#eb241c);clip-path:polygon(0% 0%,100% 56%,84% 100%,12% 76%);transform:rotate(8deg);box-shadow:0 0 10px #ff2a20}
 .er{position:absolute;top:10px;right:18px;width:37px;height:14px;background:linear-gradient(to right,#110000,#eb241c);clip-path:polygon(100% 0%,88% 76%,16% 100%,0% 56%);transform:rotate(-10deg);box-shadow:0 0 10px #ff2a20}
-.lw{position:absolute;top:132px;left:34px;width:112px;height:82px;background:linear-gradient(to right,#141418,#08080a);clip-path:polygon(0% 10%,54% 0%,100% 12%,82% 100%,18% 100%);box-shadow:inset 0 6px 8px #08080a}
+.lw{position:absolute;top:132px;left:26px;width:128px;height:82px;background:linear-gradient(to right,#141418,#08080a);clip-path:polygon(0% 10%,54% 0%,100% 12%,96% 100%,4% 100%);box-shadow:inset 0 6px 8px #08080a}
 .cr{position:absolute;top:162px;left:52px;width:58px;height:22px;border-top:2px solid #08080a;border-radius:50%;transform:rotate(-6deg)}
 .nk{position:absolute;top:234px;left:68px;width:100px;height:54px;background:linear-gradient(to right,#141418,#08080a);clip-path:polygon(5% 0%,100% 0%,100% 100%,0% 100%);z-index:-1}
 </style><div class="f"><div class="h"><div class="b"></div><div class="m"><div class="el"></div><div class="er"></div></div><div class="lw"></div><div class="cr"></div></div><div class="nk"></div></div></div></foreignObject></svg>`;
