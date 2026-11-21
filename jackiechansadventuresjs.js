@@ -134,7 +134,7 @@ function buildBanishUI() {
     BANISH.forEach((o, i) => {
         const d = document.createElement('div');
         d.className = 'bo-cell';
-        d.title = `${o.n} - ${o.m} m`;
+        d.title = `${o.n} - ${Math.round(o.x / 1550)} m`;
         d.innerHTML = `<span>${o.e}</span><span id="bo-s${i}">🟡</span>`;
         grid.appendChild(d);
     });
@@ -169,7 +169,7 @@ function buildMaskUI() {
     MASKS.forEach((o, i) => {
         const d = document.createElement('div');
         d.className = 'bo-cell mk-cell';
-        d.title = `Mask ${o.id} - ${Math.round(o.x / 20)} m`;
+        d.title = `Mask ${o.id} - ${Math.round(o.x / 1550)} m`;
         d.innerHTML = `<span>🎭</span><span id="mk-s${i}">🟡</span>`;
         grid.appendChild(d);
     });
@@ -1416,7 +1416,7 @@ function u() {
         updateCam(character);
         if (isSplit) updateCam(character2);
         const lead = Math.max(0, ...aliveChars().map(c => c.cam));
-        if (lead * 0.05 > dist) { dist = lead * 0.05; updateScoreUI(); }
+        if (lead / 1550 > dist) { dist = lead / 1550; updateScoreUI(); }
         const vb = viewBounds();
         checkBanishCollect();
         checkMaskCollect();
