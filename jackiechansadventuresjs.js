@@ -2244,6 +2244,8 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.restore();
 }
 */
+const headImg = new Image();
+headImg.src = 'jackiehead.png';
 function drawHuman(chr, label) {
     ctx.save();
     ctx.translate(chr.x, canvas.height - chr.y);
@@ -2350,7 +2352,8 @@ function drawHuman(chr, label) {
     ctx.beginPath();
     ctx.moveTo(-9, -54 + breathe); ctx.lineTo(0, -38 + breathe); ctx.lineTo(9, -54 + breathe);
     ctx.stroke();
-    drawJackieHead(2, -88 + breathe, 1.55, skinHead, skinShade);
+    if (headImg.complete && headImg.naturalWidth) ctx.drawImage(headImg, -21, -108 + breathe, 46, 58);
+    else drawJackieHead(1, -82 + breathe, 1.15, skinHead, skinShade);
     drawJointLimb(0, shoulderY, 22, 20, 13, 11, shF, elF, shirtArm, skinArm, 'hand');
     ctx.restore();
     drawJointLimb(3, hipY, 34, 34, 18, 15, hipF, kneeF, pantsLeg, pantsLeg, 'shoe');
