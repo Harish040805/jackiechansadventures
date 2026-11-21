@@ -240,9 +240,11 @@ const GROUND = (() => {
         while (x < to) {
             const t = prev === 'G' && rnd() < 0.3 ? (rnd() < 0.6 ? 'BN' : 'BZ') : 'G';
             const [a, b] = LEN[t];
-            const x2 = Math.min(to, x + a + rnd() * (b - a));
-            out.push({ x1: x, x2, t });
-            x = x2; prev = t;
+            let x2 = Math.min(to, x + a + rnd() * (b - a));
+            if (to - x2 < LEN.G[0]) x2 = to;
+            const tt = x2 - x < a ? 'G' : t;
+            out.push({ x1: x, x2, t: tt });
+            x = x2; prev = tt;
         }
     };
     for (const z of forced) {
