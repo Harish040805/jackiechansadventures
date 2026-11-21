@@ -1049,6 +1049,7 @@ function updatePlayer(chr, keysState, playerNum) {
         if (Math.abs(chr.vx) < 0.05) chr.vx = 0;
     }
     chr.x += chr.vx * dt;
+    const prevY = chr.y;
     const groundLevel = 0;
     if (chr.isFlying) {
         if (keysState.up) chr.y += 8 * dt;
@@ -1068,6 +1069,7 @@ function updatePlayer(chr, keysState, playerNum) {
             chr.isJumping = false;
         }
     }
+    chr.vyReal = (chr.y - prevY) / Math.max(dt, 0.001);
     chr.squish += (1 - chr.squish) * 0.15;
     if (Math.abs(chr.vx) > 0.2 && !chr.isJumping && !chr.isFlying) {
         chr.walkCycle += Math.abs(chr.vx) * chr.strideFrequency * dt;
@@ -1084,7 +1086,9 @@ const AIM_ERROR = 0;
 function throwBlade(e, targetChr) {
     const sx = e.x;
     const sy = enemyCY(e);
-    const aim = aimArrow(sx, sy, targetChr, ARROW_SPEED);
+    const tv = Math.hypot(targetChr.vx, targetChr.vyReal || 0);
+    const bs = (!e.fly && targetChr.isFlying) ? Math.max(ARROW_SPEED, tv * 1.3 + 1) : ARROW_SPEED;
+    const aim = aimArrow(sx, sy, targetChr, bs);
     arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang, owner: e });
 }
 function futureY(chr, keys, t) {
@@ -1100,7 +1104,7 @@ function aimArrow(sx, sy, chr, spd) {
     const cx = chr.x;
     const cy = canvas.height - chr.y - 35;
     if (chr.isFlying) {
-        const vyS = (keys.down ? 8 : 0) - (keys.up ? 8 : 0);
+        const vyS = -(chr.vyReal || 0);
         const rx = cx - sx, ry = cy - sy;
         const vx = chr.vx;
         const qa = vx * vx + vyS * vyS - spd * spd;
@@ -1121,7 +1125,7 @@ function aimArrow(sx, sy, chr, spd) {
         if (!(FT > 0)) FT = Math.hypot(rx, ry) / spd;
         FT = Math.min(FT, 90);
         const fx = (cx + vx * FT) - sx;
-        const fy = (canvas.height - futureY(chr, keys, FT) - 35) - sy;
+        const fy = (canvas.height - Math.max(0, Math.min(canvas.height - 110, chr.y - vyS * FT)) - 35) - sy;
         const fa = Math.atan2(fy, fx);
         return { vx: Math.cos(fa) * spd, vy: Math.sin(fa) * spd, ang: fa };
     }
