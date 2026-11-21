@@ -1,6 +1,6 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-Laser from pig talisman color to white with yellow border with spiral or wave effect round line
+On Process: Laser from pig talisman color to white with yellow border with spiral or wave effect round line
 
 Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat always, but make it without affecting the banishment objects & masks. No steep or slope near flower, water bodies,any masks.
 
