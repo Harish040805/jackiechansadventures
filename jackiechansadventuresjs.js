@@ -1513,7 +1513,7 @@ function drawFires() {
     }
     ctx.restore();
 }
-const LASER_PAD = 34;
+const LASER_PAD = 25;
 function laserTip(chr, ex, ey) {
     const p = aimPt(chr);
     return { x: p.x, y: p.y };
