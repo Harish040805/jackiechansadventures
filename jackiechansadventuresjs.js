@@ -2378,6 +2378,21 @@ function drawHuman(chr, label) {
     ctx.filter = 'none';
     ctx.restore();
 }
+const GUARD_FACE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="300" viewBox="0 0 260 300"><foreignObject width="260" height="300"><div xmlns="http://www.w3.org/1999/xhtml"><style>
+.f{position:relative;width:260px;height:300px;isolation:isolate}
+.h{position:absolute;top:22px;left:46px;width:168px;height:236px;background-color:#121215;border-radius:3% 3% 52% 48% / 24% 1% 58% 54%;transform:rotate(7deg);box-shadow:inset -14px -10px 0 #09090b,inset 6px 4px 0 #1c1c21}
+.h::before{content:"";position:absolute;top:12px;left:14px;width:34px;height:44px;background-color:#121215;clip-path:polygon(0% 35%,82% 0%,100% 85%,12% 100%);transform:rotate(-22deg)}
+.h::after{content:"";position:absolute;top:6px;right:22px;width:30px;height:38px;background-color:#121215;clip-path:polygon(18% 0%,100% 35%,88% 100%,0% 85%);transform:rotate(24deg)}
+.b{position:absolute;top:74px;left:16px;width:146px;height:38px;background:linear-gradient(to right,#08080a,#26262e);clip-path:polygon(0% 18%,62% 44%,100% 24%,92% 76%,60% 92%,4% 62%);transform:rotate(-4deg)}
+.m{position:absolute;top:94px;left:24px;width:132px;height:44px;background:linear-gradient(to right,#ccc,#202026);clip-path:polygon(0% 22%,58% 42%,100% 16%,90% 84%,56% 64%,8% 88%);box-shadow:inset 0 -6px 0 #5b6269}
+.el{position:absolute;top:12px;left:16px;width:44px;height:13px;background:linear-gradient(to right,#110000,#eb241c);clip-path:polygon(0% 0%,100% 56%,84% 100%,12% 76%);transform:rotate(8deg);box-shadow:0 0 10px #ff2a20}
+.er{position:absolute;top:10px;right:18px;width:37px;height:14px;background:linear-gradient(to right,#110000,#eb241c);clip-path:polygon(100% 0%,88% 76%,16% 100%,0% 56%);transform:rotate(-10deg);box-shadow:0 0 10px #ff2a20}
+.lw{position:absolute;top:132px;left:34px;width:112px;height:82px;background:linear-gradient(to right,#141418,#08080a);clip-path:polygon(0% 10%,54% 0%,100% 12%,82% 100%,18% 100%);box-shadow:inset 0 6px 8px #08080a}
+.cr{position:absolute;top:162px;left:52px;width:58px;height:22px;border-top:2px solid #08080a;border-radius:50%;transform:rotate(-6deg)}
+.nk{position:absolute;top:234px;left:68px;width:100px;height:54px;background:linear-gradient(to right,#141418,#08080a);clip-path:polygon(5% 0%,100% 0%,100% 100%,0% 100%);z-index:-1}
+</style><div class="f"><div class="h"><div class="b"></div><div class="m"><div class="el"></div><div class="er"></div></div><div class="lw"></div><div class="cr"></div></div><div class="nk"></div></div></div></foreignObject></svg>`;
+const guardImg = new Image();
+guardImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(GUARD_FACE_SVG);
 function drawShadowGuardBody(walk, scale, facing, state) {
     const suit = hg('#16161a', 19), suitLimb = hg('#16161a', 7), gear = '#0f0e18';
     const sash = hg('#c81e1e', 19), skin = '#f0c08a';
@@ -2425,25 +2440,16 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     ctx.beginPath();
     ctx.moveTo(-17, -2); ctx.lineTo(-36, 4 + flap); ctx.lineTo(-33, 11 + flap); ctx.lineTo(-15, 4);
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle = suit;
-    ctx.beginPath(); ctx.arc(2, -72, 19, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = sash;
-    ctx.fillRect(-17, -84, 38, 6);
-    ctx.beginPath();
-    ctx.moveTo(-16, -83); ctx.lineTo(-34, -79 + flap); ctx.lineTo(-30, -73 + flap); ctx.lineTo(-15, -78);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle = '#0a0a12';
-    ctx.beginPath(); ctx.roundRect(2, -75, 19, 10, 4); ctx.fill();
-    ctx.save();
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = '#ff0000';
-    ctx.fillStyle = '#ff1a1a';
-    ctx.beginPath(); ctx.ellipse(9, -70, 3.4, 2.6, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(16.5, -70, 3.4, 2.6, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
-    ctx.fillStyle = '#ffb3b3';
-    ctx.beginPath(); ctx.arc(9.8, -70.6, 1, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(17.3, -70.6, 1, 0, Math.PI * 2); ctx.fill();
+    if (guardImg.complete && guardImg.naturalWidth) {
+        ctx.save();
+        ctx.translate(2, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(guardImg, -21.5, -103, 43, 50);
+        ctx.restore();
+    } else {
+        ctx.fillStyle = suit;
+        ctx.beginPath(); ctx.arc(2, -72, 19, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    }
     drawJointLimb(0, shoulderY, 22, 20, 12, 10, shF, elF, suitLimb, suitLimb, 'hand', gear);
     ctx.restore();
     drawJointLimb(3, hipY, 34, 34, 17, 14, hipF, kneeF, suitLimb, suitLimb, 'shoe', gear);
