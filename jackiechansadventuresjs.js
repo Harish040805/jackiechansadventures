@@ -1983,6 +1983,144 @@ function drawJointLimb(x, y, len1, len2, w1, w2, a1, a2, c1, c2, endType, endCol
     }
     ctx.restore();
 }
+/* NEW JACKIE FACE */
+function drawJackieHead(cx, cy, s, skin, skinShade) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(s, s);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    const ink = '#2a2a33';
+    const hairCol = '#07070d';
+    ctx.fillStyle = skin;
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-14, -8);
+    ctx.bezierCurveTo(-16, 4, -11, 13, -3, 18);
+    ctx.lineTo(5, 23);
+    ctx.lineTo(11, 24.5);
+    ctx.lineTo(16, 21);
+    ctx.bezierCurveTo(19, 16, 20.5, 9, 19.5, 2);
+    ctx.bezierCurveTo(19, -8, 14, -16, 4, -18);
+    ctx.bezierCurveTo(-6, -18, -13, -14, -14, -8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = skinShade;
+    ctx.beginPath();
+    ctx.ellipse(-12.5, 3, 3.4, 5.2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.strokeStyle = skinShade;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(-9, 12);
+    ctx.quadraticCurveTo(-3, 19, 5, 21.5);
+    ctx.stroke();
+    ctx.fillStyle = skin;
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(17.5, -4);
+    ctx.quadraticCurveTo(27, 5, 19.5, 9.5);
+    ctx.quadraticCurveTo(16, 9.5, 16.5, 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = ink;
+    ctx.beginPath(); ctx.ellipse(20, 8, 1.1, 0.8, 0, 0, Math.PI * 2); ctx.fill();
+    [[4.5, 0, 5.4, 2.7, 6.4, 2.1], [15, 0, 3.6, 2.4, 16, 1.7]].forEach(([ex, ey, rx, ry, ix, ir]) => {
+        ctx.save();
+        ctx.beginPath();
+        ctx.ellipse(ex, ey, rx, ry, 0.06, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(ex - rx, ey - ry, rx * 2, ry * 2);
+        ctx.fillStyle = '#3a2412';
+        ctx.beginPath(); ctx.arc(ix, ey + 0.2, ir, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#050302';
+        ctx.beginPath(); ctx.arc(ix + 0.2, ey + 0.2, ir * 0.55, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = skin;
+        ctx.fillRect(ex - rx, ey - ry, rx * 2, ry * 0.85);
+        ctx.restore();
+        ctx.strokeStyle = '#0d0d14';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(ex - rx - 0.6, ey - ry * 0.2);
+        ctx.quadraticCurveTo(ex, ey - ry * 0.9, ex + rx + 0.6, ey - ry * 0.2);
+        ctx.stroke();
+        ctx.strokeStyle = skinShade;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.ellipse(ex, ey, rx, ry, 0.06, Math.PI * 0.15, Math.PI * 0.85); ctx.stroke();
+    });
+    ctx.fillStyle = hairCol;
+    ctx.beginPath();
+    ctx.moveTo(-1.5, -6.5);
+    ctx.quadraticCurveTo(4.5, -10.5, 11, -7);
+    ctx.lineTo(10.5, -5.2);
+    ctx.quadraticCurveTo(4.5, -8, -1.5, -4.8);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(11.5, -7.2);
+    ctx.quadraticCurveTo(15.5, -9.5, 19.5, -5.5);
+    ctx.lineTo(18.8, -3.8);
+    ctx.quadraticCurveTo(15.5, -6.8, 11.8, -5.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = skinShade;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(15.5, 3.5); ctx.quadraticCurveTo(17.5, 7, 16.5, 10); ctx.stroke();
+    ctx.strokeStyle = '#6e2e1f';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(6.5, 14.5); ctx.quadraticCurveTo(12, 16.5, 18.5, 10.8); ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(18.5, 10.8); ctx.quadraticCurveTo(20.5, 10.2, 20, 8.2); ctx.stroke();
+    ctx.lineWidth = 0.9;
+    ctx.beginPath(); ctx.moveTo(9, 17.5); ctx.quadraticCurveTo(12.5, 18.6, 15.5, 17); ctx.stroke();
+    ctx.fillStyle = hairCol;
+    ctx.beginPath();
+    ctx.moveTo(-15, 9);
+    ctx.lineTo(-26, 5);
+    ctx.lineTo(-19, -1);
+    ctx.lineTo(-30, -9);
+    ctx.lineTo(-17, -11);
+    ctx.lineTo(-25, -22);
+    ctx.lineTo(-11, -17);
+    ctx.quadraticCurveTo(-8, -32, 8, -28);
+    ctx.lineTo(-1, -19);
+    ctx.quadraticCurveTo(6, -36, 22, -26);
+    ctx.lineTo(8, -17);
+    ctx.quadraticCurveTo(16, -30, 31, -20);
+    ctx.lineTo(16, -13);
+    ctx.quadraticCurveTo(24, -19, 33, -11);
+    ctx.lineTo(15, -10.5);
+    ctx.lineTo(10, -11);
+    ctx.lineTo(5, -13.5);
+    ctx.lineTo(0, -10.5);
+    ctx.lineTo(-5, -10);
+    ctx.lineTo(-9, -5);
+    ctx.lineTo(-14, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-10, -3); ctx.lineTo(-5, -3); ctx.lineTo(-5, 8); ctx.lineTo(-10, 5.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#4a5068';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(-8, -22); ctx.quadraticCurveTo(-2, -29, 7, -26);
+    ctx.moveTo(3, -20); ctx.quadraticCurveTo(10, -29, 20, -24);
+    ctx.moveTo(10, -15.5); ctx.quadraticCurveTo(18, -23, 29, -17);
+    ctx.moveTo(-22, -17); ctx.lineTo(-15, -14);
+    ctx.stroke();
+    ctx.restore();
+}
+/*
+OLD JACKIE FACE COMMENTED
+
 function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.save();
     ctx.translate(cx, cy);
@@ -2101,6 +2239,7 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.stroke();
     ctx.restore();
 }
+*/
 function drawHuman(chr, label) {
     ctx.save();
     ctx.translate(chr.x, canvas.height - chr.y);
