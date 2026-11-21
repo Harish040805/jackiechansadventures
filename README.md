@@ -18,6 +18,8 @@ Occasionally occuring Wooden logs hung from the top using 2 ropes, where Jackie 
 
 Houses in #fede6d & #847b3d duality with roofs in #b31f30 & #471313 duality occuring occasionally where Jackie or shadow guards can climb on the roofs
 
+Chinese Words on boards with white body red border on houses
+
 Occational pair of walls in a random colour duality (but the 2 colors must belong to same family, i.e, #b51f30 & #561e16, #acf7fe & #3e5d70 like that). No wall must come alone. They must come in pairs, i.e, the sequence must follow 2 walls seperated by 10 meters of distance exactly & both walls must be in the same colour when occured, i.e, 2 yellow walls, both in dark yellow borders. In next occurance, 2 green walls, both in dark green borders. It can come in random like the water body that come occasionally but only in pairs. 
 Jackie can climb on them easily, stand in between. 🥷 shouldn't be able to climb. So, Jackie must be safe from 🥷 staying in between the pair of walls. Still, 🦇 can attack him as they fly & not walk like 🥷.
 
