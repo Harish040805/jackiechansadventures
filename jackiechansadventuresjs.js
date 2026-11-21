@@ -225,6 +225,21 @@ const WATER = (() => {
     list.sort((a, b) => a.x1 - b.x1);
     return list;
 })();
+const FIRES = (() => {
+    let s = 4242;
+    const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const blockers = BANISH.map(o => o.x).concat(MASKS.map(o => o.x));
+    const list = [BANISH[0].x];
+    let x = 6000;
+    while (x < 400000) {
+        x += 5000 + rnd() * 12000;
+        const bad = WATER.some(w => x + 450 > w.x1 && x - 450 < w.x2)
+            || blockers.some(bx => Math.abs(bx - x) < 500)
+            || Math.abs(x - BANISH[3].x) < 1000;
+        if (!bad) list.push(x);
+    }
+    return list;
+})();
 const WATER_DPS = 3;
 const grdEl = document.getElementById('grd');
 const GROUND = (() => {
@@ -232,6 +247,7 @@ const GROUND = (() => {
     const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     const forced = WATER.map(w => ({ x1: w.x1 - 200, x2: w.x2 + 200, t: 'G', w: true }));
     forced.push({ x1: BANISH[3].x - 500, x2: BANISH[3].x + 500, t: 'BN' });
+    FIRES.forEach(f => forced.push({ x1: f - 250, x2: f + 250, t: 'AS' }));
     forced.sort((a, b) => a.x1 - b.x1);
     const LEN = { G: [600, 2400], BN: [400, 900], BZ: [300, 700] };
     const out = [];
@@ -256,7 +272,7 @@ const GROUND = (() => {
     fill(400000);
     return out;
 })();
-const GCOL = { G: ['#53531d', '#2e9e4f'], BN: ['#6b4423', '#8b5a2b'], BZ: ['#a67c4a', '#c9a066'] };
+const GCOL = { G: ['#466929', '#2e9e4f'], BN: ['#6b4423', '#8b5a2b'], BZ: ['#a67c4a', '#c9a066'], AS: ['#4a4a4a', '#707070'] };
 let gStart = 0, lastGX = null;
 function groundGradient() {
     if (lastGX === camX) return null;
@@ -1393,6 +1409,101 @@ function setPaused(p) {
 pauseBtn.addEventListener('click', () => { pauseBtn.blur(); setPaused(true); });
 document.getElementById('resume-btn').addEventListener('click', () => setPaused(false));
 document.getElementById('pause-restart-btn').addEventListener('click', () => location.reload());
+class FireP {
+    constructor(fx) { this.fx = fx; this.rst(); this.lf = Math.random(); }
+    rst() {
+        this.x = this.fx + (Math.random() - 0.5) * 36;
+        this.y = canvas.height - 8 + (Math.random() - 0.5) * 4;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = -Math.random() * 1.2 - 0.6;
+        this.sz = Math.random() * 10 + 7;
+        this.lf = 1.0;
+        this.dc = Math.random() * 0.024 + 0.018;
+        this.wb = Math.random() * Math.PI * 2;
+        this.ws = Math.random() * 0.08 + 0.04;
+    }
+    upd() {
+        this.wb += this.ws * dt;
+        this.x += (this.vx + Math.sin(this.wb) * 0.3) * dt;
+        this.y += this.vy * dt;
+        this.vy *= Math.pow(0.992, dt);
+        this.vx += (this.fx - this.x) * 0.002 * dt;
+        this.sz *= Math.pow(0.965, dt);
+        this.lf -= this.dc * dt;
+        if (this.lf <= 0 || this.sz < 1) this.rst();
+    }
+    drw() {
+        const g = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.sz);
+        const a = Math.max(0, this.lf);
+        if (a > 0.75) {
+            g.addColorStop(0, `rgba(255, 255, 230, ${a})`);
+            g.addColorStop(0.35, `rgba(255, 210, 60, ${a * 0.85})`);
+            g.addColorStop(0.7, `rgba(255, 100, 10, ${a * 0.45})`);
+            g.addColorStop(1, 'rgba(180, 20, 0, 0)');
+        } else if (a > 0.4) {
+            g.addColorStop(0, `rgba(255, 180, 40, ${a * 0.9})`);
+            g.addColorStop(0.45, `rgba(240, 75, 5, ${a * 0.65})`);
+            g.addColorStop(0.8, `rgba(140, 15, 0, ${a * 0.3})`);
+            g.addColorStop(1, 'rgba(60, 5, 0, 0)');
+        } else {
+            g.addColorStop(0, `rgba(200, 45, 5, ${a * 0.7})`);
+            g.addColorStop(0.5, `rgba(100, 15, 5, ${a * 0.4})`);
+            g.addColorStop(1, 'rgba(30, 10, 10, 0)');
+        }
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.sz, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+class FireE {
+    constructor(fx) { this.fx = fx; this.rst(); this.lf = Math.random(); }
+    rst() {
+        this.x = this.fx + (Math.random() - 0.5) * 40;
+        this.y = canvas.height - 12;
+        this.vx = (Math.random() - 0.5) * 0.8;
+        this.vy = -Math.random() * 1.5 - 0.5;
+        this.sz = Math.random() * 1.2 + 0.5;
+        this.lf = 1.0;
+        this.dc = Math.random() * 0.018 + 0.01;
+        this.wb = Math.random() * Math.PI * 2;
+    }
+    upd() {
+        this.wb += 0.12 * dt;
+        this.x += (this.vx + Math.sin(this.wb) * 0.4) * dt;
+        this.y += this.vy * dt;
+        this.lf -= this.dc * dt;
+        if (this.lf <= 0) this.rst();
+    }
+    drw() {
+        const a = Math.max(0, this.lf);
+        ctx.fillStyle = `rgba(255, ${Math.floor(150 + a * 105)}, 50, ${a})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.sz, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+const fireStates = new Map();
+function drawFires() {
+    const lo = camX - 120, hi = camX + canvas.width + 120;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const fx of FIRES) {
+        if (fx < lo) continue;
+        if (fx > hi) break;
+        let f = fireStates.get(fx);
+        if (!f) {
+            f = {
+                ps: Array.from({ length: 50 }, () => new FireP(fx)),
+                es: Array.from({ length: 10 }, () => new FireE(fx))
+            };
+            fireStates.set(fx, f);
+        }
+        f.ps.forEach(p => { p.upd(); p.drw(); });
+        f.es.forEach(p => { p.upd(); p.drw(); });
+    }
+    ctx.restore();
+}
 function u() {
     if (isPaused) {
         lastFrameTime = performance.now();
@@ -1741,6 +1852,7 @@ function u() {
         ctx.fill();
         ctx.restore();
     }
+    drawFires();
     drawWater(0.9);
     drawBanishObjects();
     for (const e of ems) {
