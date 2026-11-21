@@ -256,6 +256,11 @@ const GROUND = (() => {
 })();
 const GCOL = { G: ['#466929', '#2e9e4f'], BN: ['#8b5a2b', '#a0652d'], BZ: ['#cd7f32', '#e0a050'] };
 let gStart = 0, lastGX = null;
+function mixHex(a, b) {
+    const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
+    const c = s => Math.round((((x >> s) & 255) + ((y >> s) & 255)) / 2);
+    return `rgb(${c(16)},${c(8)},${c(0)})`;
+}
 function groundGradient() {
     if (lastGX === camX) return null;
     lastGX = camX;
@@ -266,9 +271,13 @@ function groundGradient() {
         const z = GROUND[i];
         if (z.x1 > hi) break;
         const [base, hl] = GCOL[z.t], L = z.x2 - z.x1;
-        st.push(`${base} ${(z.x1 + L * 0.15 - camX).toFixed(1)}px`,
+        const prev = GROUND[i - 1] ? GCOL[GROUND[i - 1].t][0] : base;
+        const next = GROUND[i + 1] ? GCOL[GROUND[i + 1].t][0] : base;
+        st.push(`${mixHex(prev, base)} ${(z.x1 - camX).toFixed(1)}px`,
+                `${base} ${(z.x1 + L * 0.35 - camX).toFixed(1)}px`,
                 `${hl} ${(z.x1 + L * 0.5 - camX).toFixed(1)}px`,
-                `${base} ${(z.x1 + L * 0.85 - camX).toFixed(1)}px`);
+                `${base} ${(z.x1 + L * 0.65 - camX).toFixed(1)}px`,
+                `${mixHex(base, next)} ${(z.x2 - camX).toFixed(1)}px`);
     }
     return `linear-gradient(90deg, ${st.join(',')})`;
 }
