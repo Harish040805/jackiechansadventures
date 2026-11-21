@@ -2366,7 +2366,7 @@ function drawHuman(chr, label) {
     ctx.stroke();
     if (headImg.complete && headImg.naturalWidth) {
         ctx.save();
-        ctx.translate(0, -52 + breathe);
+        ctx.translate(0, -54 + breathe);
         ctx.rotate(-0.15);
         ctx.drawImage(headImg, -21, -56, 48, 60);
         ctx.restore();
