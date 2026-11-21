@@ -2346,7 +2346,7 @@ function drawHuman(chr, label) {
     ctx.beginPath();
     ctx.moveTo(-9, -54 + breathe); ctx.lineTo(0, -38 + breathe); ctx.lineTo(9, -54 + breathe);
     ctx.stroke();
-    drawJackieHead(1, -82 + breathe, 1.15, skinHead, skinShade);
+    drawJackieHead(2, -88 + breathe, 1.55, skinHead, skinShade);
     drawJointLimb(0, shoulderY, 22, 20, 13, 11, shF, elF, shirtArm, skinArm, 'hand');
     ctx.restore();
     drawJointLimb(3, hipY, 34, 34, 18, 15, hipF, kneeF, pantsLeg, pantsLeg, 'shoe');
