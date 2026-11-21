@@ -2,8 +2,6 @@
 
 Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat always, but make it without affecting the banishment objects & masks. No steep or slope near flower, water bodies,any masks.
 
-Occational Wind flow effect in UI. Just for UI, no effect on Jackie or enemies. Show in moving, thin, #fff-#dcdcdc gradient curves.
-
 Sudden Rain effect. No effect of rain on fire or Jackie or enemies. It's also just for UI. But, whenever rain occurs, the sky must turn dark gray. Capture exactly the same rain effect in background.
 
 Moving clouds effect on the sky of random different shapes
