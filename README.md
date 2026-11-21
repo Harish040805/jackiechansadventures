@@ -1,16 +1,16 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-Occasional steep & slop where player can climb up & down - Land mustn't be flat always
+Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat always
 
-Occational Wind flow effect in UI. Just for UI, no effect on player or enemies. Show in moving, thin, #fff-#dcdcdc gradient curves.
+Occational Wind flow effect in UI. Just for UI, no effect on Jackie or enemies. Show in moving, thin, #fff-#dcdcdc gradient curves.
 
-Sudden Rain effect. No effect of rain on fire or player or enemies. It's also just for UI. But, whenever rain occurs, the sky must turn dark gray. Capture exactly the same rain effect in background.
+Sudden Rain effect. No effect of rain on fire or Jackie or enemies. It's also just for UI. But, whenever rain occurs, the sky must turn dark gray. Capture exactly the same rain effect in background.
 
 Moving clouds effect on the sky of random different shapes
 
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
 
-Occasionally occuring Wooden logs hung from the top using 2 ropes, where Jackie can only burn or cut the ropes & when the wooden logs fall down, can kill Jackie making his health 0% completely & end the game or 🥷 or 🦇, i.e, it must be used cleverly to kill a group of 🥷 rather than killing the player himself. Standing on the logs & falling down with it, where 🥷 are under can kill only 🥷 under the logs & not Jackie. It can kill Jackie only if he is under the logs & the logs fall down.
+Occasionally occuring Wooden logs hung from the top using 2 ropes, where Jackie can only burn or cut the ropes & when the wooden logs fall down, can kill Jackie making his health 0% completely & end the game or 🥷 or 🦇, i.e, it must be used cleverly to kill a group of 🥷 rather than killing Jackie himself. Standing on the logs & falling down with it, where 🥷 are under can kill only 🥷 under the logs & not Jackie. It can kill Jackie only if he is under the logs & the logs fall down.
 
 Houses in #fede6d & #847b3d duality with roofs in #b31f30 & #471313 duality occuring occasionally where Jackie or shadow guards can climb on the roofs
 
