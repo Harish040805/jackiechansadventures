@@ -2338,10 +2338,10 @@ function drawHuman(chr, label) {
     ctx.beginPath(); ctx.roundRect(-17, -2, 34, 18, 5); ctx.fill(); ctx.stroke();
     ctx.fillStyle = shirtBody;
     ctx.beginPath();
-    ctx.moveTo(-9.5, -40 + breathe);
-    ctx.lineTo(9.5, -40 + breathe);
-    ctx.lineTo(6.1, -2.1 + breathe);
-    ctx.lineTo(-9.5, -2.1 + breathe);
+    ctx.moveTo(-15.2, -40 + breathe);
+    ctx.lineTo(15.2, -40 + breathe);
+    ctx.lineTo(9.8, -2.1 + breathe);
+    ctx.lineTo(-15.2, -2.1 + breathe);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
