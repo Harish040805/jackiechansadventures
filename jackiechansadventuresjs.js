@@ -1513,6 +1513,59 @@ function drawFires() {
     }
     ctx.restore();
 }
+const winds = [];
+function spawnWind() {
+    const len = 200 + Math.random() * 260;
+    winds.push({
+        x: -len,
+        y: canvas.height * (0.08 + Math.random() * 0.62),
+        len: len,
+        spd: 5 + Math.random() * 5,
+        amp: 10 + Math.random() * 22,
+        freq: 2.2 + Math.random() * 2,
+        phase: Math.random() * Math.PI * 2,
+        strands: 2 + Math.floor(Math.random() * 3),
+        gap: 7 + Math.random() * 8
+    });
+}
+function drawWind() {
+    if (winds.length < 3 && Math.random() < 0.006 * dt) spawnWind();
+    for (let i = winds.length - 1; i >= 0; i--) {
+        const w = winds[i];
+        w.x += w.spd * dt;
+        w.phase += 0.05 * dt;
+        const p = (w.x + w.len) / (canvas.width + w.len * 2);
+        if (p >= 1) {
+            winds.splice(i, 1);
+            continue;
+        }
+        const alpha = Math.sin(Math.PI * p) * 0.75;
+        const tailX = w.x - w.len;
+        const steps = 40;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalAlpha = alpha;
+        for (let s = 0; s < w.strands; s++) {
+            const grad = ctx.createLinearGradient(tailX, 0, w.x, 0);
+            grad.addColorStop(0, 'rgba(220,220,220,0)');
+            grad.addColorStop(0.5, '#dcdcdc');
+            grad.addColorStop(1, '#ffffff');
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = s === 0 ? 1.6 : 1;
+            ctx.beginPath();
+            for (let k = 0; k <= steps; k++) {
+                const t = k / steps;
+                const taper = Math.sin(Math.PI * t);
+                const px = tailX + t * w.len;
+                const py = w.y + s * w.gap + Math.sin(t * w.freq * Math.PI + w.phase + s * 0.6) * w.amp * taper;
+                if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+}
 function u() {
     if (isPaused) {
         lastFrameTime = performance.now();
@@ -1965,6 +2018,7 @@ function u() {
         ctx.restore();
     }
     ctx.restore();
+    drawWind();
     requestAnimationFrame(u);
 }
 requestAnimationFrame(u);
