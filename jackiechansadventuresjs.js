@@ -2444,7 +2444,7 @@ function drawShadowGuardBody(walk, scale, facing, state) {
         ctx.save();
         ctx.translate(2, 0);
         ctx.scale(-1, 1);
-        ctx.drawImage(guardImg, -21.5, -103, 43, 50);
+        ctx.drawImage(guardImg, -28, -118, 56, 65);
         ctx.restore();
     } else {
         ctx.fillStyle = suit;
