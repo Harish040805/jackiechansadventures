@@ -1,6 +1,6 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat always
+Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat always, but make it without affecting the banishment objects & masks. No steep or slope near flower, water bodies,any masks.
 
 Occational Wind flow effect in UI. Just for UI, no effect on Jackie or enemies. Show in moving, thin, #fff-#dcdcdc gradient curves.
 
