@@ -1099,6 +1099,32 @@ function aimArrow(sx, sy, chr, spd) {
     const keys = chr.playerNum === 1 ? keysP1 : keysP2;
     const cx = chr.x;
     const cy = canvas.height - chr.y - 35;
+    if (chr.isFlying) {
+        const vyS = (keys.down ? 8 : 0) - (keys.up ? 8 : 0);
+        const rx = cx - sx, ry = cy - sy;
+        const vx = chr.vx;
+        const qa = vx * vx + vyS * vyS - spd * spd;
+        const qb = 2 * (rx * vx + ry * vyS);
+        const qc = rx * rx + ry * ry;
+        let FT = 0;
+        if (Math.abs(qa) < 1e-6) {
+            if (qb < 0) FT = -qc / qb;
+        } else {
+            const disc = qb * qb - 4 * qa * qc;
+            if (disc >= 0) {
+                const sq = Math.sqrt(disc);
+                const r1 = (-qb - sq) / (2 * qa), r2 = (-qb + sq) / (2 * qa);
+                const pos = [r1, r2].filter(v => v > 0);
+                if (pos.length) FT = Math.min(...pos);
+            }
+        }
+        if (!(FT > 0)) FT = Math.hypot(rx, ry) / spd;
+        FT = Math.min(FT, 90);
+        const fx = (cx + vx * FT) - sx;
+        const fy = (canvas.height - futureY(chr, keys, FT) - 35) - sy;
+        const fa = Math.atan2(fy, fx);
+        return { vx: Math.cos(fa) * spd, vy: Math.sin(fa) * spd, ang: fa };
+    }
     let ax = cx - sx, ay = cy - sy;
     let T = Math.hypot(ax, ay) / spd;
     for (let i = 0; i < 5; i++) {
