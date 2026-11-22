@@ -4,8 +4,6 @@ Sun during day slowly fades before night occurs. Moon during night slowly fades 
 
 Allow Jackie to make manual attacks for on screen button as well as keyboard keys like O for punch K for kick B for block. Random objects like wood on the ground, hanging rope. If B clicked stadning near wood, the wood must block the incoming blade attacks. Normal B can block shadow guard punches, using B only standing near wood can lift wood and block all incoming blades. If Jackie jumps towards a hanging rope and uses B, he must be able to hold the hanging rope and swing to & fro until he use B again. Mechanism same like tarzan game.
 
-Occasionally occuring Wooden logs hung from the top using 2 ropes, where Jackie can only burn or cut the ropes & when the wooden logs fall down, can kill Jackie making his health 0% completely & end the game or 🥷 or 🦇, i.e, it must be used cleverly to kill a group of 🥷 rather than killing Jackie himself. Standing on the logs & falling down with it, where 🥷 are under can kill only 🥷 under the logs & not Jackie. It can kill Jackie only if he is under the logs & the logs fall down.
-
 Houses in #fede6d & #847b3d duality with roofs in #b31f30 & #471313 duality occuring occasionally where Jackie or shadow guards can climb on the roofs
 
 Chinese Words on boards with white body red border on houses
