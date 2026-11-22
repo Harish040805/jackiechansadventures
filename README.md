@@ -1,10 +1,21 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
+
+
+
+
+
+I asked you to use the Section 13/ uncle's antique shop once in the starting but you used only Cartoon street house. For Section 13/ uncle's antique shop, use #fede6d as house color & #b31f30 as roof color. Also, if you use Cartoon street house at an interval of 10 m. After 10 m, have the mountains, trees, river background for 10 m. After that, bring the houses again. Loop them such way till the end. Always bring the trees to the front of houses.
+
+
+Jackie or shadow guards can jump & run on the roofs of the houses which are paralleogram in shape & top of the houses which are flat on the top. By pressing down arrow, they can come back to the ground.
+
+
+
+
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
 
 Allow Jackie to make manual attacks for on screen button as well as keyboard keys like O for punch K for kick B for block. Random objects like wood on the ground, hanging rope. If B clicked stadning near wood, the wood must block the incoming blade attacks. Normal B can block shadow guard punches, using B only standing near wood can lift wood and block all incoming blades. If Jackie jumps towards a hanging rope and uses B, he must be able to hold the hanging rope and swing to & fro until he use B again. Mechanism same like tarzan game.
-
-Houses in #fede6d & #847b3d duality with roofs in #b31f30 & #471313 duality occuring occasionally where Jackie or shadow guards can climb on the roofs
 
 Chinese Words on boards with white body red border on houses
 
