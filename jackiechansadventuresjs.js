@@ -410,28 +410,45 @@ function renderLogs() {
             l.shown = true;
         }
         const top = l.b + LOG_H;
-        const hang = l.state === 0;
-        const eL = hang ? top - 12 : l.endL;
-        const eR = hang ? top - 12 : l.endR;
+        const sw = l.state === 3;
+        const eL = l.state === 0 ? top - 12 : (sw ? (l.side < 0 ? l.cutH : top - 12) : l.endL);
+        const eR = l.state === 0 ? top - 12 : (sw ? (l.side > 0 ? l.cutH : top - 12) : l.endR);
+        const pvx = 195 - (l.side || 0) * 101;
+        const ang = (l.side || 0) * (l.rot || 0);
         l.rl.style.height = Math.max(0, H - eL) + 'px';
         l.rr.style.height = Math.max(0, H - eR) + 'px';
         l.rl.style.transform = `translate3d(${l.x - LOG_ROPE - 3.5}px, 0, 0)`;
         l.rr.style.transform = `translate3d(${l.x + LOG_ROPE - 3.5}px, 0, 0)`;
-        l.el.style.transform = `translate3d(${l.x - 195 * LOG_S}px, ${H - top - 8 * LOG_S}px, 0) scale(${LOG_S})`;
+        l.el.style.transform = `translate3d(${l.x - 195 * LOG_S}px, ${H - top - 8 * LOG_S}px, 0) scale(${LOG_S}) translate(${pvx}px, 32px) rotate(${ang}rad) translate(${-pvx}px, -32px)`;
     }
 }
 function cutLog(l, side, y) {
     if (l.state !== 0) return;
     const h = canvas.height - y;
-    l.state = 1;
+    l.state = 3;
+    l.side = side;
+    l.cutH = h;
+    l.swing = 0;
+    l.rot = 0;
     l.vy = 0;
-    l.endL = side < 0 ? h : h + (canvas.height - h) * 0.4;
-    l.endR = side > 0 ? h : h + (canvas.height - h) * 0.4;
     addSparks(l.x + side * LOG_ROPE, y, '#d4a348', 10);
 }
 function updateLogs() {
     for (const l of LOGS) {
+        if (l.state === 3) {
+            l.swing += dt;
+            l.rot = 0.9 * Math.sin(Math.min(1, l.swing / 32) * Math.PI / 2);
+            if (l.swing >= 32) {
+                const H = canvas.height;
+                l.endL = l.side < 0 ? l.cutH : l.cutH + (H - l.cutH) * 0.4;
+                l.endR = l.side > 0 ? l.cutH : l.cutH + (H - l.cutH) * 0.4;
+                l.state = 1;
+                l.vy = 0;
+            }
+            continue;
+        }
         if (l.state !== 1) continue;
+        l.rot *= Math.pow(0.9, dt);
         l.vy = Math.min(12, l.vy + 0.6 * dt);
         l.b -= l.vy * dt;
         const gx = Math.max(groundH(l.x - LOG_HW), groundH(l.x), groundH(l.x + LOG_HW));
@@ -439,6 +456,7 @@ function updateLogs() {
             l.b = gx;
             l.state = 2;
             l.land = 1;
+            l.rot = 0;
             addSparks(l.x - LOG_HW, canvas.height - gx, '#8d5524', 10);
             addSparks(l.x + LOG_HW, canvas.height - gx, '#8d5524', 10);
         }
