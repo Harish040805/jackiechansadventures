@@ -79,6 +79,13 @@
             <button onclick="location.reload()" class="restart-class" id="special-id">🔄 Play Again</button>
         </div>
     </div>
+    <div id="win-overlay" class="start-overlay-class" style="display:none; z-index:120;">
+        <img src="https://raw.githubusercontent.com/Harish040805/jackiechansadventures/main/jackiechancoverpage.jpg" class="coverimage" alt="Jackie Chan Adventures" />
+        <h1 class="gameover">Game Over. You Won!</h1>
+        <div class="tot-score">Total Score: <span id="win-sc">0</span></div>
+        <div>Banishment Objects: <span id="win-bo">0</span>/8 &nbsp; Masks: <span id="win-mk">0</span>/10 &nbsp; Distance: <span id="win-dc">0</span> m</div>
+        <button onclick="location.reload()" class="restart-class" style="width:auto;">Play Again</button>
+    </div>
     <button id="pause-btn" title="Pause (P / Esc)">⏸️ Pause</button>
     <div id="pause-overlay">
         <div class="pause-box">
