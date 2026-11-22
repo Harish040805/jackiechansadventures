@@ -118,6 +118,42 @@ function buildWater() {
     m.parentNode.insertBefore(w, m);
 }
 buildWater();
+function buildClouds() {
+    const box = document.getElementById('clouds');
+    if (!box) return;
+    box.innerHTML = '';
+    const cnt = 7;
+    for (let i = 0; i < cnt; i++) {
+        const w = 120 + Math.random() * 160;
+        const dur = 60 + Math.random() * 90;
+        const c = document.createElement('div');
+        c.className = 'cloud';
+        c.style.width = w + 'px';
+        c.style.top = (3 + Math.random() * 80) + '%';
+        c.style.opacity = (0.45 + Math.random() * 0.35).toFixed(2);
+        c.style.animationDuration = dur + 's';
+        c.style.animationDelay = (-Math.random() * dur) + 's';
+        const base = document.createElement('i');
+        base.style.width = (w * 0.9) + 'px';
+        base.style.height = '26px';
+        base.style.left = (w * 0.05) + 'px';
+        base.style.bottom = '0px';
+        base.style.borderRadius = '30px';
+        c.appendChild(base);
+        const n = 3 + Math.floor(Math.random() * 4);
+        for (let j = 0; j < n; j++) {
+            const size = 28 + Math.random() * 32;
+            const p = document.createElement('i');
+            p.style.width = size + 'px';
+            p.style.height = size + 'px';
+            p.style.left = ((j / (n - 1)) * (w - size) + (Math.random() - 0.5) * 16) + 'px';
+            p.style.bottom = (4 + Math.random() * 10) + 'px';
+            c.appendChild(p);
+        }
+        box.appendChild(c);
+    }
+}
+buildClouds();
 const BANISH = [
     { e: '🗡️', n: 'Shendu',     m: 100 },
     { e: '🪭', n: 'Xiao Fung',  m: 200 },
