@@ -1,7 +1,5 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat always, but make it without affecting the banishment objects & masks. No steep or slope near flower, water bodies,any masks.
-
 Sudden Rain effect. No effect of rain on fire or Jackie or enemies. It's also just for UI. But, whenever rain occurs, the sky must turn dark gray. Capture exactly the same rain effect in background.
 
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
