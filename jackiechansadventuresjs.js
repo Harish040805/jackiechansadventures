@@ -1784,6 +1784,78 @@ function drawWind() {
         ctx.restore();
     }
 }
+const rain = { on: false, k: 0, next: performance.now() + 15000 + Math.random() * 25000, end: 0 };
+const drops = [];
+const splashes = [];
+const rainSkyEl = document.getElementById('rain-sky');
+const RAIN_COLORS = ['rgba(190,205,225,0.28)', 'rgba(205,218,236,0.42)', 'rgba(225,235,248,0.6)'];
+function drawRain() {
+    const now = performance.now();
+    if (!rain.on && now > rain.next) {
+        rain.on = true;
+        rain.end = now + 15000 + Math.random() * 20000;
+        document.body.classList.add('raining');
+    }
+    if (rain.on && now > rain.end) {
+        rain.on = false;
+        rain.next = now + 25000 + Math.random() * 50000;
+        document.body.classList.remove('raining');
+    }
+    rain.k += ((rain.on ? 1 : 0) - rain.k) * Math.min(1, 0.02 * dt);
+    if (rainSkyEl) rainSkyEl.style.opacity = (rain.k * 0.92).toFixed(3);
+    if (rain.k < 0.01 && !drops.length && !splashes.length) return;
+    let n = rain.k * canvas.width / 55 * dt;
+    n = Math.floor(n) + (Math.random() < n % 1 ? 1 : 0);
+    for (let i = 0; i < n; i++) {
+        const z = Math.random();
+        const spd = 15 + z * 17;
+        drops.push({
+            x: Math.random() * (canvas.width + 260),
+            y: -40,
+            vx: -spd * 0.18,
+            vy: spd,
+            len: 9 + z * 24,
+            z: z,
+            l: z < 0.34 ? 0 : (z < 0.67 ? 1 : 2),
+            gy: canvas.height - 2 - (1 - z) * 16
+        });
+    }
+    for (let i = drops.length - 1; i >= 0; i--) {
+        const d = drops[i];
+        d.x += d.vx * dt;
+        d.y += d.vy * dt;
+        if (d.y >= d.gy) {
+            if (d.z > 0.3 && splashes.length < 160) splashes.push({ x: d.x, y: d.gy, r: 1, a: 0.5 });
+            drops.splice(i, 1);
+        }
+    }
+    ctx.save();
+    ctx.lineCap = 'round';
+    for (let l = 0; l < 3; l++) {
+        ctx.strokeStyle = RAIN_COLORS[l];
+        ctx.lineWidth = 0.7 + l * 0.5;
+        ctx.beginPath();
+        for (const d of drops) {
+            if (d.l !== l) continue;
+            const k = d.len / d.vy;
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(d.x - d.vx * k, d.y - d.vy * k);
+        }
+        ctx.stroke();
+    }
+    ctx.lineWidth = 1;
+    for (let i = splashes.length - 1; i >= 0; i--) {
+        const s = splashes[i];
+        s.r += 0.45 * dt;
+        s.a -= 0.04 * dt;
+        if (s.a <= 0) { splashes.splice(i, 1); continue; }
+        ctx.strokeStyle = 'rgba(225,235,248,' + s.a.toFixed(2) + ')';
+        ctx.beginPath();
+        ctx.ellipse(s.x, s.y, s.r * 2.2, s.r * 0.7, 0, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    ctx.restore();
+}
 function u() {
     if (isPaused) {
         lastFrameTime = performance.now();
@@ -2245,6 +2317,7 @@ function u() {
     }
     ctx.restore();
     drawWind();
+    drawRain();
     requestAnimationFrame(u);
 }
 requestAnimationFrame(u);
