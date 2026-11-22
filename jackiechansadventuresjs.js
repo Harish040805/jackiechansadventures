@@ -1954,7 +1954,6 @@ function u() {
             const tip = laserClip(ex, ey, aimPt(chr).x, aimPt(chr).y);
             const mx = tip.x, my = tip.y;
             const dx = mx - ex, dy = my - ey;
-            const dy = my - ey;
             const lineLen = Math.hypot(dx, dy) || 1;
             for (let j = ems.length - 1; j >= 0; j--) {
                 const e = ems[j];
@@ -2000,7 +1999,7 @@ function u() {
         const ey = eye.y;
         const tip = laserClip(ex, ey, aimPt(chr).x, aimPt(chr).y);
         const mx = tip.x, my = tip.y;
-        const dx = mx - ex;
+        const dx = mx - ex, dy = my - ey;
         const len = Math.hypot(dx, dy) || 1;
         const nx = -dy / len, ny = dx / len;
         const now = performance.now();
