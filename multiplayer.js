@@ -212,13 +212,14 @@
         t: 'snap', W: canvas.width, H: canvas.height,
         hp, hp2, sgk, ek, dist: Math.round(dist * 100) / 100, b: r1(b),
         bo: BANISH.map(o => o.got ? 1 : 0),
+        mk: MASKS.map(o => o.got ? 1 : 0),
         c1: packChar(character), c2: packChar(character2),
         e: ems.map(e => [e.id || (e.id = entId++), r1(e.x), r1(e.y), e.fly ? 1 : 0, Math.round(e.anim * 100) / 100, e.facing || -1, e.attacking ? 1 : 0, Math.round((e.rise === undefined ? 1 : e.rise) * 100) / 100, e.moving ? 1 : 0]),
         a: arws.map(a => [a.id || (a.id = entId++), r1(a.x), r1(a.y), Math.round(a.ang * 100) / 100]),
         f: fbs.map(f => [f.id || (f.id = entId++), r1(f.x), r1(f.y)]),
         mb: magicBeams, ax: Math.round(mx + camX), ay: Math.round(my),
         pz: isPaused,
-        fx: fxQ.splice(0, 80), over: isGameOver
+        fx: fxQ.splice(0, 80), over: isGameOver, won: hasWon
       });
     } catch (e) {}
   }
@@ -344,6 +345,7 @@
     updateHpBar(hp1Bar, hp); updateHpBar(hp2Bar, hp2);
     updateScoreUI();
     if (s.bo) { s.bo.forEach((v, i) => { if (BANISH[i]) BANISH[i].got = !!v; }); updateBanishUI(); }
+    if (s.mk) { s.mk.forEach((v, i) => { if (MASKS[i]) MASKS[i].got = !!v; }); updateMaskUI(); updateScoreUI(true); }
     applyChar(character, s.c1, kx); applyChar(character2, s.c2, kx);
     [[character, s.c1], [character2, s.c2]].forEach(([c, sc]) => {
       if (sc.mo) {
@@ -362,7 +364,8 @@
       else if (f[0] === 'f') _ft(f[1], gx(f[2]), gy(f[3]), f[4] || undefined, f[5] || undefined);
       else if (f[0] === 'b') _bn(f[1]);
     });
-    if (s.over && !isGameOver) triggerGameOver();
+    if (s.won) { if (!hasWon) triggerWin(); }
+    else if (s.over && !isGameOver) triggerGameOver();
   }
   let lastSm = performance.now();
   (function smoothLoop(now) {
