@@ -330,8 +330,8 @@ const TERRAIN = (() => {
     let x = 4000;
     while (x < 400000) {
         const h = 35 + rnd() * 55;
-        const up = rnd() < 0.5 ? h * (0.8 + rnd() * 0.3) : h / (0.2 + rnd() * 0.25);
-        const dn = rnd() < 0.5 ? h * (0.8 + rnd() * 0.3) : h / (0.2 + rnd() * 0.25);
+        const up = rnd() < 0.5 ? h * (2.2 + rnd() * 0.8) : h / (0.2 + rnd() * 0.25);
+        const dn = rnd() < 0.5 ? h * (2.2 + rnd() * 0.8) : h / (0.2 + rnd() * 0.25);
         const plat = 150 + rnd() * 550;
         const x2 = x + up + plat + dn;
         const bad = zones.some(z => x2 > z.a - z.p && x < z.b + z.p);
