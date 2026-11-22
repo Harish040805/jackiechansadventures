@@ -353,35 +353,41 @@ function groundH(x) {
     if (r < 0) return 0;
     const t = TERRAIN[r];
     if (x >= t.x2) return 0;
-    if (x < t.x1 + t.up) return t.h * (x - t.x1) / t.up;
-    if (x > t.x2 - t.dn) return t.h * (t.x2 - x) / t.dn;
+    if (x < t.x1 + t.up) { const u = (x - t.x1) / t.up; return t.h * u * u * (3 - 2 * u); }
+    if (x > t.x2 - t.dn) { const u = (t.x2 - x) / t.dn; return t.h * u * u * (3 - 2 * u); }
     return t.h;
+}
+function groundFill() {
+    const lo = camX - 2500, hi = camX + canvas.width + 2500, span = hi - lo;
+    const g = ctx.createLinearGradient(lo, 0, hi, 0);
+    const o = x => Math.min(1, Math.max(0, (x - lo) / span));
+    let i = gStart;
+    while (i > 0 && GROUND[i].x1 > lo) i--;
+    for (; i < GROUND.length; i++) {
+        const z = GROUND[i];
+        if (z.x1 > hi) break;
+        const [base, hl] = GCOL[z.t], L = z.x2 - z.x1;
+        const a = z.w ? 0 : (z.t === 'G' ? 0.15 : 0.25);
+        g.addColorStop(o(z.x1 + L * a), base);
+        g.addColorStop(o(z.x1 + L * 0.5), hl);
+        g.addColorStop(o(z.x1 + L * (1 - a)), base);
+    }
+    return g;
 }
 function drawTerrain() {
     const lo = camX - 400, hi = camX + canvas.width + 400, H = canvas.height;
     ctx.save();
-    ctx.lineWidth = 3;
-    ctx.lineJoin = 'round';
+    ctx.fillStyle = groundFill();
     for (const t of TERRAIN) {
         if (t.x2 < lo) continue;
         if (t.x1 > hi) break;
         ctx.beginPath();
         ctx.moveTo(t.x1, H + 3);
-        ctx.lineTo(t.x1, H);
-        ctx.lineTo(t.x1 + t.up, H - t.h);
-        ctx.lineTo(t.x2 - t.dn, H - t.h);
+        for (let x = t.x1; x < t.x2; x += 4) ctx.lineTo(x, H - groundH(x));
         ctx.lineTo(t.x2, H);
         ctx.lineTo(t.x2, H + 3);
         ctx.closePath();
-        ctx.fillStyle = t.c;
         ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(t.x1, H);
-        ctx.lineTo(t.x1 + t.up, H - t.h);
-        ctx.lineTo(t.x2 - t.dn, H - t.h);
-        ctx.lineTo(t.x2, H);
-        ctx.strokeStyle = t.l;
-        ctx.stroke();
     }
     ctx.restore();
 }
