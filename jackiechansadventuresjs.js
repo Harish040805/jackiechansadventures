@@ -1117,13 +1117,13 @@ let smoothLeftLegAngle = 0, smoothRightLegAngle = 0;
 let smoothLeftArmAngle = 0, smoothRightArmAngle = 0;
 let smoothLeftLegAngle2 = 0, smoothRightLegAngle2 = 0;
 let smoothLeftArmAngle2 = 0, smoothRightArmAngle2 = 0;
-const ARROW_SPEED = 7.5;
+const ARROW_SPEED = 11;
 const AIM_ERROR = 0;
 function throwBlade(e, targetChr) {
     const sx = e.x;
     const sy = enemyCY(e);
     const tv = Math.hypot(targetChr.vx, targetChr.vyReal || 0);
-    const bs = (!e.fly && targetChr.isFlying) ? Math.max(ARROW_SPEED, tv * 1.3 + 1) : ARROW_SPEED;
+    const bs = e.fly ? ARROW_SPEED : (targetChr.isFlying ? Math.max(11, tv * 1.3 + 1) : 11);+
     const aim = aimArrow(sx, sy, targetChr, bs);
     arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang, owner: e });
 }
