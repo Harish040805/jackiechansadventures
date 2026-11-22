@@ -170,6 +170,17 @@ const BANISH = [
     { e: '🥟', n: 'Tchang Zu' },
     { e: '🪘', n: 'Po Kong' }
 ].map((o, i) => ({ ...o, m: WORLD.BANISH[i], x: WORLD.BANISH[i], y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
+const HS_W = 1040;
+const SHOP_X = WORLD.END - 700;
+const hsLayer = document.getElementById('hs-layer');
+const hsRow = document.getElementById('hs-row');
+const spLayer = document.getElementById('sp-layer');
+const HS_TILE = '<div class="hs-b1"><div class="hs-b1t"></div><div class="hs-b1q"></div><div class="hs-w hs-w1"></div><div class="hs-w hs-w2"></div><div class="hs-w hs-w3"></div><div class="hs-aw"></div><div class="hs-g"></div><div class="hs-d"></div></div>' +
+    '<div class="hs-b1s"><div class="hs-b1sw"></div></div>' +
+    '<div class="hs-b2"><div class="hs-b2r"></div><div class="hs-bw hs-m1"></div><div class="hs-bw hs-m2"></div><div class="hs-bw hs-m3"></div><div class="hs-bw hs-m4"></div><div class="hs-sn"></div><div class="hs-sl hs-sl1"></div><div class="hs-bd"></div><div class="hs-sl hs-sl2"></div></div>' +
+    '<div class="hs-b3"><div class="hs-b3rf"></div><div class="hs-b3aw"></div><div class="hs-b3w1"></div><div class="hs-b3w2"></div><div class="hs-b3bx"></div><div class="hs-b3l1"></div><div class="hs-b3l2"></div></div>' +
+    '<div class="hs-b4"><div class="hs-b4rf"></div><div class="hs-b4w"></div><div class="hs-b4d"></div></div>';
+hsRow.innerHTML = Array.from({ length: Math.ceil(Math.max(window.innerWidth, 2600) / HS_W) + 2 }, () => '<div class="hs-t">' + HS_TILE + '</div>').join('');
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
     grid.innerHTML = '';
@@ -1768,6 +1779,10 @@ function updateViewCam() {
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
     maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
     logLayer.style.transform = `translate3d(${b}px, 0, 0)`;
+    hsRow.style.transform = `translate3d(${b % HS_W}px, 0, 0)`;
+    spLayer.style.transform = `translate3d(${SHOP_X + b}px, 0, 0)`;
+    const shopSX = SHOP_X - camX;
+    hsLayer.style.clipPath = shopSX < canvas.width ? `inset(0 ${Math.max(0, canvas.width - shopSX)}px 0 0)` : 'none';
 }
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
