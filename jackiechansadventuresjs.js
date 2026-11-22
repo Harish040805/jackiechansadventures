@@ -678,7 +678,7 @@ function spawnE(owner) {
         ? owner.cam + owner.viewW + 80 + Math.random() * 160
         : owner.cam + owner.viewW * (0.55 + Math.random() * 0.35);
     const startY = isFly ? Math.random() * 180 + 130 : 0;
-    const baseSpeed = Math.random() * 1.2 + 2.4;
+    const baseSpeed = isFly ? Math.random() * 1.2 + 2.4 : Math.random() * 1.5 + 6.4;
     ems.push({
         x: startX,
         y: startY,
