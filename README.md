@@ -4,8 +4,6 @@ Occasional steep & slop where Jackie can climb up & down - Land mustn't be flat 
 
 Sudden Rain effect. No effect of rain on fire or Jackie or enemies. It's also just for UI. But, whenever rain occurs, the sky must turn dark gray. Capture exactly the same rain effect in background.
 
-Moving clouds effect on the sky of random different shapes
-
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
 
 Allow Jackie to make manual attacks for on screen button as well as keyboard keys like O for punch K for kick B for block. Random objects like wood on the ground, hanging rope. If B clicked stadning near wood, the wood must block the incoming blade attacks. Normal B can block shadow guard punches, using B only standing near wood can lift wood and block all incoming blades. If Jackie jumps towards a hanging rope and uses B, he must be able to hold the hanging rope and swing to & fro until he use B again. Mechanism same like tarzan game.
