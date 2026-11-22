@@ -411,8 +411,8 @@ function renderLogs() {
         }
         const top = l.b + LOG_H;
         const sw = l.state === 3;
-        const eL = l.state === 0 ? top - 12 : (sw ? (l.side < 0 ? l.cutH : top - 12) : l.endL);
-        const eR = l.state === 0 ? top - 12 : (sw ? (l.side > 0 ? l.cutH : top - 12) : l.endR);
+        const eL = l.state === 0 ? top - 12 : (sw ? (l.cL || top - 12) : l.endL);
+        const eR = l.state === 0 ? top - 12 : (sw ? (l.cR || top - 12) : l.endR);
         const pvx = 195 - (l.side || 0) * 101;
         const ang = (l.side || 0) * (l.rot || 0);
         l.rl.style.height = Math.max(0, H - eL) + 'px';
@@ -422,29 +422,68 @@ function renderLogs() {
         l.el.style.transform = `translate3d(${l.x - 195 * LOG_S}px, ${H - top - 8 * LOG_S}px, 0) scale(${LOG_S}) translate(${pvx}px, 32px) rotate(${ang}rad) translate(${-pvx}px, -32px)`;
     }
 }
+const ROPE_TOL = 24, ROPE_BLADES = 5, ROPE_BURN_MS = 5000, LOG_GATHER = 1400;
+let laserFrame = 0;
 function cutLog(l, side, y) {
-    if (l.state !== 0) return;
+    if (l.state !== 0 && l.state !== 3) return;
     const h = canvas.height - y;
-    l.state = 3;
-    l.side = side;
-    l.cutH = h;
-    l.swing = 0;
-    l.rot = 0;
+    if (side < 0) { if (l.cL) return; l.cL = h; } else { if (l.cR) return; l.cR = h; }
+    addSparks(l.x + side * LOG_ROPE, y, '#ff9f43', 14);
+    if (l.state === 0) {
+        l.state = 3;
+        l.side = side;
+        l.rot = 0;
+        return;
+    }
+    l.endL = l.cL;
+    l.endR = l.cR;
+    l.state = 1;
     l.vy = 0;
-    addSparks(l.x + side * LOG_ROPE, y, '#d4a348', 10);
+}
+function ropeCut(l, s) {
+    return s < 0 ? !!l.cL : !!l.cR;
+}
+function hitRope(l, s, y) {
+    l.bc = l.bc || { '-1': [], '1': [] };
+    const list = l.bc[s];
+    let c = list.find(o => Math.abs(o.y - y) < ROPE_TOL);
+    if (!c) { c = { y, n: 0 }; list.push(c); }
+    c.n++;
+    addSparks(l.x + s * LOG_ROPE, y, '#b0bec5', 4);
+    if (c.n >= ROPE_BLADES) cutLog(l, s, c.y);
+}
+function burnRope(l, s, y) {
+    l.bn = l.bn || {};
+    let b = l.bn[s];
+    if (!b || Math.abs(b.y - y) > ROPE_TOL) b = l.bn[s] = { y, t: 0, f: laserFrame };
+    b.t += dt * 16.667;
+    b.f = laserFrame;
+    if (Math.random() < 0.35 * dt) addSparks(l.x + s * LOG_ROPE, y, '#ff9f43', 2);
+    if (b.t >= ROPE_BURN_MS) {
+        l.bn[s] = null;
+        cutLog(l, s, y);
+    }
+}
+function logAccum(e) {
+    for (const l of LOGS) {
+        if ((l.state !== 0 && l.state !== 3) || Math.abs(e.x - l.x) > LOG_GATHER) continue;
+        const top = l.b + LOG_H;
+        for (const c of aliveChars()) {
+            if (c.invisible || c.isShadowGuard) continue;
+            if (Math.abs(c.x - l.x) < LOG_HW && c.y >= top - 8) {
+                if (e.slot === undefined) e.slot = Math.random() * 2 - 1;
+                return l.x + e.slot * (LOG_HW - 14);
+            }
+        }
+    }
+    return null;
 }
 function updateLogs() {
+    laserFrame++;
     for (const l of LOGS) {
+        if (l.bn) for (const k in l.bn) if (l.bn[k] && l.bn[k].f < laserFrame - 1) l.bn[k] = null;
         if (l.state === 3) {
-            l.swing += dt;
-            l.rot = 0.9 * Math.sin(Math.min(1, l.swing / 32) * Math.PI / 2);
-            if (l.swing >= 32) {
-                const H = canvas.height;
-                l.endL = l.side < 0 ? l.cutH : l.cutH + (H - l.cutH) * 0.4;
-                l.endR = l.side > 0 ? l.cutH : l.cutH + (H - l.cutH) * 0.4;
-                l.state = 1;
-                l.vy = 0;
-            }
+            l.rot += (0.9 - l.rot) * Math.min(1, 0.12 * dt);
             continue;
         }
         if (l.state !== 1) continue;
@@ -495,11 +534,11 @@ function logBlade(a) {
     for (const l of LOGS) {
         if (Math.abs(a.x - l.x) > 160) continue;
         const topY = H - (l.b + LOG_H);
-        if (l.state === 0 && a.y > 0 && a.y < topY + 4) {
+        if ((l.state === 0 || l.state === 3) && a.y > 0 && a.y < topY + 4) {
             for (const s of [-1, 1]) {
                 const rx = l.x + s * LOG_ROPE;
-                if (rx >= Math.min(px, a.x) - 6 && rx <= Math.max(px, a.x) + 6) {
-                    cutLog(l, s, a.y);
+                if (!ropeCut(l, s) && rx >= Math.min(px, a.x) - 6 && rx <= Math.max(px, a.x) + 6) {
+                    hitRope(l, s, a.y);
                     return true;
                 }
             }
@@ -514,12 +553,12 @@ function logBlade(a) {
 function logFireCut(f) {
     const H = canvas.height, px = f.x - f.vx * dt;
     for (const l of LOGS) {
-        if (l.state !== 0 || Math.abs(f.x - l.x) > 160) continue;
+        if ((l.state !== 0 && l.state !== 3) || Math.abs(f.x - l.x) > 160) continue;
         const topY = H - (l.b + LOG_H);
         if (f.y < 0 || f.y > topY + 6) continue;
         for (const s of [-1, 1]) {
             const rx = l.x + s * LOG_ROPE;
-            if (rx >= Math.min(px, f.x) - 10 && rx <= Math.max(px, f.x) + 10) {
+            if (!ropeCut(l, s) && rx >= Math.min(px, f.x) - 10 && rx <= Math.max(px, f.x) + 10) {
                 cutLog(l, s, f.y);
                 return true;
             }
@@ -530,14 +569,14 @@ function logFireCut(f) {
 function logLaserCut(ex, ey, mx, my) {
     const H = canvas.height;
     for (const l of LOGS) {
-        if (l.state !== 0 || l.x < Math.min(ex, mx) - 120 || l.x > Math.max(ex, mx) + 120) continue;
+        if ((l.state !== 0 && l.state !== 3) || l.x < Math.min(ex, mx) - 120 || l.x > Math.max(ex, mx) + 120) continue;
         const topY = H - (l.b + LOG_H);
         for (const s of [-1, 1]) {
             const rx = l.x + s * LOG_ROPE;
-            if (segHitsBox(ex, ey, mx, my, { cx: rx, cy: topY / 2, hw: 2, hh: topY / 2 }, 3)) {
+            if (!ropeCut(l, s) && segHitsBox(ex, ey, mx, my, { cx: rx, cy: topY / 2, hw: 2, hh: topY / 2 }, 3)) {
                 const dx = mx - ex;
                 const t = Math.abs(dx) < 1 ? 0 : Math.max(0, Math.min(1, (rx - ex) / dx));
-                cutLog(l, s, Math.max(0, Math.min(topY, ey + t * (my - ey))));
+                burnRope(l, s, Math.max(0, Math.min(topY, ey + t * (my - ey))));
                 break;
             }
         }
@@ -2126,7 +2165,12 @@ function u() {
                     : null;
                 let moving = false;
                 e.attacking = false;
-                if (prey) {
+                const accX = logAccum(e);
+                if (accX !== null) {
+                    const gap = accX - e.x;
+                    moving = Math.abs(gap) > 10;
+                    if (moving) e.facing = gap > 0 ? 1 : -1;
+                } else if (prey) {
                     const gap = prey.x - e.x;
                     e.attacking = boxesOverlap(enemyBox(e), playerBox(prey));
                     if (Math.abs(gap) > 8) {
