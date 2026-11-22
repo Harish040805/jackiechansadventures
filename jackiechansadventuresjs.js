@@ -1881,6 +1881,11 @@ function u() {
                 arws.splice(i, 1);
                 continue;
             }
+            if (a.y > canvas.height - groundH(a.x)) {
+                addSparks(a.x, canvas.height - groundH(a.x), '#b0bec5', 6);
+                arws.splice(i, 1);
+                continue;
+            }
             let bladeHit = false;
             for (let j = ems.length - 1; j >= 0; j--) {
                 const en = ems[j];
