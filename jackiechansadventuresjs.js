@@ -1737,7 +1737,7 @@ function u() {
                 }
             }
             if (bladeTarget && !e.attacking && !(e.burstLeft > 0) && now - e.lt > 1400) {
-                if (e.x > bladeTarget.cam + 320 && e.x < bladeTarget.cam + bladeTarget.viewW + 20) {
+                if (e.x > bladeTarget.cam - 20 && e.x < bladeTarget.cam + bladeTarget.viewW + 20) {
                     e.lt = now;
                     throwBlade(e, bladeTarget);
                     e.burstLeft = e.fly ? 0 : 2;
