@@ -130,6 +130,26 @@ body.raining #clouds { filter: brightness(0.5); }
     from { transform: translateX(-320px); }
     to { transform: translateX(100vw); }
 }
+.hl-layer { position: absolute; bottom: 100px; left: 0; width: 100vw; height: calc(100vh - 100px); pointer-events: none; z-index: 2; will-change: transform; }
+.hl-rope { position: absolute; top: 0; left: 0; width: 7px; background: repeating-linear-gradient(-38deg, #d4a348 0px, #b58129 4px, #6e4910 8px, #a16e1f 11px, #d4a348 14px); box-shadow: inset -2px 0 3px rgba(0,0,0,0.7), inset 1px 0 2px rgba(255,224,150,0.4); }
+.hl-bn { position: absolute; left: 0; top: 0; width: 390px; height: 210px; transform-origin: 0 0; filter: drop-shadow(0 10px 8px rgba(0,0,0,0.45)); }
+.hl-lg { position: absolute; height: 52px; border-radius: 6px; background: repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(18,8,2,0.45) 4px, transparent 6px, rgba(85,50,24,0.25) 9px, transparent 12px), linear-gradient(180deg, #6d4525 0%, #4e2e16 32%, #361e0d 72%, #1f1006 100%); box-shadow: inset 0 3px 5px rgba(215,162,108,0.28), inset 0 -6px 10px rgba(0,0,0,0.85), 0 8px 14px rgba(0,0,0,0.75); }
+.hl-lg::before { content: ""; position: absolute; top: 0; left: -13px; width: 26px; height: 100%; border-radius: 50%; background: radial-gradient(ellipse at center, #70441f 0%, #b5834c 14%, #87582c 22%, #cfa069 32%, #8f5e31 44%, #c7965e 56%, #7a4c24 68%, #b88750 80%, #3d2310 92%, #241307 100%); box-shadow: inset 0 0 5px rgba(0,0,0,0.75), -2px 2px 5px rgba(0,0,0,0.6); }
+.hl-lg::after { content: ""; position: absolute; top: 0; right: -11px; width: 22px; height: 100%; border-radius: 50%; background: linear-gradient(90deg, #422611 0%, #1d0f05 100%); z-index: -1; }
+.hl-l1 { top: 8px; left: 34px; width: 322px; z-index: 4; }
+.hl-l2 { top: 42px; left: 16px; width: 356px; z-index: 3; }
+.hl-l3 { top: 46px; left: 24px; width: 342px; z-index: 5; }
+.hl-l4 { top: 82px; left: 10px; width: 368px; z-index: 2; }
+.hl-l5 { top: 88px; left: 20px; width: 350px; z-index: 6; }
+.hl-l6 { top: 84px; left: 30px; width: 332px; z-index: 4; }
+.hl-l7 { top: 122px; left: 22px; width: 344px; z-index: 3; }
+.hl-l8 { top: 126px; left: 36px; width: 318px; z-index: 5; }
+.hl-st { position: absolute; top: 2px; width: 26px; height: 180px; border-radius: 12px; background: repeating-linear-gradient(-34deg, #dba94c 0px, #b58026 5px, #63400c 9px, #9c691c 13px, #dba94c 17px); box-shadow: inset 4px 0 6px rgba(255,228,160,0.45), inset -5px 0 8px rgba(0,0,0,0.8), -5px 0 10px rgba(0,0,0,0.7), 5px 0 10px rgba(0,0,0,0.7); z-index: 8; }
+.hl-sl { left: 82px; }
+.hl-sr { right: 82px; }
+.hl-st::before { content: ""; position: absolute; top: 0; left: 8px; width: 2px; height: 100%; background: rgba(45,26,4,0.65); box-shadow: 8px 0 0 rgba(45,26,4,0.65); }
+.hl-kt { position: absolute; top: -12px; left: -5px; width: 36px; height: 32px; border-radius: 10px; background: repeating-linear-gradient(42deg, #e0af52 0px, #b37d24 5px, #5e3c09 9px, #e0af52 13px); box-shadow: inset 0 3px 5px rgba(255,232,175,0.5), inset 0 -4px 7px rgba(0,0,0,0.85), 0 6px 10px rgba(0,0,0,0.75); z-index: 9; }
+.hl-kt::after { content: ""; position: absolute; top: 12px; left: -3px; width: 42px; height: 12px; border-radius: 6px; background: repeating-linear-gradient(-25deg, #cfa046 0px, #9e6c1d 4px, #543507 8px); box-shadow: 0 3px 6px rgba(0,0,0,0.8); }
 @property --bg-color-1 {
   syntax: '<color>';
   inherits: false;
