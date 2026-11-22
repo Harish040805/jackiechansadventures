@@ -1123,7 +1123,7 @@ function throwBlade(e, targetChr) {
     const sx = e.x;
     const sy = enemyCY(e);
     const tv = Math.hypot(targetChr.vx, targetChr.vyReal || 0);
-    const bs = e.fly ? ARROW_SPEED : (targetChr.isFlying ? Math.max(11, tv * 1.3 + 1) : 11);+
+    const bs = e.fly ? ARROW_SPEED : (targetChr.isFlying ? Math.max(11, tv * 1.3 + 1) : 11);
     const aim = aimArrow(sx, sy, targetChr, bs);
     arws.push({ x: sx, y: sy, vx: aim.vx, vy: aim.vy, ang: aim.ang, owner: e });
 }
