@@ -155,15 +155,15 @@ function buildClouds() {
 }
 buildClouds();
 const BANISH = [
-    { e: '🗡️', n: 'Shendu',     m: 100 },
-    { e: '🪭', n: 'Xiao Fung',  m: 200 },
-    { e: '🍐', n: 'Bai Tza',    m: 400 },
-    { e: '🌸', n: 'Dai Gui',    m: 800 },
-    { e: '🪷', n: 'Tso Lan',    m: 1600 },
-    { e: '🪈', n: 'Hsi Wu',     m: 3200 },
-    { e: '🥟', n: 'Tchang Zu',  m: 6400 },
-    { e: '🪘', n: 'Po Kong',    m: 12800 }
-].map((o, i) => ({ ...o, x: o.m * 20 + 450, y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
+    { e: '🗡️', n: 'Shendu',     m: 24000 },
+    { e: '🪭', n: 'Xiao Fung',  m: 58000 },
+    { e: '🍐', n: 'Bai Tza',    m: 93000 },
+    { e: '🌸', n: 'Dai Gui',    m: 128000 },
+    { e: '🪷', n: 'Tso Lan',    m: 165000 },
+    { e: '🪈', n: 'Hsi Wu',     m: 201000 },
+    { e: '🥟', n: 'Tchang Zu',  m: 256000 },
+    { e: '🪘', n: 'Po Kong',    m: 322000 }
+].map((o, i) => ({ ...o, x: o.m, y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
     grid.innerHTML = '';
@@ -184,7 +184,7 @@ function updateBanishUI() {
 buildBanishUI();
 const maskLayer = document.getElementById('mask-layer');
 const MASK_Y = 30, MASK_SCALE = 0.2, MASK_POINTS = 100;
-const MASKS = [1000, 6400, 12000, 24000, 45000, 90000, 110000, 180000, 220000, 330000]
+const MASKS = [8000, 41000, 76000, 111000, 147000, 183000, 220000, 238000, 285000, 362000]
     .map((x, i) => ({ id: i + 1, x, y: MASK_Y, got: false, el: null }));
 MASKS.forEach(o => {
     const mk = document.getElementById('m' + o.id);
@@ -249,7 +249,7 @@ const WATER = (() => {
     const dry = [BANISH[0], BANISH[3], BANISH[7], ...MASKS];
     const list = [];
     let x = 1500;
-    const end = BANISH[7].x + 2000;
+    const end = 395000;
     while (x < end) {
         x += (40 + rnd() * 80) * 20;
         const w = (20 + rnd() * 10) * 20;
@@ -885,7 +885,11 @@ function fireStraightLaser(caster, incantation, beamColor = '#00ff66') {
     const startX = caster.x;
     const startY = canvas.height - caster.y - 35;
     const facing = caster.facing >= 0 ? 1 : -1;
-    const endX = facing > 0 ? caster.cam + caster.viewW + 120 : caster.cam - 120;
+    let endX = facing > 0 ? caster.cam + caster.viewW + 120 : caster.cam - 120;
+    const beamH = caster.y + 35;
+    for (let gx = startX; facing > 0 ? gx < endX : gx > endX; gx += facing * 4) {
+        if (groundH(gx) > beamH) { endX = gx; break; }
+    }
     const endY = startY;
     magicBeams.push({
         startX, startY, endX, endY,
@@ -1656,6 +1660,18 @@ function drawFires() {
     ctx.restore();
 }
 const LASER_PAD = 25;
+function laserClip(ex, ey, tx, ty) {
+    const dx = tx - ex, dy = ty - ey;
+    const n = Math.ceil((Math.hypot(dx, dy) || 1) / 4);
+    for (let i = 1; i <= n; i++) {
+        const k = i / n;
+        if (ey + dy * k > canvas.height - groundH(ex + dx * k)) {
+            const p = (i - 1) / n;
+            return { x: ex + dx * p, y: ey + dy * p };
+        }
+    }
+    return { x: tx, y: ty };
+}
 function laserTip(chr, ex, ey) {
     const p = aimPt(chr);
     return { x: p.x, y: p.y };
@@ -1925,16 +1941,19 @@ function u() {
                     break;
                 }
             }
-            if (hitEnemy || f.x < vb.lo || f.x > vb.hi || f.y < 0 || f.y > canvas.height) {
+            const hitGround = f.y > canvas.height - groundH(f.x);
+            if (hitGround) addSparks(f.x, f.y, '#ff9f43', 6);
+            if (hitEnemy || hitGround || f.x < vb.lo || f.x > vb.hi || f.y < 0 || f.y > canvas.height) {
                 fbs.splice(i, 1);
             }
         }
         const checkLaserHits = (chr) => {
-            const mx = aimPt(chr).x, my = aimPt(chr).y;
             const eye = eyePos(chr);
             const ex = eye.x;
             const ey = eye.y;
-            const dx = mx - ex;
+            const tip = laserClip(ex, ey, aimPt(chr).x, aimPt(chr).y);
+            const mx = tip.x, my = tip.y;
+            const dx = mx - ex, dy = my - ey;
             const dy = my - ey;
             const lineLen = Math.hypot(dx, dy) || 1;
             for (let j = ems.length - 1; j >= 0; j--) {
@@ -1976,11 +1995,12 @@ function u() {
     }
 }
     const drawPigLaser = (chr) => {
-        const mx = aimPt(chr).x, my = aimPt(chr).y;
         const eye = eyePos(chr);
         const ex = eye.x;
         const ey = eye.y;
-        const dx = mx - ex, dy = my - ey;
+        const tip = laserClip(ex, ey, aimPt(chr).x, aimPt(chr).y);
+        const mx = tip.x, my = tip.y;
+        const dx = mx - ex;
         const len = Math.hypot(dx, dy) || 1;
         const nx = -dy / len, ny = dx / len;
         const now = performance.now();
@@ -2376,128 +2396,6 @@ function drawJackieHead(cx, cy, s, skin, skinShade) {
     ctx.stroke();
     ctx.restore();
 }
-/*
-OLD JACKIE FACE COMMENTED
-
-function drawJackieHead(cx, cy, s, skin, skinShade) {
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(s, s);
-    ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
-    const ink = '#31313b';
-    const hairCol = '#0b0b12';
-    ctx.fillStyle = skin;
-    ctx.strokeStyle = ink;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-14, -6);
-    ctx.bezierCurveTo(-16, 6, -10, 18, 0, 22);
-    ctx.lineTo(8, 24);
-    ctx.lineTo(15, 20);
-    ctx.bezierCurveTo(19, 14, 20, 6, 19, 0);
-    ctx.bezierCurveTo(19, -8, 14, -16, 4, -18);
-    ctx.bezierCurveTo(-6, -18, -13, -14, -14, -6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = skinShade;
-    ctx.beginPath();
-    ctx.ellipse(-13, 4, 3.6, 5.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = skin;
-    ctx.beginPath();
-    ctx.moveTo(17, -3);
-    ctx.quadraticCurveTo(26, 5, 19, 9);
-    ctx.quadraticCurveTo(16, 9, 16, 6);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = ink;
-    ctx.beginPath(); ctx.arc(19.5, 8, 0.9, 0, Math.PI * 2); ctx.fill();
-        [[4, -0.5, 5.2, 3.1, 5.7, 2.4], [14.5, -0.5, 3.6, 2.8, 15.6, 1.9]].forEach(([ex, ey, rx, ry, ix, ir]) => {
-        ctx.save();
-        ctx.beginPath();
-        ctx.ellipse(ex, ey, rx, ry, 0.05, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(ex - rx, ey - ry, rx * 2, ry * 2);
-        ctx.fillStyle = '#7a4a22';
-        ctx.beginPath(); ctx.arc(ix, ey + 0.2, ir, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#1a0f08';
-        ctx.beginPath(); ctx.arc(ix + 0.2, ey + 0.2, ir * 0.5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = skin;
-        ctx.fillRect(ex - rx, ey - ry, rx * 2, ry * 0.8);
-        ctx.restore();
-        ctx.strokeStyle = ink;
-        ctx.lineCap = 'round';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(ex - rx - 0.5, ey - ry * 0.1);
-        ctx.quadraticCurveTo(ex, ey - ry * 0.55, ex + rx + 0.5, ey - ry * 0.1);
-        ctx.stroke();
-        ctx.lineWidth = 0.8;
-        ctx.beginPath(); ctx.ellipse(ex, ey, rx, ry, 0.05, Math.PI * 0.1, Math.PI * 0.9); ctx.stroke();
-    });
-    ctx.strokeStyle = hairCol;
-    ctx.lineCap = 'round';
-    ctx.lineWidth = 3.4;
-    ctx.beginPath(); ctx.moveTo(-1.5, -6); ctx.quadraticCurveTo(4, -9.5, 10.5, -6.8); ctx.stroke();
-    ctx.lineWidth = 2.8;
-    ctx.beginPath(); ctx.moveTo(11.5, -6.5); ctx.quadraticCurveTo(15, -8.2, 19, -5.5); ctx.stroke();
-    ctx.strokeStyle = skinShade;
-    ctx.lineWidth = 1.2;
-    ctx.beginPath(); ctx.moveTo(15.5, -2.5); ctx.quadraticCurveTo(17.5, 2, 16.5, 6); ctx.stroke();
-    ctx.strokeStyle = '#7a3322';
-    ctx.lineWidth = 1.6;
-    ctx.beginPath(); ctx.moveTo(7, 13.5); ctx.quadraticCurveTo(12.5, 16, 18, 10.5); ctx.stroke();
-    ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(18, 10.5); ctx.quadraticCurveTo(20, 10.5, 19.6, 8.6); ctx.stroke();
-    ctx.lineWidth = 0.9;
-    ctx.beginPath(); ctx.moveTo(10, 16.8); ctx.quadraticCurveTo(13, 18, 15.5, 16.2); ctx.stroke();
-    ctx.fillStyle = hairCol;
-    ctx.beginPath();
-    ctx.moveTo(-15, 10);
-    ctx.lineTo(-25, 6);
-    ctx.lineTo(-18, 0);
-    ctx.lineTo(-28, -8);
-    ctx.lineTo(-16, -10);
-    ctx.lineTo(-23, -20);
-    ctx.lineTo(-11, -16);
-    ctx.quadraticCurveTo(-4, -30, 14, -25);
-    ctx.lineTo(2, -18);
-    ctx.quadraticCurveTo(10, -32, 26, -22);
-    ctx.lineTo(11, -15);
-    ctx.quadraticCurveTo(18, -27, 33, -15);
-    ctx.lineTo(19, -11);
-    ctx.quadraticCurveTo(24, -15, 30, -7);
-    ctx.lineTo(13, -9);
-    ctx.lineTo(10, -10);
-    ctx.lineTo(5, -12.5);
-    ctx.lineTo(1, -9.5);
-    ctx.lineTo(-5, -9);
-    ctx.lineTo(-9, -4);
-    ctx.lineTo(-14, 0);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-9, -3); ctx.lineTo(-5, -3); ctx.lineTo(-5, 7); ctx.lineTo(-9, 5);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = '#31313b';
-    ctx.lineCap = 'round';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(-7, -20);  ctx.quadraticCurveTo(0, -27, 11, -24);
-    ctx.moveTo(5, -19);   ctx.quadraticCurveTo(13, -27, 23, -21);
-    ctx.moveTo(13, -15);  ctx.quadraticCurveTo(20, -23, 30, -15);
-    ctx.moveTo(19, -11.5); ctx.quadraticCurveTo(24, -13, 28, -8.5);
-    ctx.moveTo(-21, -16); ctx.lineTo(-15, -13);
-    ctx.stroke();
-    ctx.restore();
-}
-*/
 const headImg = new Image();
 headImg.src = 'jackiehead.png';
 function drawHuman(chr, label) {
