@@ -30,6 +30,7 @@ const goSc = document.getElementById('go-sc');
 const chiBanner = document.getElementById('chi-banner');
 let hp = 100, hp2 = 100, isGameOver = false, isPaused = false, pauseStartTime = 0, gameStarted = false, enemiesActive = false, introOpen = false, enemyInterval = null, sgk = 0, ek = 0, dist = 0, prevScore = -1, prevDist = -1, b = 0;
 const lw = 1800;
+let hasWon = false;
 const hasSnake = c => !!(c.activeTalismans && c.activeTalismans.snake);
 const SNAKE_ALPHA = 0.12;
 let mx = window.innerWidth / 2, my = window.innerHeight / 2;
@@ -154,16 +155,21 @@ function buildClouds() {
     }
 }
 buildClouds();
+const WORLD = {
+    END: 400000,
+    BANISH: [24000, 58000, 93000, 128000, 165000, 201000, 256000, 322000],
+    MASKS: [8000, 41000, 76000, 111000, 147000, 183000, 220000, 238000, 285000, 362000]
+};
 const BANISH = [
-    { e: '🗡️', n: 'Shendu',     m: 24000 },
-    { e: '🪭', n: 'Xiao Fung',  m: 58000 },
-    { e: '🍐', n: 'Bai Tza',    m: 93000 },
-    { e: '🌸', n: 'Dai Gui',    m: 128000 },
-    { e: '🪷', n: 'Tso Lan',    m: 165000 },
-    { e: '🪈', n: 'Hsi Wu',     m: 201000 },
-    { e: '🥟', n: 'Tchang Zu',  m: 256000 },
-    { e: '🪘', n: 'Po Kong',    m: 322000 }
-].map((o, i) => ({ ...o, x: o.m, y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
+    { e: '🗡️', n: 'Shendu' },
+    { e: '🪭', n: 'Xiao Fung' },
+    { e: '🍐', n: 'Bai Tza' },
+    { e: '🌸', n: 'Dai Gui' },
+    { e: '🪷', n: 'Tso Lan' },
+    { e: '🪈', n: 'Hsi Wu' },
+    { e: '🥟', n: 'Tchang Zu' },
+    { e: '🪘', n: 'Po Kong' }
+].map((o, i) => ({ ...o, m: WORLD.BANISH[i], x: WORLD.BANISH[i], y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 function buildBanishUI() {
     const grid = document.getElementById('bo-grid');
     grid.innerHTML = '';
@@ -184,7 +190,7 @@ function updateBanishUI() {
 buildBanishUI();
 const maskLayer = document.getElementById('mask-layer');
 const MASK_Y = 30, MASK_SCALE = 0.2, MASK_POINTS = 100;
-const MASKS = [8000, 41000, 76000, 111000, 147000, 183000, 220000, 238000, 285000, 362000]
+const MASKS = WORLD.MASKS
     .map((x, i) => ({ id: i + 1, x, y: MASK_Y, got: false, el: null }));
 MASKS.forEach(o => {
     const mk = document.getElementById('m' + o.id);
@@ -249,7 +255,7 @@ const WATER = (() => {
     const dry = [BANISH[0], BANISH[3], BANISH[7], ...MASKS];
     const list = [];
     let x = 1500;
-    const end = 395000;
+    const end = WORLD.END - 5000;
     while (x < end) {
         x += (40 + rnd() * 80) * 20;
         const w = (20 + rnd() * 10) * 20;
@@ -267,7 +273,7 @@ const FIRES = (() => {
     const blockers = BANISH.map(o => o.x).concat(MASKS.map(o => o.x));
     const list = [BANISH[0].x];
     let x = 6000;
-    while (x < 400000) {
+    while (x < WORLD.END) {
         x += 5000 + rnd() * 12000;
         const bad = WATER.some(w => x + 450 > w.x1 && x - 450 < w.x2)
             || blockers.some(bx => Math.abs(bx - x) < 500)
@@ -314,7 +320,7 @@ const GROUND = (() => {
         out.push({ x1: x, x2: z.x2, t: z.t, w: z.w });
         x = z.x2; prev = z.t;
     }
-    fill(400000);
+    fill(WORLD.END);
     return out;
 })();
 const GCOL = { G: ['#466929', '#2e9e4f'], BN: ['#6b4423', '#8b5a2b'], BZ: ['#a67c4a', '#c9a066'], AS: ['#4a4a4a', '#707070'] };
@@ -328,7 +334,7 @@ const TERRAIN = (() => {
     MASKS.forEach(o => zones.push({ a: o.x, b: o.x, p: 800 }));
     const list = [];
     let x = 4000;
-    while (x < 400000) {
+    while (x < WORLD.END) {
         const h = 35 + rnd() * 55;
         const up = rnd() < 0.5 ? h * (2.2 + rnd() * 0.8) : h / (0.2 + rnd() * 0.25);
         const dn = rnd() < 0.5 ? h * (2.2 + rnd() * 0.8) : h / (0.2 + rnd() * 0.25);
@@ -636,13 +642,29 @@ function beginPlay() {
 }
 document.getElementById('instructions-start-btn').addEventListener('click', beginPlay);
 document.getElementById('instructions-skip-btn').addEventListener('click', beginPlay);
-const getSpawnDelay = () => Math.max(250, 3000 * 0.5 ** ((Date.now() - gt) / 60000));
+const getSpawnDelay = () => Math.max(350, 3000 * 0.5 ** (dist / 60) * 0.5 ** ((Date.now() - gt) / 240000));
+const spawnCount = () => Math.min(5, 1 + Math.floor(dist / 50));
+const enemyCap = () => Math.min(40, 5 + Math.floor(dist / 8));
 function spawnTick() {
     if (!enemiesActive) return;
     const now = Date.now();
     if (now < nextSpawnAt) return;
+    if (ems.length >= enemyCap()) { nextSpawnAt = now + 500; return; }
     nextSpawnAt = now + getSpawnDelay();
-    aliveChars().forEach(spawnE);
+    aliveChars().forEach(c => { for (let i = 0; i < spawnCount(); i++) spawnE(c); });
+}
+function triggerWin() {
+    if (hasWon) return;
+    hasWon = true;
+    isGameOver = true;
+    [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
+    document.getElementById('win-sc').textContent = calcScore();
+    document.getElementById('win-bo').textContent = boCount();
+    document.getElementById('win-mk').textContent = mkCount();
+    document.getElementById('win-dc').textContent = Math.floor(dist);
+    pauseBtn.style.display = 'none';
+    pauseOverlay.style.display = 'none';
+    document.getElementById('win-overlay').style.display = 'flex';
 }
 function triggerGameOver() {
     isGameOver = true;
@@ -751,7 +773,7 @@ function spawnE(owner) {
         ? owner.cam + owner.viewW + 80 + Math.random() * 160
         : owner.cam + owner.viewW * (0.55 + Math.random() * 0.35);
     const startY = isFly ? Math.random() * 180 + 130 : groundH(startX);
-    const baseSpeed = isFly ? Math.random() * 1.2 + 2.4 : Math.random() * 1.5 + 6.4;
+    const baseSpeed = isFly ? Math.random() * 1.2 + 2.4 : (Math.random() * 1.5 + 6.4) * (1 + Math.min(0.3, dist / 800));
     ems.push({
         x: startX,
         y: startY,
@@ -1164,7 +1186,10 @@ function updatePlayer(chr, keysState, playerNum) {
     chr.x += chr.vx * dt;
     const prevY = chr.y;
     const groundLevel = groundH(chr.x);
+    if (chr.wasFlying && !chr.isFlying && chr.y > canvas.height * 0.5) chr.rFall = true;
+    chr.wasFlying = chr.isFlying;
     if (chr.isFlying) {
+        chr.rFall = false;
         if (keysState.up) chr.y += 8 * dt;
         if (keysState.down) chr.y -= 8 * dt;
         if (chr.y < groundLevel) chr.y = groundLevel;
@@ -1181,6 +1206,10 @@ function updatePlayer(chr, keysState, playerNum) {
             chr.y = groundLevel;
             chr.vy = 0;
             chr.isJumping = false;
+            if (chr.rFall) {
+                chr.rFall = false;
+                dmg(9999, chr);
+            }
         }
     }
     chr.wasGround = chr.y <= groundLevel + 0.01;
@@ -1779,6 +1808,7 @@ function u() {
         if (isSplit) updateCam(character2);
         const lead = Math.max(0, ...aliveChars().map(c => c.cam));
         if (lead / 1550 > dist) { dist = lead / 1550; updateScoreUI(); }
+        if (lead >= WORLD.END) triggerWin();
         const vb = viewBounds();
         checkBanishCollect();
         checkMaskCollect();
@@ -1866,7 +1896,7 @@ function u() {
                     e.burstT = 140;
                 }
             }
-            if (bladeTarget && !e.attacking && !(e.burstLeft > 0) && now - e.lt > 1400) {
+            if (bladeTarget && !e.attacking && !(e.burstLeft > 0) && now - e.lt > Math.max(600, 1400 - dist * 4)) {
                 if (e.x > bladeTarget.cam - 20 && e.x < bladeTarget.cam + bladeTarget.viewW + 20) {
                     e.lt = now;
                     throwBlade(e, bladeTarget);
