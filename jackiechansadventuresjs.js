@@ -363,6 +363,168 @@ function groundH(x) {
     if (x > t.x2 - t.dn) { const u = (t.x2 - x) / t.dn; return t.h * u * u * (3 - 2 * u); }
     return t.h;
 }
+const LOG_S = 0.5, LOG_H = 170 * LOG_S, LOG_HW = 185 * LOG_S, LOG_ROPE = 101 * LOG_S;
+const LOGS = (() => {
+    let s = 5151;
+    const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const zones = BANISH.map(o => o.x).concat(MASKS.map(o => o.x));
+    const list = [];
+    let x = 7000;
+    while (x < WORLD.END - 3000) {
+        x += 9000 + rnd() * 15000;
+        if (zones.some(z => Math.abs(z - x) < 700)) continue;
+        const hang = 130 + rnd() * 170;
+        list.push({ x, hang, b: hang, vy: 0, state: 0, endL: 0, endR: 0, land: 0, el: null, rl: null, rr: null, shown: false });
+    }
+    return list;
+})();
+const logLayer = document.createElement('div');
+logLayer.className = 'hl-layer';
+canvas.parentNode.insertBefore(logLayer, canvas);
+const LOG_HTML = Array.from({ length: 8 }, (_, i) => `<div class="hl-lg hl-l${i + 1}"></div>`).join('') +
+    '<div class="hl-st hl-sl"><div class="hl-kt"></div></div><div class="hl-st hl-sr"><div class="hl-kt"></div></div>';
+function buildLogEl(l) {
+    l.rl = document.createElement('div');
+    l.rl.className = 'hl-rope';
+    l.rr = document.createElement('div');
+    l.rr.className = 'hl-rope';
+    l.el = document.createElement('div');
+    l.el.className = 'hl-bn';
+    l.el.innerHTML = LOG_HTML;
+    logLayer.append(l.rl, l.rr, l.el);
+}
+function renderLogs() {
+    const H = canvas.height, lo = camX - 400, hi = camX + canvas.width + 400;
+    for (const l of LOGS) {
+        const vis = l.x > lo && l.x < hi;
+        if (!vis) {
+            if (l.el && l.shown) {
+                l.el.style.display = l.rl.style.display = l.rr.style.display = 'none';
+                l.shown = false;
+            }
+            continue;
+        }
+        if (!l.el) buildLogEl(l);
+        if (!l.shown) {
+            l.el.style.display = l.rl.style.display = l.rr.style.display = '';
+            l.shown = true;
+        }
+        const top = l.b + LOG_H;
+        const hang = l.state === 0;
+        const eL = hang ? top - 12 : l.endL;
+        const eR = hang ? top - 12 : l.endR;
+        l.rl.style.height = Math.max(0, H - eL) + 'px';
+        l.rr.style.height = Math.max(0, H - eR) + 'px';
+        l.rl.style.transform = `translate3d(${l.x - LOG_ROPE - 3.5}px, 0, 0)`;
+        l.rr.style.transform = `translate3d(${l.x + LOG_ROPE - 3.5}px, 0, 0)`;
+        l.el.style.transform = `translate3d(${l.x - 195 * LOG_S}px, ${H - top - 8 * LOG_S}px, 0) scale(${LOG_S})`;
+    }
+}
+function cutLog(l, side, y) {
+    if (l.state !== 0) return;
+    const h = canvas.height - y;
+    l.state = 1;
+    l.vy = 0;
+    l.endL = side < 0 ? h : h + (canvas.height - h) * 0.4;
+    l.endR = side > 0 ? h : h + (canvas.height - h) * 0.4;
+    addSparks(l.x + side * LOG_ROPE, y, '#d4a348', 10);
+}
+function updateLogs() {
+    for (const l of LOGS) {
+        if (l.state !== 1) continue;
+        l.vy = Math.min(12, l.vy + 0.6 * dt);
+        l.b -= l.vy * dt;
+        const gx = Math.max(groundH(l.x - LOG_HW), groundH(l.x), groundH(l.x + LOG_HW));
+        if (l.b <= gx) {
+            l.b = gx;
+            l.state = 2;
+            l.land = 1;
+            addSparks(l.x - LOG_HW, canvas.height - gx, '#8d5524', 10);
+            addSparks(l.x + LOG_HW, canvas.height - gx, '#8d5524', 10);
+        }
+    }
+}
+function logSurface(chr, prevY) {
+    let best = -1;
+    for (const l of LOGS) {
+        if (Math.abs(chr.x - l.x) > LOG_HW) continue;
+        const top = l.b + LOG_H;
+        if (prevY >= top - 6 && top > best) best = top;
+    }
+    return best;
+}
+function logHits() {
+    for (const l of LOGS) {
+        const active = (l.state === 1 && l.vy > 1) || l.land;
+        l.land = 0;
+        if (!active) continue;
+        const top = l.b + LOG_H, bot = l.b;
+        for (const c of aliveChars()) {
+            if (Math.abs(c.x - l.x) < LOG_HW + 10 && c.y < top - 6 && c.y + 48 * (c.giant ? 1.5 : 1) > bot) dmg(9999, c);
+        }
+        for (let j = ems.length - 1; j >= 0; j--) {
+            const e = ems[j];
+            if (e.fly) continue;
+            if (Math.abs(e.x - l.x) < LOG_HW + 10 && e.y < top && e.y + GUARD_H > bot) {
+                registerKill(e, enemyCY(e), '#8d5524', 14);
+                ems.splice(j, 1);
+            }
+        }
+    }
+}
+function logBlade(a) {
+    const H = canvas.height, px = a.x - a.vx * dt;
+    for (const l of LOGS) {
+        if (Math.abs(a.x - l.x) > 160) continue;
+        const topY = H - (l.b + LOG_H);
+        if (l.state === 0 && a.y > 0 && a.y < topY + 4) {
+            for (const s of [-1, 1]) {
+                const rx = l.x + s * LOG_ROPE;
+                if (rx >= Math.min(px, a.x) - 6 && rx <= Math.max(px, a.x) + 6) {
+                    cutLog(l, s, a.y);
+                    return true;
+                }
+            }
+        }
+        if (Math.abs(a.x - l.x) < LOG_HW + 6 && a.y > topY - 6 && a.y < H - l.b + 6) {
+            addSparks(a.x, a.y, '#b0bec5', 6);
+            return true;
+        }
+    }
+    return false;
+}
+function logFireCut(f) {
+    const H = canvas.height, px = f.x - f.vx * dt;
+    for (const l of LOGS) {
+        if (l.state !== 0 || Math.abs(f.x - l.x) > 160) continue;
+        const topY = H - (l.b + LOG_H);
+        if (f.y < 0 || f.y > topY + 6) continue;
+        for (const s of [-1, 1]) {
+            const rx = l.x + s * LOG_ROPE;
+            if (rx >= Math.min(px, f.x) - 10 && rx <= Math.max(px, f.x) + 10) {
+                cutLog(l, s, f.y);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+function logLaserCut(ex, ey, mx, my) {
+    const H = canvas.height;
+    for (const l of LOGS) {
+        if (l.state !== 0 || l.x < Math.min(ex, mx) - 120 || l.x > Math.max(ex, mx) + 120) continue;
+        const topY = H - (l.b + LOG_H);
+        for (const s of [-1, 1]) {
+            const rx = l.x + s * LOG_ROPE;
+            if (segHitsBox(ex, ey, mx, my, { cx: rx, cy: topY / 2, hw: 2, hh: topY / 2 }, 3)) {
+                const dx = mx - ex;
+                const t = Math.abs(dx) < 1 ? 0 : Math.max(0, Math.min(1, (rx - ex) / dx));
+                cutLog(l, s, Math.max(0, Math.min(topY, ey + t * (my - ey))));
+                break;
+            }
+        }
+    }
+}
 function groundFill() {
     const lo = camX - 2500, hi = camX + canvas.width + 2500, span = hi - lo;
     const g = ctx.createLinearGradient(lo, 0, hi, 0);
@@ -1185,11 +1347,14 @@ function updatePlayer(chr, keysState, playerNum) {
     }
     chr.x += chr.vx * dt;
     const prevY = chr.y;
-    const groundLevel = groundH(chr.x);
+    const lgS = logSurface(chr, prevY);
+    const onLog = lgS >= 0 && lgS >= groundH(chr.x);
+    const groundLevel = Math.max(groundH(chr.x), lgS);
     if (chr.wasFlying && !chr.isFlying && chr.y > canvas.height * 0.5) chr.rFall = true;
     chr.wasFlying = chr.isFlying;
     if (chr.isFlying) {
         chr.rFall = false;
+        chr.logFall = false;
         if (keysState.up) chr.y += 8 * dt;
         if (keysState.down) chr.y -= 8 * dt;
         if (chr.y < groundLevel) chr.y = groundLevel;
@@ -1210,9 +1375,26 @@ function updatePlayer(chr, keysState, playerNum) {
                 chr.rFall = false;
                 dmg(9999, chr);
             }
+            if (chr.logFall && !onLog) {
+                if (chr.logFallH - groundLevel > 120) dmg(50, chr);
+                chr.logFall = false;
+                chr.logFallH = 0;
+            }
         }
     }
     chr.wasGround = chr.y <= groundLevel + 0.01;
+    if (chr.wasGround && onLog) {
+        chr.logFall = false;
+        chr.logFallH = 0;
+        chr.onLogNow = true;
+    } else if (!chr.wasGround && chr.onLogNow) {
+        chr.onLogNow = false;
+        chr.logFall = true;
+        chr.logFallH = chr.y;
+    } else if (chr.wasGround) {
+        chr.onLogNow = false;
+    }
+    if (chr.logFall) chr.logFallH = Math.max(chr.logFallH, chr.y);
     chr.vyReal = (chr.y - prevY) / Math.max(dt, 0.001);
     chr.squish += (1 - chr.squish) * 0.15;
     if (Math.abs(chr.vx) > 0.2 && !chr.isJumping && !chr.isFlying) {
@@ -1240,7 +1422,7 @@ function futureY(chr, keys, t) {
         const vyFly = (keys.up ? 8 : 0) - (keys.down ? 8 : 0);
         return Math.max(0, Math.min(canvas.height - 110, chr.y + vyFly * t));
     }
-    const gh = groundH(chr.x);
+    const gh = Math.max(groundH(chr.x), logSurface(chr, chr.y));
     if (chr.y <= gh + 0.5 && chr.vy <= 0) return chr.y;
     return Math.max(gh, chr.y + chr.vy * t - 0.5 * chr.gravity * t * t);
 }
@@ -1528,6 +1710,7 @@ function updateViewCam() {
     m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
     maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
+    logLayer.style.transform = `translate3d(${b}px, 0, 0)`;
 }
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
@@ -1867,6 +2050,7 @@ function u() {
     lastFrameTime = frameNow;
     if (gameStarted && !isGameOver && !isGuest) {
         spawnTick();
+        updateLogs();
         updateTalismanTimers(character);
         if (isSplit) updateTalismanTimers(character2);
         updatePlayer(character, keysP1, 1);
@@ -1882,6 +2066,7 @@ function u() {
         if (lead / 1550 > dist) { dist = lead / 1550; updateScoreUI(); }
         if (lead >= WORLD.END) triggerWin();
         const vb = viewBounds();
+        logHits();
         checkBanishCollect();
         checkMaskCollect();
         if (!introOpen) {
@@ -1984,6 +2169,10 @@ function u() {
             const a = arws[i];
             a.x += a.vx * dt;
             a.y += a.vy * dt;
+            if (logBlade(a)) {
+                arws.splice(i, 1);
+                continue;
+            }
             const hit1 = !character.isShadowGuard && hp > 0 &&
                          Math.abs(character.x - a.x) < 22 &&
                          Math.abs((canvas.height - character.y - 35) - a.y) < 25;
@@ -2032,6 +2221,10 @@ function u() {
             const f = fbs[i];
             f.x += f.vx * dt;
             f.y += f.vy * dt;
+            if (logFireCut(f)) {
+                fbs.splice(i, 1);
+                continue;
+            }
             let hitEnemy = false;
             for (let j = ems.length - 1; j >= 0; j--) {
                 const e = ems[j];
@@ -2065,6 +2258,7 @@ function u() {
                     ems.splice(j, 1);
                 }
             }
+            logLaserCut(ex, ey, mx, my);
         };
         if (character.isPigLaserActive && hp > 0) {
             checkLaserHits(character);
@@ -2074,6 +2268,7 @@ function u() {
         }
     }
     updateViewCam();
+    renderLogs();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(-camX, 0);
