@@ -318,6 +318,73 @@ const GROUND = (() => {
     return out;
 })();
 const GCOL = { G: ['#466929', '#2e9e4f'], BN: ['#6b4423', '#8b5a2b'], BZ: ['#a67c4a', '#c9a066'], AS: ['#4a4a4a', '#707070'] };
+const TERRAIN = (() => {
+    let s = 9091;
+    const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+    const zones = [];
+    WATER.forEach(w => zones.push({ a: w.x1, b: w.x2, p: 350 }));
+    FIRES.forEach(f => zones.push({ a: f, b: f, p: 800 }));
+    BANISH.forEach((o, i) => zones.push({ a: o.x, b: o.x, p: i === 3 ? 1500 : 800 }));
+    MASKS.forEach(o => zones.push({ a: o.x, b: o.x, p: 800 }));
+    const list = [];
+    let x = 4000;
+    while (x < 400000) {
+        const h = 35 + rnd() * 55;
+        const up = rnd() < 0.5 ? h * (0.8 + rnd() * 0.3) : h / (0.2 + rnd() * 0.25);
+        const dn = rnd() < 0.5 ? h * (0.8 + rnd() * 0.3) : h / (0.2 + rnd() * 0.25);
+        const plat = 150 + rnd() * 550;
+        const x2 = x + up + plat + dn;
+        const bad = zones.some(z => x2 > z.a - z.p && x < z.b + z.p);
+        if (bad) { x += 400; continue; }
+        const mid = (x + x2) / 2;
+        const zn = GROUND.find(z => mid >= z.x1 && mid < z.x2);
+        const col = GCOL[zn ? zn.t : 'G'];
+        list.push({ x1: x, x2, h, up, dn, c: col[0], l: col[1] });
+        x = x2 + 1500 + rnd() * 4000;
+    }
+    return list;
+})();
+function groundH(x) {
+    let lo = 0, hi = TERRAIN.length - 1, r = -1;
+    while (lo <= hi) {
+        const m = (lo + hi) >> 1;
+        if (TERRAIN[m].x1 <= x) { r = m; lo = m + 1; } else hi = m - 1;
+    }
+    if (r < 0) return 0;
+    const t = TERRAIN[r];
+    if (x >= t.x2) return 0;
+    if (x < t.x1 + t.up) return t.h * (x - t.x1) / t.up;
+    if (x > t.x2 - t.dn) return t.h * (t.x2 - x) / t.dn;
+    return t.h;
+}
+function drawTerrain() {
+    const lo = camX - 400, hi = camX + canvas.width + 400, H = canvas.height;
+    ctx.save();
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    for (const t of TERRAIN) {
+        if (t.x2 < lo) continue;
+        if (t.x1 > hi) break;
+        ctx.beginPath();
+        ctx.moveTo(t.x1, H + 3);
+        ctx.lineTo(t.x1, H);
+        ctx.lineTo(t.x1 + t.up, H - t.h);
+        ctx.lineTo(t.x2 - t.dn, H - t.h);
+        ctx.lineTo(t.x2, H);
+        ctx.lineTo(t.x2, H + 3);
+        ctx.closePath();
+        ctx.fillStyle = t.c;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(t.x1, H);
+        ctx.lineTo(t.x1 + t.up, H - t.h);
+        ctx.lineTo(t.x2 - t.dn, H - t.h);
+        ctx.lineTo(t.x2, H);
+        ctx.strokeStyle = t.l;
+        ctx.stroke();
+    }
+    ctx.restore();
+}
 let gStart = 0, lastGX = null;
 function groundGradient() {
     if (lastGX === camX) return null;
@@ -677,7 +744,7 @@ function spawnE(owner) {
     const startX = isFly
         ? owner.cam + owner.viewW + 80 + Math.random() * 160
         : owner.cam + owner.viewW * (0.55 + Math.random() * 0.35);
-    const startY = isFly ? Math.random() * 180 + 130 : 0;
+    const startY = isFly ? Math.random() * 180 + 130 : groundH(startX);
     const baseSpeed = isFly ? Math.random() * 1.2 + 2.4 : Math.random() * 1.5 + 6.4;
     ems.push({
         x: startX,
@@ -695,7 +762,7 @@ function spawnE(owner) {
         rise: isFly ? 1 : 0,
         anim: Math.random() * 10
     });
-    if (!isFly) addSparks(startX, canvas.height - 3, '#4a3b6b', 12);
+    if (!isFly) addSparks(startX, canvas.height - startY - 3, '#4a3b6b', 12);
 }
 function getTalismanDisplayName(name) {
     switch (name) {
@@ -1086,7 +1153,7 @@ function updatePlayer(chr, keysState, playerNum) {
     }
     chr.x += chr.vx * dt;
     const prevY = chr.y;
-    const groundLevel = 0;
+    const groundLevel = groundH(chr.x);
     if (chr.isFlying) {
         if (keysState.up) chr.y += 8 * dt;
         if (keysState.down) chr.y -= 8 * dt;
@@ -1096,6 +1163,7 @@ function updatePlayer(chr, keysState, playerNum) {
         chr.isJumping = false;
     } else {
         chr.y += chr.vy * dt;
+        if (chr.wasGround && !chr.isJumping && chr.vy <= 0 && chr.y > groundLevel && chr.y - groundLevel < 40) chr.y = groundLevel;
         if (chr.y > groundLevel || chr.vy > 0) {
             chr.vy -= chr.gravity * dt;
         }
@@ -1105,6 +1173,7 @@ function updatePlayer(chr, keysState, playerNum) {
             chr.isJumping = false;
         }
     }
+    chr.wasGround = chr.y <= groundLevel + 0.01;
     chr.vyReal = (chr.y - prevY) / Math.max(dt, 0.001);
     chr.squish += (1 - chr.squish) * 0.15;
     if (Math.abs(chr.vx) > 0.2 && !chr.isJumping && !chr.isFlying) {
@@ -1132,8 +1201,9 @@ function futureY(chr, keys, t) {
         const vyFly = (keys.up ? 8 : 0) - (keys.down ? 8 : 0);
         return Math.max(0, Math.min(canvas.height - 110, chr.y + vyFly * t));
     }
-    if (chr.y <= 0 && chr.vy <= 0) return 0;
-    return Math.max(0, chr.y + chr.vy * t - 0.5 * chr.gravity * t * t);
+    const gh = groundH(chr.x);
+    if (chr.y <= gh + 0.5 && chr.vy <= 0) return chr.y;
+    return Math.max(gh, chr.y + chr.vy * t - 0.5 * chr.gravity * t * t);
 }
 function aimArrow(sx, sy, chr, spd) {
     const keys = chr.playerNum === 1 ? keysP1 : keysP2;
@@ -1709,6 +1779,7 @@ function u() {
             if (e.hitCooldown > 0) e.hitCooldown -= dt;
             if (!e.fly && e.rise < 1) {
                 e.rise = Math.min(1, e.rise + dt / 50);
+                e.y = groundH(e.x);
                 if (Math.random() < 0.3 * dt) {
                     addSparks(e.x + (Math.random() - 0.5) * 26, canvas.height - 3, '#4a3b6b', 3);
                 }
@@ -1733,7 +1804,7 @@ function u() {
                     e.attacking = boxesOverlap(enemyBox(e), playerBox(prey));
                     if (Math.abs(gap) > 8) {
                         e.facing = gap > 0 ? 1 : -1;
-                        moving = !e.attacking && !(prey.y > 0 && Math.abs(gap) < 40);
+                        moving = !e.attacking && !(prey.y > groundH(prey.x) + 1 && Math.abs(gap) < 40);
                     }
                 } else {
                     const bump = aliveChars().find(c => !c.isShadowGuard && boxesOverlap(enemyBox(e), playerBox(c)));
@@ -1743,6 +1814,7 @@ function u() {
                 }
                 if (moving) e.x += e.facing * e.spd * dt;
                 e.moving = moving;
+                e.y = groundH(e.x);
                 if (moving || e.attacking) e.anim += 0.12 * dt;
             }
 
@@ -1874,6 +1946,7 @@ function u() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(-camX, 0);
+    drawTerrain();
     for (const chr of [character, character2]) {
     if (chr === character2 && !isSplit) continue;
     const alive = chr === character ? hp > 0 : hp2 > 0;
@@ -2430,10 +2503,11 @@ function drawHuman(chr, label) {
         ctx.restore();
     }
     ctx.save();
-    ctx.globalAlpha = Math.max(0.12, 0.35 - chr.y / 900);
+    const agl = Math.max(0, chr.y - groundH(chr.x));
+    ctx.globalAlpha = Math.max(0.12, 0.35 - agl / 900);
     ctx.fillStyle = '#0b2a14';
     ctx.beginPath();
-    ctx.ellipse(0, chr.y + 2, (chr.giant ? 40 : 26) * Math.max(0.5, 1 - chr.y / 500), 6, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, agl + 2, (chr.giant ? 40 : 26) * Math.max(0.5, 1 - agl / 500), 6, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     if (chr.isDogImmortal) {
@@ -2452,7 +2526,7 @@ function drawHuman(chr, label) {
     if (chr.invisible && hasSnake(chr)) ctx.globalAlpha = SNAKE_ALPHA;
     if (chr.isShadowGuard) {
         const moving = Math.abs(chr.vx) > 0.2;
-        const state = (chr.isJumping || chr.isFlying || chr.y > 0) ? 'air' : (moving ? 'run' : 'idle');
+        const state = (chr.isJumping || chr.isFlying || chr.y > groundH(chr.x) + 1) ? 'air' : (moving ? 'run' : 'idle');
         drawShadowGuardBody(chr.walkCycle, 0.42 * (chr.giant ? 1.5 : 1), chr.facing, state);
         ctx.restore();
         return;
@@ -2469,7 +2543,7 @@ function drawHuman(chr, label) {
     const target = Math.abs(chr.vx) > 0.2 ? 1 : 0;
     chr.moveBlend = (chr.moveBlend || 0) + (target - (chr.moveBlend || 0)) * 0.2;
     const mb = chr.moveBlend;
-    const air = chr.isJumping || chr.isFlying || chr.y > 0;
+    const air = chr.isJumping || chr.isFlying || chr.y > groundH(chr.x) + 1;
     const t = chr.walkCycle;
     const breathe = Math.sin(performance.now() / 500 + chr.playerNum * 2) * 1.2 * (1 - mb);
     const bob = -Math.abs(Math.sin(t)) * 4 * mb;
