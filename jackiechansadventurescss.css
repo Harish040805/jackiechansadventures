@@ -56,16 +56,16 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .m-item {
   display: inline-block; width: 600px; height: 250px;
   background:
-    linear-gradient(#eef6fa, #eef6fa) 72px 62px / 156px 22px no-repeat,
-    linear-gradient(#eef6fa, #eef6fa) 372px 25px / 156px 22px no-repeat,
-    linear-gradient(72deg,  transparent 0 33%, #2b2625 33% 33.7%, transparent 33.7% 100%),
-    linear-gradient(112deg, transparent 0 46%, #2b2625 46% 46.6%, transparent 46.6% 100%),
-    linear-gradient(68deg,  transparent 0 58%, #2b2625 58% 58.7%, transparent 58.7% 100%),
-    linear-gradient(105deg, transparent 0 80%, #2b2625 80% 80.6%, transparent 80.6% 100%),
-    linear-gradient(28deg,  #4a4340 0 24%, transparent 24% 100%),
-    linear-gradient(-28deg, #5a524f 0 20%, transparent 20% 100%),
-    linear-gradient(90deg, #cdb892 0 12%, #9a8f86 12% 25%, #d6c29a 25% 38%, #6e6560 38% 50%, #c4b08a 50% 62%, #e0cfa8 62% 75%, #857b75 75% 88%, #5f5753 88% 100%); 
-  clip-path: polygon(0% 100%, 12% 25%, 38% 25%, 50% 100%, 62% 10%, 88% 10%, 100% 100%); }
+    linear-gradient(24deg,  #4a4340 0 30%, transparent 30% 100%),
+    linear-gradient(-28deg, #5f5753 0 22%, transparent 22% 100%),
+    linear-gradient(118deg, transparent 0 28%, #9a8f86 28% 46%, transparent 46% 100%),
+    linear-gradient(62deg,  transparent 0 58%, #857b75 58% 74%, transparent 74% 100%),
+    linear-gradient(120deg, transparent 0 80%, #6e6560 80% 100%),
+    linear-gradient(100deg, #e0cfa8 0 14%, transparent 14% 100%),
+    linear-gradient(80deg,  transparent 0 48%, #d6c29a 48% 60%, transparent 60% 100%),
+    linear-gradient(#cdb892, #cdb892);
+  clip-path: polygon(0% 100%, 6% 55%, 12% 28%, 20% 22%, 30% 30%, 38% 24%, 45% 60%, 50% 100%, 56% 55%, 62% 12%, 72% 18%, 80% 8%, 88% 14%, 94% 55%, 100% 100%);
+}
 .mask-slot { position: absolute; filter: drop-shadow(0 0 18px #fff) drop-shadow(0 0 36px rgba(255, 255, 255, 0.85)); }
 .o, .pf, .sl { position: relative; width: 46px; height: 42px; font-size: 21px; background-image: linear-gradient(90deg, #a3a3a3 0 55%, #707070 55% 100%); clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); display: flex; justify-content: center; align-items: center; border: 3px solid #444; cursor: pointer; user-select: none; transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease; }
 .o:hover, .pf:hover, .sl:hover { background-image: linear-gradient(90deg, #bfbfbf 0 55%, #8a8a8a 55% 100%); transform: scale(1.08); }
