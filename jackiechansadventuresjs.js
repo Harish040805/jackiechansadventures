@@ -187,10 +187,10 @@ function addPlat(x1, x2, levels) {
 }
 for (let i = 0; i < 15; i++) {
     const o = HOUSE_START + i * HS_W;
-    addPlat(o + 10,  o + 280,  [140, 285]);
-    addPlat(o + 360, o + 634,  [125, 250]);
+    addPlat(o + 10,  o + 280,  [140, 235, 331]);
+    addPlat(o + 360, o + 634,  [125, 195, 267]);
     addPlat(o + 648, o + 863,  [120, 238]);
-    addPlat(o + 882, o + 1002, [110, 222]);
+    addPlat(o + 882, o + 1002, [110, 222, 307]);
 }
 addPlat(SHOP_X + 0,   SHOP_X + 132, [126, 250]);
 addPlat(SHOP_X + 150, SHOP_X + 448, [140, 285]);
@@ -2161,10 +2161,9 @@ function drawRain() {
 function khanClimb(e, prey, now) {
     if (e.vy === undefined) e.vy = 0;
     if (prey && e.vy === 0 && !e.air) {
-        const pf = floorOf(prey);
-        const preyOnRoof = pf > groundH(prey.x) + 1 && !prey.isJumping && !prey.isFlying && prey.y <= pf + 0.5;
-        if (preyOnRoof && e.y < pf - 20) {
-            if (!e.climbAt) e.climbAt = now + 1000;
+        const pf = Math.max(floorOf(prey), prey.isFlying ? prey.y : 0);
+        if (pf > e.y + 20 && Math.abs(prey.x - e.x) < 500) {
+        if (!e.climbAt) e.climbAt = now + 250;
             if (now >= e.climbAt) {
                 let best = null;
                 for (const p of PLATS) {
