@@ -180,6 +180,30 @@ const hsRow = document.getElementById('hs-row');
 const spLayer = document.getElementById('sp-layer');
 const rvLayer = document.getElementById('rv-layer');
 rvLayer.style.width = HOUSE_START + 'px';
+const ROOF_BASE = -6;
+const PLATS = [];
+function addPlat(x1, x2, levels) {
+    levels.forEach(h => PLATS.push({ x1: x1 + 4, x2: x2 - 4, y: h + ROOF_BASE }));
+}
+for (let i = 0; i < 15; i++) {
+    const o = HOUSE_START + i * HS_W;
+    addPlat(o + 10,  o + 280,  [140, 285]);
+    addPlat(o + 360, o + 634,  [125, 250]);
+    addPlat(o + 648, o + 863,  [120, 238]);
+    addPlat(o + 882, o + 1002, [110, 222]);
+}
+addPlat(SHOP_X + 0,   SHOP_X + 132, [126, 250]);
+addPlat(SHOP_X + 150, SHOP_X + 448, [140, 285]);
+addPlat(SHOP_X + 460, SHOP_X + 806, [93, 180]);
+addPlat(SHOP_X + 812, SHOP_X + 950, [128, 250]);
+function roofSurface(x, prevY) {
+    let best = -1;
+    for (const p of PLATS) {
+        if (x > p.x1 && x < p.x2 && prevY >= p.y - 6 && p.y > best) best = p.y;
+    }
+    return best;
+}
+const floorOf = c => c.floorY !== undefined ? c.floorY : groundH(c.x);
 const HS_TILE = '<div class="hs-b1"><div class="hs-b1t"></div><div class="hs-b1q"></div><div class="hs-w hs-w1"></div><div class="hs-w hs-w2"></div><div class="hs-w hs-w3"></div><div class="hs-aw"></div><div class="hs-g"></div><div class="hs-d"></div></div>' +
     '<div class="hs-b1s"><div class="hs-b1sw"></div></div>' +
     '<div class="hs-b2"><div class="hs-b2r"></div><div class="hs-bw hs-m1"></div><div class="hs-bw hs-m2"></div><div class="hs-bw hs-m3"></div><div class="hs-bw hs-m4"></div><div class="hs-sn"></div><div class="hs-sl hs-sl1"></div><div class="hs-bd"></div><div class="hs-sl hs-sl2"></div></div>' +
@@ -1023,6 +1047,7 @@ function spawnE(owner) {
         facing: owner.x > startX ? 1 : -1,
         attacking: false,
         rise: isFly ? 1 : 0,
+        vy: 0,
         anim: Math.random() * 10
     });
     if (!isFly) addSparks(startX, canvas.height - startY - 3, '#4a3b6b', 12);
@@ -1422,7 +1447,8 @@ function updatePlayer(chr, keysState, playerNum) {
     const prevY = chr.y;
     const lgS = logSurface(chr, prevY);
     const onLog = lgS >= 0 && lgS >= groundH(chr.x);
-    const groundLevel = Math.max(groundH(chr.x), lgS);
+    const groundLevel = Math.max(groundH(chr.x), lgS, roofSurface(chr.x, prevY));
+    chr.floorY = groundLevel;
     if (chr.wasFlying && !chr.isFlying && chr.y > canvas.height * 0.5) chr.rFall = true;
     chr.wasFlying = chr.isFlying;
     if (chr.isFlying) {
@@ -2123,6 +2149,37 @@ function drawRain() {
     }
     ctx.restore();
 }
+function guardClimb(e, prey, now) {
+    if (e.vy === undefined) e.vy = 0;
+    if (prey && e.vy === 0 && !e.air) {
+        const pf = floorOf(prey);
+        const preyOnRoof = pf > groundH(prey.x) + 1 && !prey.isJumping && !prey.isFlying && prey.y <= pf + 0.5;
+        if (preyOnRoof && e.y < pf - 20) {
+            if (!e.climbAt) e.climbAt = now + 1000;
+            if (now >= e.climbAt) {
+                let best = null;
+                for (const p of PLATS) {
+                    if (e.x < p.x1 + 6 || e.x > p.x2 - 6) continue;
+                    const d = p.y - e.y;
+                    if (d > 10 && d <= 140 && p.y <= pf + 0.5 && (!best || p.y > best.y)) best = p;
+                }
+                if (best) e.vy = 14;
+            }
+        } else {
+            e.climbAt = 0;
+        }
+        if (e.y > pf + 20 && Math.abs(prey.x - e.x) < 14) {
+            e.x += e.facing * e.spd * 0.5 * dt;
+            e.moving = true;
+        }
+    }
+    const floor = Math.max(groundH(e.x), roofSurface(e.x, e.y));
+    if (e.vy === 0 && e.y > floor && e.y - floor < 8) e.y = floor;
+    e.y += e.vy * dt;
+    if (e.y > floor || e.vy > 0) e.vy -= 0.65 * dt;
+    if (e.y <= floor) { e.y = floor; e.vy = 0; }
+    e.air = e.y > floor + 0.5;
+}
 function u() {
     if (isPaused) {
         lastFrameTime = performance.now();
@@ -2202,7 +2259,7 @@ function u() {
                     e.attacking = boxesOverlap(enemyBox(e), playerBox(prey));
                     if (Math.abs(gap) > 8) {
                         e.facing = gap > 0 ? 1 : -1;
-                        moving = !e.attacking && !(prey.y > groundH(prey.x) + 1 && Math.abs(gap) < 40);
+                        moving = !e.attacking && !(prey.y > floorOf(prey) + 1 && Math.abs(gap) < 40);
                     }
                 } else {
                     const bump = aliveChars().find(c => !c.isShadowGuard && boxesOverlap(enemyBox(e), playerBox(c)));
@@ -2212,7 +2269,7 @@ function u() {
                 }
                 if (moving) e.x += e.facing * e.spd * dt;
                 e.moving = moving;
-                e.y = groundH(e.x);
+                guardClimb(e, prey, now);
                 if (moving || e.attacking) e.anim += 0.12 * dt;
             }
 
@@ -2549,7 +2606,7 @@ function u() {
                 drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, 'idle');
             } else {
                 ctx.translate(e.x, gy);
-                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.attacking ? 'attack' : (e.moving ? 'run' : 'idle'));
+                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.air ? 'air' : (e.attacking ? 'attack' : (e.moving ? 'run' : 'idle')));
             }
         }
         ctx.restore();
@@ -2798,7 +2855,7 @@ function drawHuman(chr, label) {
         ctx.restore();
     }
     ctx.save();
-    const agl = Math.max(0, chr.y - groundH(chr.x));
+    const agl = Math.max(0, chr.y - floorOf(chr));
     ctx.globalAlpha = Math.max(0.12, 0.35 - agl / 900);
     ctx.fillStyle = '#0b2a14';
     ctx.beginPath();
@@ -2821,7 +2878,7 @@ function drawHuman(chr, label) {
     if (chr.invisible && hasSnake(chr)) ctx.globalAlpha = SNAKE_ALPHA;
     if (chr.isShadowGuard) {
         const moving = Math.abs(chr.vx) > 0.2;
-        const state = (chr.isJumping || chr.isFlying || chr.y > groundH(chr.x) + 1) ? 'air' : (moving ? 'run' : 'idle');
+        const state = (chr.isJumping || chr.isFlying || chr.y > floorOf(chr) + 1) ? 'air' : (moving ? 'run' : 'idle');
         drawShadowGuardBody(chr.walkCycle, 0.42 * (chr.giant ? 1.5 : 1), chr.facing, state);
         ctx.restore();
         return;
@@ -2838,7 +2895,7 @@ function drawHuman(chr, label) {
     const target = Math.abs(chr.vx) > 0.2 ? 1 : 0;
     chr.moveBlend = (chr.moveBlend || 0) + (target - (chr.moveBlend || 0)) * 0.2;
     const mb = chr.moveBlend;
-    const air = chr.isJumping || chr.isFlying || chr.y > groundH(chr.x) + 1;
+    const air = chr.isJumping || chr.isFlying || chr.y > floorOf(chr) + 1;
     const t = chr.walkCycle;
     const breathe = Math.sin(performance.now() / 500 + chr.playerNum * 2) * 1.2 * (1 - mb);
     const bob = -Math.abs(Math.sin(t)) * 4 * mb;
