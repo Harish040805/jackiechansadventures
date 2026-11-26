@@ -171,7 +171,7 @@ const BANISH = [
     { e: '🪘', n: 'Po Kong' }
 ].map((o, i) => ({ ...o, m: WORLD.BANISH[i], x: WORLD.BANISH[i], y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 const HS_W = 1040;
-const SHOP_X = WORLD.END - 700;
+const SHOP_X = WORLD.END - 1500;
 const hsLayer = document.getElementById('hs-layer');
 const hsRow = document.getElementById('hs-row');
 const spLayer = document.getElementById('sp-layer');
@@ -1782,6 +1782,7 @@ function updateViewCam() {
     hsRow.style.transform = `translate3d(${b % HS_W}px, 0, 0)`;
     spLayer.style.transform = `translate3d(${SHOP_X + b}px, 0, 0)`;
     const shopSX = SHOP_X - camX;
+    spLayer.style.display = (shopSX < canvas.width && shopSX > -1000) ? 'block' : 'none';
     hsLayer.style.clipPath = shopSX < canvas.width ? `inset(0 ${Math.max(0, canvas.width - shopSX)}px 0 0)` : 'none';
 }
 function eyePos(chr) {
