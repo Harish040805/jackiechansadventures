@@ -171,7 +171,7 @@ const BANISH = [
     { e: '🪘', n: 'Po Kong' }
 ].map((o, i) => ({ ...o, m: WORLD.BANISH[i], x: WORLD.BANISH[i], y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 const HS_W = 1040;
-const SHOP_X = WORLD.END - 1500;
+const SHOP_X = 2500;
 const hsLayer = document.getElementById('hs-layer');
 const hsRow = document.getElementById('hs-row');
 const spLayer = document.getElementById('sp-layer');
