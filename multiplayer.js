@@ -199,7 +199,7 @@
     return {
       x: r1(c.x), y: r1(c.y), fy: r1(c.floorY !== undefined ? c.floorY : groundH(c.x)), vx: Math.round(c.vx * 100) / 100, f: c.facing, w: Math.round(c.walkCycle * 100) / 100,
       j: c.isJumping, fl: c.isFlying, g: c.giant, d: c.isDogImmortal, a: c.isAstral, inv: c.invisible,
-      sg: c.isShadowGuard, l: c.light, r: c.isRatActive, p: c.isPigLaserActive, dr: c.isDragonShooting,
+      sg: c.isShadowKhan, l: c.light, r: c.isRatActive, p: c.isPigLaserActive, dr: c.isDragonShooting,
       sq: Math.round(c.squish * 100) / 100, act, en,
       sp: (c.isAstral && c.spirit) ? [r1(c.spirit.x), r1(c.spirit.y)] : null,
       mo: (c.isRatActive && c.moose) ? [r1(c.moose.x), r1(c.moose.y), c.moose.face] : null
@@ -309,7 +309,7 @@
     if (!c._seen || Math.hypot(c.x - tx, c.y - s.y) > 250) { c.x = tx; c.y = s.y; c._seen = true; }
     c.vx = s.vx; c.facing = s.f; c.walkCycle = s.w; c.isJumping = s.j;
     c.isFlying = s.fl; c.giant = s.g; c.isDogImmortal = s.d; c.isAstral = s.a; c.invisible = s.inv;
-    c.isShadowGuard = s.sg; c.light = s.l; c.isRatActive = s.r; c.isPigLaserActive = s.p;
+    c.isShadowKhan = s.sg; c.light = s.l; c.isRatActive = s.r; c.isPigLaserActive = s.p;
     c.isDragonShooting = s.dr; c.squish = s.sq;
     const key = s.act.join(',');
     if (c._k !== key) {
