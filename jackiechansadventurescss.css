@@ -235,7 +235,7 @@ body.raining #clouds { filter: brightness(0.5); }
 .sp-wb { left: 80px; }
 .sp-wc { left: 196px; }
 .sp-wd { left: 244px; }
-.sp-mhsg { top: 102px; left: 108px; width: 214px; height: 22px; background: #7c5840; border: 3px solid #3b2010; color: #ffe9a8; font: bold 11px sans-serif; text-align: center; line-height: 16px; }
+.sp-mhsg { top: 100px; left: 88px; width: 214px; height: 22px; background: #7c5840; border: 3px solid #3b2010; color: #ffe9a8; font: bold 11px sans-serif; text-align: center; line-height: 16px; }
 .sp-mhe { top: 126px; left: -19px; width: 332px; height: 24px; background: linear-gradient(180deg, #e0483e 0%, #b52a23 100%); border: 3px solid #3b2010; border-radius: 16px 20px 4px 4px; z-index: 4; }
 .sp-mhs { top: 160px; left: 62px; width: 122px; height: 16px; background: #87b544; border: 3px solid #3b2010; border-radius: 4px; }
 .sp-w1a { bottom: 28px; left: 24px; width: 44px; height: 64px; background: #7ab8f5; border: 3px solid #3b2010; box-shadow: inset 0 18px 0 #b3dcff; }
