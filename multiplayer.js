@@ -197,7 +197,7 @@
     const now = isPaused ? pauseStartTime : Date.now(), act = Object.keys(c.activeTalismans || {}), en = {};
     act.forEach(k => { if (c.talismanEnds && c.talismanEnds[k]) en[k] = c.talismanEnds[k] - now; });
     return {
-      x: r1(c.x), y: r1(c.y), vx: Math.round(c.vx * 100) / 100, f: c.facing, w: Math.round(c.walkCycle * 100) / 100,
+      x: r1(c.x), y: r1(c.y), fy: r1(c.floorY !== undefined ? c.floorY : groundH(c.x)), vx: Math.round(c.vx * 100) / 100, f: c.facing, w: Math.round(c.walkCycle * 100) / 100,
       j: c.isJumping, fl: c.isFlying, g: c.giant, d: c.isDogImmortal, a: c.isAstral, inv: c.invisible,
       sg: c.isShadowGuard, l: c.light, r: c.isRatActive, p: c.isPigLaserActive, dr: c.isDragonShooting,
       sq: Math.round(c.squish * 100) / 100, act, en,
@@ -215,7 +215,7 @@
         mk: MASKS.map(o => o.got ? 1 : 0),
         lg: LOGS.map(l => [l.state, r1(l.b), r1(l.endL), r1(l.endR), Math.round((l.rot || 0) * 100) / 100, l.side || 0, r1(l.cL || 0), r1(l.cR || 0)]),
         c1: packChar(character), c2: packChar(character2),
-        e: ems.map(e => [e.id || (e.id = entId++), r1(e.x), r1(e.y), e.fly ? 1 : 0, Math.round(e.anim * 100) / 100, e.facing || -1, e.attacking ? 1 : 0, Math.round((e.rise === undefined ? 1 : e.rise) * 100) / 100, e.moving ? 1 : 0]),
+        e: ems.map(e => [e.id || (e.id = entId++), r1(e.x), r1(e.y), e.fly ? 1 : 0, Math.round(e.anim * 100) / 100, e.facing || -1, e.attacking ? 1 : 0, Math.round((e.rise === undefined ? 1 : e.rise) * 100) / 100, e.moving ? 1 : 0, e.air ? 1 : 0]),
         a: arws.map(a => [a.id || (a.id = entId++), r1(a.x), r1(a.y), Math.round(a.ang * 100) / 100]),
         f: fbs.map(f => [f.id || (f.id = entId++), r1(f.x), r1(f.y)]),
         mb: magicBeams, ax: Math.round(mx + camX), ay: Math.round(my),
@@ -305,6 +305,7 @@
   function applyChar(c, s, kx) {
     const tx = s.x * kx;
     c.tx = tx; c.ty = s.y;
+    if (s.fy !== undefined) c.floorY = s.fy;
     if (!c._seen || Math.hypot(c.x - tx, c.y - s.y) > 250) { c.x = tx; c.y = s.y; c._seen = true; }
     c.vx = s.vx; c.facing = s.f; c.walkCycle = s.w; c.isJumping = s.j;
     c.isFlying = s.fl; c.giant = s.g; c.isDogImmortal = s.d; c.isAstral = s.a; c.invisible = s.inv;
@@ -356,7 +357,7 @@
         c.moose.face = sc.mo[2];
       } else { c.moose = null; }
     });
-    ems = syncList(ents.e, s.e, r => ({ id: r[0], tx: gx(r[1]), ty: r[2], fly: !!r[3], anim: r[4], facing: r[5] || -1, attacking: !!r[6], rise: r[7] === undefined ? 1 : r[7], moving: !!r[8] }));
+    ems = syncList(ents.e, s.e, r => ({ id: r[0], tx: gx(r[1]), ty: r[2], fly: !!r[3], anim: r[4], facing: r[5] || -1, attacking: !!r[6], rise: r[7] === undefined ? 1 : r[7], moving: !!r[8], air: !!r[9] }));
     arws = syncList(ents.a, s.a, r => ({ id: r[0], tx: gx(r[1]), ty: gy(r[2]), ang: r[3] }));
     fbs = syncList(ents.f, s.f, r => ({ id: r[0], tx: gx(r[1]), ty: gy(r[2]), radius: 10 }));
     magicBeams = s.mb.map(bm => Object.assign({}, bm, { startX: gx(bm.startX), endX: gx(bm.endX), startY: gy(bm.startY), endY: gy(bm.endY) }));
