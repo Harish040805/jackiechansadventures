@@ -171,7 +171,9 @@ const BANISH = [
     { e: '🪘', n: 'Po Kong' }
 ].map((o, i) => ({ ...o, m: WORLD.BANISH[i], x: WORLD.BANISH[i], y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 const HS_W = 1040;
-const SHOP_X = 2500;
+const SHOP_X = WORLD.END - 3500;
+const HOUSE_END = WORLD.END - 600;
+const SHOP_W = 960;
 const hsLayer = document.getElementById('hs-layer');
 const hsRow = document.getElementById('hs-row');
 const spLayer = document.getElementById('sp-layer');
@@ -1782,8 +1784,11 @@ function updateViewCam() {
     hsRow.style.transform = `translate3d(${b % HS_W}px, 0, 0)`;
     spLayer.style.transform = `translate3d(${SHOP_X + b}px, 0, 0)`;
     const shopSX = SHOP_X - camX;
-    spLayer.style.display = (shopSX < canvas.width && shopSX > -1000) ? 'block' : 'none';
-    hsLayer.style.clipPath = shopSX < canvas.width ? `inset(0 ${Math.max(0, canvas.width - shopSX)}px 0 0)` : 'none';
+    spLayer.style.display = (shopSX < canvas.width && shopSX > -SHOP_W) ? 'block' : 'none';
+    const hsR = Math.max(0, Math.min(canvas.width, HOUSE_END - camX));
+    const hsA = Math.max(0, Math.min(hsR, shopSX));
+    const hsC = Math.max(0, Math.min(hsR, shopSX + SHOP_W));
+    hsLayer.style.clipPath = hsR <= 0 ? 'inset(0 0 0 100%)' : `path(evenodd, 'M0 0H${hsR}V420H0Z M${hsA} 0H${hsC}V420H${hsA}Z')`;
 }
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
