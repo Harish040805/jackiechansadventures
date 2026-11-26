@@ -171,12 +171,15 @@ const BANISH = [
     { e: '🪘', n: 'Po Kong' }
 ].map((o, i) => ({ ...o, m: WORLD.BANISH[i], x: WORLD.BANISH[i], y: [150, 400, 30, 30, 630, 550, 550, 300][i], got: false }));
 const HS_W = 1040;
-const SHOP_X = WORLD.END - 3500;
-const HOUSE_END = WORLD.END - 600;
+const SHOP_X = 300;
 const SHOP_W = 960;
+const HOUSE_START = SHOP_X + SHOP_W;
+const HOUSE_END = HOUSE_START + HS_W * 15;
 const hsLayer = document.getElementById('hs-layer');
 const hsRow = document.getElementById('hs-row');
 const spLayer = document.getElementById('sp-layer');
+const rvLayer = document.getElementById('rv-layer');
+rvLayer.style.width = HOUSE_START + 'px';
 const HS_TILE = '<div class="hs-b1"><div class="hs-b1t"></div><div class="hs-b1q"></div><div class="hs-w hs-w1"></div><div class="hs-w hs-w2"></div><div class="hs-w hs-w3"></div><div class="hs-aw"></div><div class="hs-g"></div><div class="hs-d"></div></div>' +
     '<div class="hs-b1s"><div class="hs-b1sw"></div></div>' +
     '<div class="hs-b2"><div class="hs-b2r"></div><div class="hs-bw hs-m1"></div><div class="hs-bw hs-m2"></div><div class="hs-bw hs-m3"></div><div class="hs-bw hs-m4"></div><div class="hs-sn"></div><div class="hs-sl hs-sl1"></div><div class="hs-bd"></div><div class="hs-sl hs-sl2"></div></div>' +
@@ -1781,14 +1784,17 @@ function updateViewCam() {
     t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
     maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
     logLayer.style.transform = `translate3d(${b}px, 0, 0)`;
-    hsRow.style.transform = `translate3d(${b % HS_W}px, 0, 0)`;
+    let hsOff = (b + HOUSE_START) % HS_W;
+    if (hsOff > 0) hsOff -= HS_W;
+    hsRow.style.transform = `translate3d(${hsOff}px, 0, 0)`;
     spLayer.style.transform = `translate3d(${SHOP_X + b}px, 0, 0)`;
+    rvLayer.style.transform = `translate3d(${b}px, 0, 0)`;
+    rvLayer.style.display = camX < HOUSE_START ? 'block' : 'none';
     const shopSX = SHOP_X - camX;
     spLayer.style.display = (shopSX < canvas.width && shopSX > -SHOP_W) ? 'block' : 'none';
     const hsR = Math.max(0, Math.min(canvas.width, HOUSE_END - camX));
-    const hsA = Math.max(0, Math.min(hsR, shopSX));
-    const hsC = Math.max(0, Math.min(hsR, shopSX + SHOP_W));
-    hsLayer.style.clipPath = hsR <= 0 ? 'inset(0 0 0 100%)' : `path(evenodd, 'M0 0H${hsR}V420H0Z M${hsA} 0H${hsC}V420H${hsA}Z')`;
+    const hsL = Math.max(0, Math.min(hsR, HOUSE_START - camX));
+    hsLayer.style.clipPath = hsR <= hsL ? 'inset(0 0 0 100%)' : `inset(0 ${canvas.width - hsR}px 0 ${hsL}px)`;
 }
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
