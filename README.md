@@ -2,8 +2,6 @@
 
 If you use Cartoon street house at an interval of 10 m. After 10 m, have the mountains, trees, river background for 10 m. After that, bring the houses again. Loop them such way till the end. Always bring the trees to the front of houses.
 
-Jackie or shadow khans can jump & run on the roofs. Jackie jumps on roof now perfectly. But, even if shadow khans can jump on them, they are not jumping on roofs. They are being only in ground.
-
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
 
 Allow Jackie to make manual attacks for on screen button as well as keyboard keys like O for punch K for kick B for block. Random objects like wood on the ground, hanging rope. If B clicked stadning near wood, the wood must block the incoming blade attacks. Normal B can block shadow khan punches, using B only standing near wood can lift wood and block all incoming blades. If Jackie jumps towards a hanging rope and uses B, he must be able to hold the hanging rope and swing to & fro until he use B again. Mechanism same like tarzan game.
