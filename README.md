@@ -5,7 +5,7 @@
 
 
 
-I asked you to use the Section 13/ uncle's antique shop once in the starting but you used only Cartoon street house. For Section 13/ uncle's antique shop, use #fede6d as house color & #b31f30 as roof color. Also, if you use Cartoon street house at an interval of 10 m. After 10 m, have the mountains, trees, river background for 10 m. After that, bring the houses again. Loop them such way till the end. Always bring the trees to the front of houses.
+For Section 13/ uncle's antique shop, use #fede6d as house color & #b31f30 as roof color. Also, if you use Cartoon street house at an interval of 10 m. After 10 m, have the mountains, trees, river background for 10 m. After that, bring the houses again. Loop them such way till the end. Always bring the trees to the front of houses.
 
 
 CODE FOR Section 13/ uncle's antique shop IS GIVEN IN 2 MD FILES IN SAME REPO (IN DIFFERENT FILES). SEE THEM.
