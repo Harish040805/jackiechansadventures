@@ -65,12 +65,12 @@ function moveKey(e) {
 const character = {
     playerNum: 1, name: "P1 (Blue)", x: 120, y: 0, vx: 0, vy: 0, speed: 7, baseSpeed: 7, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
     strideFrequency: 0.16, bodyTilt: 0, squish: 1, shirtColor: '#5d7da4', pantsColor: '#c09e56', activeTalisman: null, talismanTimer: null, talismanTimeLeft: 0, isDogImmortal: false, isDragonShooting: false,
-    isShadowGuard: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
+    isShadowKhan: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
 };
 const character2 = { 
     playerNum: 2, name: "P2 (Red)", x: 220, y: 0, vx: 0, vy: 0, speed: 7, baseSpeed: 7, acceleration: 2.5, friction: 0.80, gravity: 0.65, jumpForce: 14, isJumping: false, facing: 1, walkCycle: 0, 
     strideFrequency: 0.16, bodyTilt: 0, squish: 1, shirtColor: '#dc2626', pantsColor: '#1e3a8a', activeTalisman: null, talismanTimer: null, talismanTimeLeft: 0, isDogImmortal: false, isDragonShooting: false,
-    isShadowGuard: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
+    isShadowKhan: false, isRatActive: false, isPigLaserActive: false, giant: false, isFlying: false, isAstral: false, invisible: false, light: false
 };
 let dt = 1;
 let lastFrameTime = performance.now();
@@ -510,7 +510,7 @@ function logAccum(e) {
         if ((l.state !== 0 && l.state !== 3) || Math.abs(e.x - l.x) > LOG_GATHER) continue;
         const top = l.b + LOG_H;
         for (const c of aliveChars()) {
-            if (c.invisible || c.isShadowGuard) continue;
+            if (c.invisible || c.isShadowKhan) continue;
             if (Math.abs(c.x - l.x) < LOG_HW && c.y >= top - 8) {
                 if (e.slot === undefined) e.slot = Math.random() * 2 - 1;
                 return l.x + e.slot * (LOG_HW - 14);
@@ -563,7 +563,7 @@ function logHits() {
         for (let j = ems.length - 1; j >= 0; j--) {
             const e = ems[j];
             if (e.fly) continue;
-            if (Math.abs(e.x - l.x) < LOG_HW + 10 && e.y < top && e.y + GUARD_H > bot) {
+            if (Math.abs(e.x - l.x) < LOG_HW + 10 && e.y < top && e.y + KHAN_H > bot) {
                 registerKill(e, enemyCY(e), '#8d5524', 14);
                 ems.splice(j, 1);
             }
@@ -861,10 +861,10 @@ function startGame() {
 }
 const HTP_SPEECH = "Aiyaa! Jackie! Captain black have informed me for your safety! Take the talismans, my pufferfish and lizard for your protection. One more thing! Bring all of them back safely and correctly! Don't lose anything! Here is how to play. " +
   "For movement, choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up or W jumps, or flies up with the Rooster talisman. Down or S flies down. " +
-  "One more thing! Defeat Shadow Guards for ten points and Bats for fifteen points. Press Q for the Pufferfish Chi Laser, or E for the Lizard Magic Laser. Both fire straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
+  "One more thing! Defeat Shadow Khans for ten points and Bats for fifteen points. Press Q for the Pufferfish Chi Laser, or E for the Lizard Magic Laser. Both fire straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
   "One more thing! To use the talismans, press the number keys, the minus key or click the buttons at the bottom. Press again to turn one off. Several can be active at once and each has a timer. One more thing! Dragon and Ox, alone stay on until you turn them off. " +
   "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser with Chi magic. " +
-  "One more thing! Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. For Shendu, it's the sword, Xiao Fung, it's the fan, Bai Tza, its the gourd fruit. For Dai Gui, it's the flower and for Tsa Lan, its the lotus flower. For Hsi Wu, it's the flute. For Tchang Zu, it's the castanets. Atlast, for the mountain demon Po Kong, its the drums. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Guards or bats. " +
+  "One more thing! Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. For Shendu, it's the sword, Xiao Fung, it's the fan, Bai Tza, its the gourd fruit. For Dai Gui, it's the flower and for Tsa Lan, its the lotus flower. For Hsi Wu, it's the flute. For Tchang Zu, it's the castanets. Atlast, for the mountain demon Po Kong, its the drums. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Khans or bats. " +
   "One more thing! Don't forget to collect the Oni Masks of all the 10 ancient war heads. Dont forget! It's not 9! It's 10! Including Tarakudo's shadow mask. " +
   "One more thing! Press the equals key for the Tiger talisman to open an online session and share the Session I D. Or paste a friend's Session I D in the Online Co-Op box to join. Press equals again to return to single player. " +
   "One more thing! Beware of the water gaps in the ground. Standing in water drains your health, so jump or fly over them. One more thing! Press P or Escape to pause the game. " +
@@ -1008,9 +1008,9 @@ function healPlayer(chr, amount) {
     chr.light = true;
     setTimeout(() => { chr.light = false; }, 400);
 }
-const GUARD_SCALE = 0.34, GUARD_W = 20, GUARD_H = 32;
+const KHAN_SCALE = 0.34, KHAN_W = 20, KHAN_H = 32;
 function enemyBox(e) {
-    const h = e.height || GUARD_H, w = e.width || GUARD_W;
+    const h = e.height || KHAN_H, w = e.width || KHAN_W;
     return {
         cx: e.x,
         cy: e.fly ? canvas.height - (e.y + 35) : canvas.height - e.y - h / 2,
@@ -1043,8 +1043,8 @@ function spawnE(owner) {
         lt: Date.now(),
         hitCooldown: 0,
         hits: 0,
-        width: isFly ? 40 : GUARD_W,
-        height: isFly ? 34 : GUARD_H,
+        width: isFly ? 40 : KHAN_W,
+        height: isFly ? 34 : KHAN_H,
         facing: owner.x > startX ? 1 : -1,
         attacking: false,
         rise: isFly ? 1 : 0,
@@ -1106,7 +1106,7 @@ function clearTalismanForPlayer(chr) {
     chr.talismanTimeLeft = 0;
     chr.isDogImmortal = false;
     chr.isDragonShooting = false;
-    chr.isShadowGuard = false;
+    chr.isShadowKhan = false;
     chr.isRatActive = false;
     chr.moose = null;
     chr.isPigLaserActive = false;
@@ -1231,7 +1231,7 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
         delete chr.activeTalismans[name];
         if (name === 'dog') chr.isDogImmortal = false;
         if (name === 'dragon') chr.isDragonShooting = false;
-        if (name === 'monkey') chr.isShadowGuard = false;
+        if (name === 'monkey') chr.isShadowKhan = false;
         if (name === 'rat') chr.isRatActive = false;
         if (name === 'rabbit') chr.speed = chr.baseSpeed;
         if (name === 'pig') chr.isPigLaserActive = false;
@@ -1257,9 +1257,9 @@ if (!chr.activeTalismans) chr.activeTalismans = {};
             updatePlayerTalismanUI(chr);
             break;
         case 'monkey':
-            chr.isShadowGuard = true;
+            chr.isShadowKhan = true;
             chr.activeTalismans['monkey'] = true;
-            startPlayerTimer(chr, 'monkey', 10, () => { chr.isShadowGuard = false; });
+            startPlayerTimer(chr, 'monkey', 10, () => { chr.isShadowKhan = false; });
             break;
         case 'rat':
             chr.isRatActive = true;
@@ -2158,7 +2158,7 @@ function drawRain() {
     }
     ctx.restore();
 }
-function guardClimb(e, prey, now) {
+function khanClimb(e, prey, now) {
     if (e.vy === undefined) e.vy = 0;
     if (prey && e.vy === 0 && !e.air) {
         const pf = floorOf(prey);
@@ -2246,8 +2246,8 @@ function u() {
                 continue;
             }
             const validTargets = [];
-            if (!character.invisible && !character.isShadowGuard && hp > 0) validTargets.push(character);
-            if (isSplit && !character2.invisible && !character2.isShadowGuard && hp2 > 0) validTargets.push(character2);
+            if (!character.invisible && !character.isShadowKhan && hp > 0) validTargets.push(character);
+            if (isSplit && !character2.invisible && !character2.isShadowKhan && hp2 > 0) validTargets.push(character2);
 
             if (e.fly) {
                 e.x -= e.spd * dt;
@@ -2271,22 +2271,22 @@ function u() {
                         moving = !e.attacking && !(prey.y > floorOf(prey) + 1 && Math.abs(gap) < 40);
                     }
                 } else {
-                    const bump = aliveChars().find(c => !c.isShadowGuard && boxesOverlap(enemyBox(e), playerBox(c)));
+                    const bump = aliveChars().find(c => !c.isShadowKhan && boxesOverlap(enemyBox(e), playerBox(c)));
                     e.attacking = !!bump;
                     e.facing = bump ? (bump.x > e.x ? 1 : -1) : -1;
                     moving = !bump;
                 }
                 if (moving) e.x += e.facing * e.spd * dt;
                 e.moving = moving;
-                guardClimb(e, prey, now);
+                khanClimb(e, prey, now);
                 if (moving || e.attacking) e.anim += 0.12 * dt;
             }
 
             if (e.hitCooldown <= 0) {
                 const gb = enemyBox(e);
-                const hitP1 = !character.isShadowGuard && hp > 0 &&
+                const hitP1 = !character.isShadowKhan && hp > 0 &&
                               boxesOverlap(gb, playerBox(character));
-                const hitP2 = isSplit && !character2.isShadowGuard && hp2 > 0 &&
+                const hitP2 = isSplit && !character2.isShadowKhan && hp2 > 0 &&
                               boxesOverlap(gb, playerBox(character2));
                 if (hitP1) {
                     dmg(6, character);
@@ -2328,10 +2328,10 @@ function u() {
                 arws.splice(i, 1);
                 continue;
             }
-            const hit1 = !character.isShadowGuard && hp > 0 &&
+            const hit1 = !character.isShadowKhan && hp > 0 &&
                          Math.abs(character.x - a.x) < 22 &&
                          Math.abs((canvas.height - character.y - 35) - a.y) < 25;
-            const hit2 = isSplit && !character2.isShadowGuard && hp2 > 0 &&
+            const hit2 = isSplit && !character2.isShadowKhan && hp2 > 0 &&
                          Math.abs(character2.x - a.x) < 22 &&
                          Math.abs((canvas.height - character2.y - 35) - a.y) < 25;
             if (hit1) {
@@ -2612,10 +2612,10 @@ function u() {
                 ctx.rect(e.x - 60, gy + 3 - 150, 120, 150);
                 ctx.clip();
                 ctx.translate(e.x, gy + (1 - rise) * 62);
-                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, 'idle');
+                drawShadowKhanBody(e.anim * 5, KHAN_SCALE, e.facing || -1, 'idle');
             } else {
                 ctx.translate(e.x, gy);
-                drawShadowGuardBody(e.anim * 5, GUARD_SCALE, e.facing || -1, e.air ? 'air' : (e.attacking ? 'attack' : (e.moving ? 'run' : 'idle')));
+                drawShadowKhanBody(e.anim * 5, KHAN_SCALE, e.facing || -1, e.air ? 'air' : (e.attacking ? 'attack' : (e.moving ? 'run' : 'idle')));
             }
         }
         ctx.restore();
@@ -2885,10 +2885,10 @@ function drawHuman(chr, label) {
         ctx.restore();
     }
     if (chr.invisible && hasSnake(chr)) ctx.globalAlpha = SNAKE_ALPHA;
-    if (chr.isShadowGuard) {
+    if (chr.isShadowKhan) {
         const moving = Math.abs(chr.vx) > 0.2;
         const state = (chr.isJumping || chr.isFlying || chr.y > floorOf(chr) + 1) ? 'air' : (moving ? 'run' : 'idle');
-        drawShadowGuardBody(chr.walkCycle, 0.42 * (chr.giant ? 1.5 : 1), chr.facing, state);
+        drawShadowKhanBody(chr.walkCycle, 0.42 * (chr.giant ? 1.5 : 1), chr.facing, state);
         ctx.restore();
         return;
     }
@@ -2983,7 +2983,7 @@ function drawHuman(chr, label) {
     ctx.filter = 'none';
     ctx.restore();
 }
-const GUARD_FACE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="300" viewBox="0 0 260 300"><foreignObject width="260" height="300"><div xmlns="http://www.w3.org/1999/xhtml"><style>
+const KHAN_FACE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="300" viewBox="0 0 260 300"><foreignObject width="260" height="300"><div xmlns="http://www.w3.org/1999/xhtml"><style>
 .f{position:relative;width:260px;height:300px;isolation:isolate}
 .h{position:absolute;top:22px;left:46px;width:168px;height:236px;background-color:#121215;border-radius:3% 3% 52% 48% / 24% 1% 58% 54%;transform:rotate(7deg);box-shadow:inset -14px -10px 0 #09090b,inset 6px 4px 0 #1c1c21}
 .h::before{content:"";position:absolute;top:12px;left:14px;width:34px;height:44px;background-color:#121215;clip-path:polygon(0% 35%,82% 0%,100% 85%,12% 100%);transform:rotate(-22deg)}
@@ -2996,9 +2996,9 @@ const GUARD_FACE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="260" heig
 .cr{position:absolute;top:162px;left:52px;width:58px;height:22px;border-top:2px solid #08080a;border-radius:50%;transform:rotate(-6deg)}
 .nk{position:absolute;top:234px;left:68px;width:100px;height:54px;background:linear-gradient(to right,#141418,#08080a);clip-path:polygon(5% 0%,100% 0%,100% 100%,0% 100%);z-index:-1}
 </style><div class="f"><div class="h"><div class="b"></div><div class="m"><div class="el"></div><div class="er"></div></div><div class="lw"></div><div class="cr"></div></div><div class="nk"></div></div></div></foreignObject></svg>`;
-const guardImg = new Image();
-guardImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(GUARD_FACE_SVG);
-function drawShadowGuardBody(walk, scale, facing, state) {
+const khanImg = new Image();
+khanImg.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(KHAN_FACE_SVG);
+function drawShadowKhanBody(walk, scale, facing, state) {
     const suit = hg('#16161a', 19), suitLimb = hg('#16161a', 7), gear = '#0f0e18';
     const sash = hg('#c81e1e', 19), skin = '#f0c08a';
     const sw = Math.sin(walk), cw = Math.cos(walk);
@@ -3045,11 +3045,11 @@ function drawShadowGuardBody(walk, scale, facing, state) {
     ctx.beginPath();
     ctx.moveTo(-17, -2); ctx.lineTo(-36, 4 + flap); ctx.lineTo(-33, 11 + flap); ctx.lineTo(-15, 4);
     ctx.closePath(); ctx.fill();
-    if (guardImg.complete && guardImg.naturalWidth) {
+    if (khanImg.complete && khanImg.naturalWidth) {
         ctx.save();
         ctx.translate(2, 0);
         ctx.scale(-1, 1);
-        ctx.drawImage(guardImg, -28, -118, 60, 65);
+        ctx.drawImage(khanImg, -28, -118, 60, 65);
         ctx.restore();
     } else {
         ctx.fillStyle = suit;
