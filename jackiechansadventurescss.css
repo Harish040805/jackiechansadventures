@@ -225,7 +225,7 @@ body.raining #clouds { filter: brightness(0.5); }
 .sp-lbw { top: 28px; left: 18px; width: 24px; height: 36px; background: #85c1f5; border: 3px solid #26183d; box-shadow: 36px 0 0 #85c1f5, 36px 0 0 3px #26183d; }
 .sp-lba { top: 104px; left: -6px; width: 132px; height: 22px; background: repeating-linear-gradient(90deg, #d84b5a 0 18px, #f4c44e 18px 36px); border: 3px solid #26183d; transform: skewX(-16deg); }
 .sp-lbd { bottom: 0; left: 20px; width: 56px; height: 112px; background: #b58ee0; border: 3px solid #26183d; border-bottom: none; }
-.sp-mh { left: 150px; bottom: 0; width: 298px; height: 304px; background: repeating-linear-gradient(0deg, rgba(59,32,16,0.14) 0 2px, transparent 2px 14px), linear-gradient(90deg, #f3a83b 0%, #f9c859 45%, #fbd66d 100%); border: 3px solid #3b2010; z-index: 6; }
+.sp-mh { left: 150px; bottom: 0; width: 298px; height: 304px; background: repeating-linear-gradient(0deg, rgba(59,32,16,0.14) 0 2px, transparent 2px 14px), linear-gradient(90deg, #f3a83b 0%, #fede6d 45%, #ffea9e 100%); border: 3px solid #3b2010; z-index: 6; }
 .sp-mhr { top: -22px; left: -25px; width: 342px; height: 26px; background: linear-gradient(180deg, #e0483e 0%, #b82c25 100%); border: 3px solid #3b2010; border-radius: 24px 28px 6px 6px; }
 .sp-mhr::before { content: ""; position: absolute; top: -12px; left: -6px; width: 26px; height: 16px; background: #e0483e; border: 3px solid #3b2010; border-bottom: none; border-radius: 14px 4px 0 0; }
 .sp-mhr::after { content: ""; position: absolute; top: -12px; right: -6px; width: 26px; height: 16px; background: #e0483e; border: 3px solid #3b2010; border-bottom: none; border-radius: 4px 14px 0 0; }
