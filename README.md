@@ -1,19 +1,8 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-
-
-
-
-
 If you use Cartoon street house at an interval of 10 m. After 10 m, have the mountains, trees, river background for 10 m. After that, bring the houses again. Loop them such way till the end. Always bring the trees to the front of houses.
 
-
-
-
-Jackie or shadow guards can jump & run on the roofs of the houses which are paralleogram in shape & top of the houses which are flat on the top. By pressing down arrow, they can come back to the ground.
-
-
-
+Jackie or shadow guards can jump & run on the roofs. Jackie jumps on roof now perfectly. But, even if shadow guards can jump on them, they are not jumping on roofs. They are being only in ground.
 
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
 
