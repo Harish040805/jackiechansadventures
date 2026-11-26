@@ -196,9 +196,10 @@ addPlat(SHOP_X + 0,   SHOP_X + 132, [126, 250]);
 addPlat(SHOP_X + 150, SHOP_X + 448, [140, 285]);
 addPlat(SHOP_X + 460, SHOP_X + 806, [93, 180]);
 addPlat(SHOP_X + 812, SHOP_X + 950, [128, 250]);
-function roofSurface(x, prevY) {
+function roofSurface(x, prevY, below) {
     let best = -1;
     for (const p of PLATS) {
+        if (below !== undefined && p.y >= below - 1) continue;   // ignore the level being dropped through
         if (x > p.x1 && x < p.x2 && prevY >= p.y - 6 && p.y > best) best = p.y;
     }
     return best;
@@ -1447,7 +1448,15 @@ function updatePlayer(chr, keysState, playerNum) {
     const prevY = chr.y;
     const lgS = logSurface(chr, prevY);
     const onLog = lgS >= 0 && lgS >= groundH(chr.x);
-    const groundLevel = Math.max(groundH(chr.x), lgS, roofSurface(chr.x, prevY));
+    if (keysState.down && !chr.downHeld && !chr.isFlying && chr.floorY !== undefined &&
+        chr.floorY > groundH(chr.x) + 1 && chr.y <= chr.floorY + 0.5 &&
+        roofSurface(chr.x, prevY) === chr.floorY) {
+        chr.dropThru = chr.floorY;
+        chr.wasGround = false;
+    }
+    chr.downHeld = !!keysState.down;
+    if (chr.dropThru !== undefined && chr.y < chr.dropThru - 10) chr.dropThru = undefined;
+    const groundLevel = Math.max(groundH(chr.x), lgS, roofSurface(chr.x, prevY, chr.dropThru));
     chr.floorY = groundLevel;
     if (chr.wasFlying && !chr.isFlying && chr.y > canvas.height * 0.5) chr.rFall = true;
     chr.wasFlying = chr.isFlying;
