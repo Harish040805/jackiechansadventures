@@ -463,7 +463,7 @@ function renderLogs() {
         l.el.style.transform = `translate3d(${l.x - 195 * LOG_S}px, ${H - top - 8 * LOG_S}px, 0) scale(${LOG_S}) translate(${pvx}px, 32px) rotate(${ang}rad) translate(${-pvx}px, -32px)`;
     }
 }
-const ROPE_TOL = 24, ROPE_BLADES = 5, ROPE_BURN_MS = 5000, LOG_GATHER = 1400;
+const ROPE_TOL = 24, ROPE_BLADES = 5, ROPE_BURN_MS = 5000, LOG_GATHER = 1400, OX_LOG_MS = 4000;
 let laserFrame = 0;
 function cutLog(l, side, y) {
     if (l.state !== 0 && l.state !== 3) return;
@@ -523,6 +523,20 @@ function updateLogs() {
     laserFrame++;
     for (const l of LOGS) {
         if (l.bn) for (const k in l.bn) if (l.bn[k] && l.bn[k].f < laserFrame - 1) l.bn[k] = null;
+        if (l.state === 0 || l.state === 3) {
+            const top = l.b + LOG_H;
+            const oxOn = aliveChars().some(c => {
+                const k = Object.keys(c.activeTalismans || {});
+                return k.includes('ox') && c.onLogNow && Math.abs(c.x - l.x) < LOG_HW && Math.abs(c.y - top) < 4;
+            });
+            l.oxT = oxOn ? (l.oxT || 0) + dt * 16.667 : 0;
+            if (l.oxT >= OX_LOG_MS) {
+                l.oxT = 0;
+                const cy = canvas.height - (top - 12);
+                cutLog(l, -1, cy);
+                cutLog(l, 1, cy);
+            }
+        }
         if (l.state === 3) {
             l.rot += (0.9 - l.rot) * Math.min(1, 0.12 * dt);
             continue;
