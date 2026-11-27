@@ -863,7 +863,7 @@ const HTP_SPEECH = "Aiyaa! Jackie! Captain black have informed me for your safet
   "For movement, choose arrow keys or W A S D in the Controls box on the left. Left and right move you. Up or W jumps, or flies up with the Rooster talisman. Down or S flies down. " +
   "One more thing! Defeat Shadow Khans for ten points and Bats for fifteen points. Press Q for the Pufferfish Chi Laser, or E for the Lizard Magic Laser. Both fire straight in the direction you face. With the Dragon talisman, click to shoot fireballs at your mouse. With the Pig talisman, an eye laser follows your mouse and destroys enemies it touches. " +
   "One more thing! To use the talismans, press the number keys, the minus key or click the buttons at the bottom. Press again to turn one off. Several can be active at once and each has a timer. One more thing! Dragon and Ox, alone stay on until you turn them off. " +
-  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a ninja. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser with Chi magic. " +
+  "Dog makes you invulnerable. Dragon shoots fireballs. Horse heals twenty health. Monkey transforms you into a Shadow Khan. Rat summons Super Moose. Rabbit gives super speed. Pig fires an eye laser. Ox makes you a giant and halves the damage you take. Rooster gives flight. Sheep sends out an astral spirit. Snake makes you invisible. Lizard and Pufferfish fire a one shot magic laser with Chi magic. " +
   "One more thing! Find and collect the banishment objects of the demons Shendu, Xiao Fung, Bai Tza, Dai Gui, Tso Lan, Hsi Wu, Tchang Zu, and Po Kong. For Shendu, it's the sword, Xiao Fung, it's the fan, Bai Tza, its the gourd fruit. For Dai Gui, it's the flower and for Tso Lan, its the lotus flower. For Hsi Wu, it's the flute. For Tchang Zu, it's the castanets. At last, for the mountain demon Po Kong, its the drums. Check the board under your health bar. Yellow means not collected yet, and green means collected. Once collected, an object can never be lost to Shadow Khans or bats. " +
   "One more thing! Don't forget to collect the Oni Masks of all the 10 ancient war heads. Dont forget! It's not 9! It's 10! Including Tarakudo's shadow mask. " +
   "One more thing! Press the equals key for the Tiger talisman to open an online session and share the Session I D. Or paste a friend's Session I D in the Online Co-Op box to join. Press equals again to return to single player. " +
@@ -1058,7 +1058,7 @@ function getTalismanDisplayName(name) {
         case 'dog': return '🐕 Dog (Invulnerable)';
         case 'dragon': return '🐉 Dragon (Fireblast)';
         case 'horse': return '🐴 Horse (Noble Healing)';
-        case 'monkey': return '🐒 Monkey (Ninja Disguise)';
+        case 'monkey': return '🐒 Monkey (Shadow Khan Disguise)';
         case 'rat': return '🐀 Rat (Super Moose)';
         case 'rabbit': return '🐇 Rabbit (Super Speed)';
         case 'pig': return '🐷 Pig (Thermal Eye Laser)';
