@@ -1472,7 +1472,7 @@ function updatePlayer(chr, keysState, playerNum) {
     if (chr.dropThru !== undefined && chr.y < chr.dropThru - 10) chr.dropThru = undefined;
     const groundLevel = Math.max(groundH(chr.x), lgS, roofSurface(chr.x, prevY, chr.dropThru));
     chr.floorY = groundLevel;
-    if (chr.wasFlying && !chr.isFlying && chr.y > canvas.height * 0.5) chr.rFall = true;
+    if (chr.wasFlying && !chr.isFlying && chr.y - groundLevel > canvas.height * 0.5) chr.rFall = true;
     chr.wasFlying = chr.isFlying;
     if (chr.isFlying) {
         chr.rFall = false;
@@ -1516,7 +1516,6 @@ function updatePlayer(chr, keysState, playerNum) {
     } else if (chr.wasGround) {
         chr.onLogNow = false;
     }
-    if (chr.logFall) chr.logFallH = Math.max(chr.logFallH, chr.y);
     chr.vyReal = (chr.y - prevY) / Math.max(dt, 0.001);
     chr.squish += (1 - chr.squish) * 0.15;
     if (Math.abs(chr.vx) > 0.2 && !chr.isJumping && !chr.isFlying) {
