@@ -351,6 +351,10 @@
     if (s.lg) s.lg.forEach((v, i) => { const l = LOGS[i]; if (l) { l.state = v[0]; l.b = v[1]; l.endL = v[2]; l.endR = v[3]; l.rot = v[4]; l.side = v[5]; l.cL = v[6]; l.cR = v[7]; } });
     applyChar(character, s.c1, kx); applyChar(character2, s.c2, kx);
     [[character, s.c1], [character2, s.c2]].forEach(([c, sc]) => {
+      if (sc.sp) {
+        c.spTx = gx(sc.sp[0]); c.spTy = gy(sc.sp[1]);
+        if (!c.spirit) c.spirit = { x: c.spTx, y: c.spTy };
+      } else { c.spirit = null; }
       if (sc.mo) {
         c.moTx = gx(sc.mo[0]); c.moTy = gy(sc.mo[1]);
         if (!c.moose) c.moose = { x: c.moTx, y: c.moTy, face: sc.mo[2] };
