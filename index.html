@@ -53,7 +53,10 @@
     <div id="chi-banner">Magic must defeat magic!</div>
     <div id="jump-hint">🏃‍♂️ Click ArrowUp / W to Jump | 🏡 Click C + ArrowUp / C + W to Climb on Houses | 🌱 Click ArrowDown to Reach back to the Land </div>
     <div id="sc-m">
-        <div class="hud-title">🏆 SCORE BOARD</div>
+        <div class="hud-head">
+            <div class="hud-title">🏆 SCORE BOARD</div>
+            <button id="pause-btn" title="Pause (P / Esc)">⏸️ Pause</button>
+        </div>
         <div>🥷 Shadow Khans: <span id="hud-sgk">0</span> (<span id="hud-sgs">0</span> pts)</div>
         <div style="display:flex; gap:20px;">
             <span>🦇 Bats: <span id="hud-ek">0</span> (<span id="hud-es">0</span> pts)</span>
@@ -88,7 +91,6 @@
         <div>Banishment Objects: <span id="win-bo">0</span>/8 &nbsp; Masks: <span id="win-mk">0</span>/10 &nbsp; Distance: <span id="win-dc">0</span> m</div>
         <button onclick="location.reload()" class="restart-class" style="width:auto;">Play Again</button>
     </div>
-    <button id="pause-btn" title="Pause (P / Esc)">⏸️ Pause</button>
     <div id="pause-overlay">
         <div class="pause-box">
             <h1 class="gameover">⏸️ Game Paused</h1>
