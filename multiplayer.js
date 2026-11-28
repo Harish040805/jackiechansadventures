@@ -24,7 +24,7 @@
   let hostW = 0, hostH = 0;
   const ents = { e: new Map(), a: new Map(), f: new Map() };
   const fxQ = [];
-  const gk = { l: false, r: false, u: false, d: false };
+  const gk = { l: false, r: false, u: false, d: false, c: false };
   const panel = document.createElement('div');
   panel.id = 'mp-panel';
   panel.innerHTML = `
@@ -182,6 +182,7 @@
       gAimX = +d.ax || 0; gAimY = +d.ay || 0;
       if (d.u && !wasUp && isSplit && hp2 > 0 && !character2.isFlying && !character2.isJumping) {
         character2.vy = character2.jumpForce; character2.isJumping = true;
+        if (d.c) character2.climbOn = true;
       }
     } else if (d.t === 'tal') {
       if (GUEST_TALISMANS.indexOf(d.name) >= 0) switchTalismanForPlayer(character2, d.name);
@@ -397,7 +398,7 @@
   }
   function sendIn() {
     if (!hostConn || !hostConn.open) return;
-    try { hostConn.send(Object.assign({ t: 'in', l: gk.l, r: gk.r, u: gk.u, d: gk.d, vw: canvas.width }, hostAim())); } catch (e) {}
+    try { hostConn.send(Object.assign({ t: 'in', l: gk.l, r: gk.r, u: gk.u, d: gk.d, c: gk.c, vw: canvas.width }, hostAim())); } catch (e) {}
   }
   function guestLaser() {
     if (!hostConn || !hostConn.open || isGameOver || hp2 <= 0) return;
@@ -421,6 +422,8 @@
       if (k === 'u' && !e.repeat && !gk.u && hp2 > 0 && !character2.isFlying && !character2.isJumping) sayHip();
       if (!gk[k]) { gk[k] = true; sendIn(); }
       e.preventDefault();
+    } else if (e.key === 'c' || e.key === 'C') {
+      if (!gk.c) { gk.c = true; sendIn(); }
     } else if ((e.key === 'e' || e.key === 'E' || e.key === 'q' || e.key === 'Q') && !e.repeat) {
       guestLaser();
     } else if (HK[e.key] && !e.repeat) {
@@ -432,6 +435,7 @@
   window.addEventListener('keyup', e => {
     if (!isGuest) return;
     if (e.target && e.target.tagName === 'INPUT') return;
+    if ((e.key === 'c' || e.key === 'C') && gk.c) { gk.c = false; sendIn(); }
     const dir = moveKey(e);
     if (dir) {
       const k = DIR[dir];
@@ -440,7 +444,7 @@
     e.stopImmediatePropagation();
   }, true);
   window.addEventListener('blur', () => {
-    if (isGuest) { gk.l = gk.r = gk.u = gk.d = false; sendIn(); }
+    if (isGuest) { gk.l = gk.r = gk.u = gk.d = gk.c = false; sendIn(); }
   });
   window.addEventListener('mousemove', e => {
     if (!isGuest) return;
