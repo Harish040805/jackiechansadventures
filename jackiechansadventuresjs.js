@@ -2476,51 +2476,95 @@ function u() {
 }
     const drawPigLaser = (chr) => {
         const eye = eyePos(chr);
-        const ex = eye.x;
-        const ey = eye.y;
+        const ex = eye.x, ey = eye.y;
         const tip = laserClip(ex, ey, aimPt(chr).x, aimPt(chr).y);
         const mx = tip.x, my = tip.y;
         const dx = mx - ex, dy = my - ey;
         const len = Math.hypot(dx, dy) || 1;
-        const nx = -dy / len, ny = dx / len;
+        const ux = dx / len, uy = dy / len;
+        const nx = -uy, ny = ux;
         const now = performance.now();
+        const pulse = 0.85 + Math.sin(now / 55) * 0.15;
+        const line = (w, col, blur) => {
+            ctx.lineWidth = w; ctx.strokeStyle = col;
+            ctx.shadowBlur = blur; ctx.shadowColor = '#ff3d00';
+            ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(mx, my); ctx.stroke();
+        };
         ctx.save();
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = '#ffd700';
-        ctx.strokeStyle = '#ffd700';
-        ctx.lineWidth = 8;
-        ctx.beginPath();
-        ctx.moveTo(ex, ey);
-        ctx.lineTo(mx, my);
-        ctx.stroke();
-        ctx.shadowBlur = 6;
-        ctx.shadowColor = '#fff';
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(ex, ey);
-        ctx.lineTo(mx, my);
-        ctx.stroke();
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = '#ffd700';
-        ctx.lineWidth = 2;
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        line(30 * pulse, 'rgba(255,40,0,0.18)', 30);
+        line(17 * pulse, 'rgba(255,90,10,0.45)', 22);
+        line(8 * pulse,  'rgba(255,200,60,0.9)', 14);
+        line(3.2,        '#ffffff', 8);
+        ctx.shadowBlur = 0;
+        const gap = 46, off = (now / 3) % gap;
+        for (let d = off; d < len; d += gap) {
+            const px = ex + ux * d, py = ey + uy * d;
+            const g = ctx.createRadialGradient(px, py, 0, px, py, 14);
+            g.addColorStop(0, 'rgba(255,255,220,0.95)');
+            g.addColorStop(0.4, 'rgba(255,170,30,0.6)');
+            g.addColorStop(1, 'rgba(255,60,0,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(px, py, 14, 0, Math.PI * 2); ctx.fill();
+        }
         const steps = Math.max(2, Math.ceil(len / 4));
+        ctx.lineWidth = 2;
         for (let w = 0; w < 2; w++) {
-            ctx.strokeStyle = w === 0 ? '#ffd700' : '#ffffff';
+            ctx.strokeStyle = w === 0 ? '#ff7a18' : '#fff2b0';
+            ctx.shadowBlur = 8; ctx.shadowColor = '#ff6a00';
             ctx.beginPath();
             for (let i = 0; i <= steps; i++) {
                 const d = (i / steps) * len;
-                const amp = 9 * Math.min(1, d / 30);
-                const off = Math.sin(d / 14 - now / 90 + w * Math.PI) * amp;
-                const px = ex + (dx / len) * d + nx * off;
-                const py = ey + (dy / len) * d + ny * off;
+                const off2 = Math.sin(d / 12 - now / 70 + w * Math.PI) * 10 * Math.min(1, d / 30);
+                const px = ex + ux * d + nx * off2, py = ey + uy * d + ny * off2;
                 if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
             }
             ctx.stroke();
         }
+        ctx.shadowBlur = 0;
+        let g = ctx.createRadialGradient(ex, ey, 0, ex, ey, 20 * pulse);
+        g.addColorStop(0, 'rgba(255,255,255,1)');
+        g.addColorStop(0.35, 'rgba(255,200,60,0.8)');
+        g.addColorStop(1, 'rgba(255,40,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(ex, ey, 20 * pulse, 0, Math.PI * 2); ctx.fill();
+        g = ctx.createRadialGradient(mx, my, 0, mx, my, 34 * pulse);
+        g.addColorStop(0, 'rgba(255,255,255,1)');
+        g.addColorStop(0.3, 'rgba(255,210,70,0.85)');
+        g.addColorStop(0.7, 'rgba(255,70,10,0.4)');
+        g.addColorStop(1, 'rgba(120,10,0,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(mx, my, 34 * pulse, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,230,140,0.8)'; ctx.lineWidth = 2;
+        for (let j = 0; j < 8; j++) {
+            const a = now / 220 + j * Math.PI / 4, r = (j % 2 ? 20 : 32) * pulse;
+            ctx.beginPath(); ctx.moveTo(mx, my);
+            ctx.lineTo(mx + Math.cos(a) * r, my + Math.sin(a) * r); ctx.stroke();
+        }
+        for (let r = 0; r < 2; r++) {
+            const k = ((now / 450) + r * 0.5) % 1;
+            ctx.strokeStyle = `rgba(255,150,40,${(1 - k) * 0.8})`;
+            ctx.lineWidth = 2.5 * (1 - k) + 0.5;
+            ctx.beginPath(); ctx.arc(mx, my, 6 + k * 34, 0, Math.PI * 2); ctx.stroke();
+        }
         ctx.restore();
+        if (Math.random() < 0.9 * dt) {
+            particles.push({
+                x: mx, y: my,
+                vx: (Math.random() - 0.5) * 6 - ux * 2, vy: -Math.random() * 4 - 0.5,
+                radius: Math.random() * 2.5 + 1, alpha: 1, decay: 0.04,
+                color: ['#ffd700', '#ff7a18', '#ff3d00', '#ffffff'][Math.floor(Math.random() * 4)]
+            });
+        }
+        if (Math.random() < 0.5 * dt) {
+            const d = Math.random() * len;
+            particles.push({
+                x: ex + ux * d, y: ey + uy * d,
+                vx: (Math.random() - 0.5) * 1.5, vy: -Math.random() * 1.5 - 0.3,
+                radius: Math.random() * 1.8 + 0.8, alpha: 0.9, decay: 0.05, color: '#ff9f43'
+            });
+        }
     };
     if (character.isPigLaserActive && hp > 0) {
         drawPigLaser(character);
