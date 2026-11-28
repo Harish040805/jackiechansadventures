@@ -1841,8 +1841,8 @@ function updateViewCam() {
     b = -camX;
     const gg = groundGradient();
     if (gg) grdEl.style.backgroundImage = gg;
-    m.style.transform = `translate3d(${(b * 0.2) % lw}px, 0, 0)`;
-    t.style.transform = `translate3d(${(b * 0.6) % lw}px, 0, 0)`;
+    m.style.transform = `translate3d(${b % lw}px, 0, 0)`;
+    t.style.transform = `translate3d(${b % lw}px, 0, 0)`;
     maskLayer.style.transform = `translate3d(${b}px, 0, 0)`;
     logLayer.style.transform = `translate3d(${b}px, 0, 0)`;
     let hsOff = (b + HOUSE_START) % HS_W;
