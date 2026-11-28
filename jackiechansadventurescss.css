@@ -16,11 +16,17 @@ body.coop-right .ui-c { right: 8px; left: auto; }
 body.coop-left .ui-c { left: 8px; right: auto; }
 body.coop .b { flex-direction: column; width: auto; padding: 8px 6px; gap: 4px; border-radius: 12px; }
 body.coop .b > span { display: none; }
+body.coop #grd::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 60px; background: inherit; }
 body.coop .o, body.coop .pf, body.coop .sl { width: 40px; height: 36px; font-size: 18px; }
 body.coop-right #hp-m { right: 70px; }
 body.coop-right #pause-btn { right: 70px; }
 body.coop-left #sc-m { left: 70px; }
 body.coop-left #mp-panel { left: 70px; }
+@media (max-height: 640px) {
+    body.coop .b { display: grid; grid-template-rows: repeat(7, auto); grid-auto-flow: column; }
+    body.coop-right #hp-m, body.coop-right #pause-btn { right: 115px; }
+    body.coop-left #sc-m, body.coop-left #mp-panel { left: 115px; }
+}
 canvas { display: block; position: absolute; bottom: 100px; left: 0; width: 100vw; height: calc(100vh - 100px); pointer-events: none; z-index: 3; }
 hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25); }
 .b { display: flex; flex-direction: row; justify-content: center; align-items: center; width: 100%; padding: 6px 0; background-image: linear-gradient(#16C716, #19B319, #22A122); box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); gap: 40px; }
