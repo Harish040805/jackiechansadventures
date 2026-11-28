@@ -1,9 +1,5 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
-In background setup, the houses & trees must move in same speed. Let the mountains moving speed be unchanged.
-
-Hide scroll bar everywhere but, enable scrolling.
-
 Fire effect for dragon fireballs.
 
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
