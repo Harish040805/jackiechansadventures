@@ -57,6 +57,12 @@
     (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(
       () => setMsg('Link copied!'), () => setMsg(link));
   });
+  function updateLayout() {
+    const coop = isSplit || isGuest;
+    document.body.classList.toggle('coop', coop);
+    document.body.classList.toggle('coop-left', coop && controlScheme === 'wasd');
+    document.body.classList.toggle('coop-right', coop && controlScheme === 'arrows');
+  }
   function setScheme(s) {
     controlScheme = s;
     $('mp-arrows').classList.toggle('sel', s === 'arrows');
@@ -64,6 +70,7 @@
     clearInputKeys();
     gk.l = gk.r = gk.u = gk.d = false;
     if (isGuest) sendIn();
+    updateLayout();
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   }
   $('mp-arrows').addEventListener('click', () => setScheme('arrows'));
@@ -287,6 +294,7 @@
     b2.style.display = 'none';
     refresh();
     setOpen(false);
+    setScheme('wasd');
     inTimer = setInterval(sendIn, 33);
   }
   function showLost(msg) {
@@ -476,6 +484,7 @@ window.addEventListener('click', e => {
       if (isSplit) startHosting(); else stopHosting();
     }
     $('mp-join').style.display = guestConn ? 'none' : 'block';
+    updateLayout();
   }, 200);
   setScheme('arrows');
   refresh();
