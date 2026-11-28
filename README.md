@@ -1,5 +1,9 @@
 *** When Asking To Change The Game UI With CLAUDE, Backup All Your HTML, CSS, JS Codes First. Then, Upload Sample Images From JACKE CHAN'S ADVENTURES Cartoon, CLAUDE Can't Perform Effectively Without That. Careful In Changing Code!!! ***
 
+In background setup, the houses & trees must move in same speed. Let the mountains moving speed be unchanged.
+
+Hide scroll bar everywhere but, enable scrolling.
+
 Sun during day slowly fades before night occurs. Moon during night slowly fades before sun occurs. Small stars along with Moon in night. Don't use emojis for these 3. Match the background change correctly for sun, moon & star's arrival.
 
 Allow Jackie to make manual attacks for on screen button as well as keyboard keys like O for punch K for kick B for block. Random objects like wood on the ground, hanging rope. If B clicked stadning near wood, the wood must block the incoming blade attacks. Normal B can block shadow khan punches, using B only standing near wood can lift wood and block all incoming blades. If Jackie jumps towards a hanging rope and uses B, he must be able to hold the hanging rope and swing to & fro until he use B again. Mechanism same like tarzan game.
