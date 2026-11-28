@@ -174,7 +174,11 @@ const HS_W = 1040;
 const SHOP_X = 300;
 const SHOP_W = 960;
 const HOUSE_START = SHOP_X + SHOP_W;
-const HOUSE_END = HOUSE_START + HS_W * 15;
+const HOUSE_TILES = 15;
+const HOUSE_SPAN = HS_W * HOUSE_TILES;
+const HOUSE_CYCLE = HOUSE_SPAN * 2;
+const HOUSE_ZONES = Math.ceil((WORLD.END - HOUSE_START) / HOUSE_CYCLE);
+const HOUSE_END = HOUSE_START + HOUSE_CYCLE * (HOUSE_ZONES - 1) + HOUSE_SPAN;
 const hsLayer = document.getElementById('hs-layer');
 const hsRow = document.getElementById('hs-row');
 const spLayer = document.getElementById('sp-layer');
@@ -185,12 +189,14 @@ const PLATS = [];
 function addPlat(x1, x2, levels) {
     levels.forEach(h => PLATS.push({ x1: x1 + 4, x2: x2 - 4, y: h + ROOF_BASE }));
 }
-for (let i = 0; i < 15; i++) {
-    const o = HOUSE_START + i * HS_W;
-    addPlat(o + 10,  o + 280,  [140, 235, 331]);
-    addPlat(o + 360, o + 634,  [125, 195, 267]);
-    addPlat(o + 648, o + 863,  [120, 238]);
-    addPlat(o + 882, o + 1002, [110, 222, 307]);
+for (let z = 0; z < HOUSE_ZONES; z++) {
+    for (let i = 0; i < HOUSE_TILES; i++) {
+        const o = HOUSE_START + z * HOUSE_CYCLE + i * HS_W;
+        addPlat(o + 10,  o + 280,  [140, 235, 331]);
+        addPlat(o + 360, o + 634,  [125, 195, 267]);
+        addPlat(o + 648, o + 863,  [120, 238]);
+        addPlat(o + 882, o + 1002, [110, 222, 307]);
+    }
 }
 addPlat(SHOP_X + 0,   SHOP_X + 132, [126, 250]);
 addPlat(SHOP_X + 150, SHOP_X + 448, [140, 285]);
@@ -1840,9 +1846,13 @@ function updateViewCam() {
     rvLayer.style.display = camX < HOUSE_START ? 'block' : 'none';
     const shopSX = SHOP_X - camX;
     spLayer.style.display = (shopSX < canvas.width && shopSX > -SHOP_W) ? 'block' : 'none';
-    const hsR = Math.max(0, Math.min(canvas.width, HOUSE_END - camX));
-    const hsL = Math.max(0, Math.min(hsR, HOUSE_START - camX));
-    hsLayer.style.clipPath = hsR <= hsL ? 'inset(0 0 0 100%)' : `inset(0 ${canvas.width - hsR}px 0 ${hsL}px)`;
+    const hsTiles = hsRow.children;
+    for (let i = 0; i < hsTiles.length; i++) {
+        const n = Math.round((hsOff + i * HS_W + camX - HOUSE_START) / HS_W);
+        const show = n >= 0 && n < HOUSE_ZONES * HOUSE_TILES * 2 && n % (HOUSE_TILES * 2) < HOUSE_TILES;
+        const v = show ? '' : 'hidden';
+        if (hsTiles[i].style.visibility !== v) hsTiles[i].style.visibility = v;
+    }
 }
 function eyePos(chr) {
     const S = 0.42 * (chr.giant ? 1.5 : 1);
