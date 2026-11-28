@@ -2599,6 +2599,30 @@ function u() {
         ctx.restore();
     }
     for (const f of fbs) {
+        if (!f.trail) f.trail = [];
+        f.trail.push({ x: f.x, y: f.y });
+        if (f.trail.length > 22) f.trail.shift();
+        if (Math.random() < 0.7 * dt) {
+            particles.push({
+                x: f.x + (Math.random() - 0.5) * 8, y: f.y + (Math.random() - 0.5) * 8,
+                vx: (Math.random() - 0.5) * 1.2 - (f.vx || 0) * 0.05, vy: (Math.random() - 0.5) * 1.2 - 0.6,
+                radius: Math.random() * 2.5 + 1.5, color: Math.random() < 0.5 ? '#ff9f43' : '#ff4757',
+                alpha: 0.9, decay: 0.05
+            });
+        }
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        const tn = f.trail.length;
+        for (let i = 0; i < tn; i++) {
+            const k = (i + 1) / tn, p = f.trail[i];
+            const r = f.radius * k * (0.9 + Math.random() * 0.25);
+            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+            g.addColorStop(0, `rgba(255,${Math.floor(120 + 135 * k)},${Math.floor(40 * k)},${0.55 * k})`);
+            g.addColorStop(1, 'rgba(180,20,0,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
         ctx.save();
         ctx.translate(f.x, f.y);
         const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, f.radius);
