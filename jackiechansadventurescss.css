@@ -215,7 +215,7 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 .wl-left { animation-name: waterLeft; }
 .wl-lens { clip-path: polygon(0 50%, 20% 0, 80% 0, 100% 50%, 80% 100%, 20% 100%); border-radius: 0; }
 .wl-wave { height: 6px !important; background: transparent; border-top: 2px solid #fff; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
-#active-power-hud { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; pointer-events: none; }
+#active-power-hud { position: absolute; top: 28px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; pointer-events: none; }
 #b2 { background-image: linear-gradient(#b91c1c, #991b1b, #7f1d1d); }
 #bo-board { width: 270px; background: #fef9c3; border: 2px solid #ca8a04; border-radius: 8px; padding: 6px 12px; }
 #bo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px; }
@@ -243,7 +243,7 @@ hr { margin: 12px 0; border: 0; border-top: 1px solid rgba(255, 255, 255, 0.25);
 #mp-join { margin-top: 8px; border-top: 1px solid rgba(255,255,255,.2); padding-top: 6px; }
 #mp-lost { position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,.9); color: #fff; display: flex; flex-direction: column; gap: 16px; justify-content: center; align-items: center; font: 22px 'Segoe UI', sans-serif; }
 #mp-lost button { font-size: 20px; padding: 10px 24px; border: 0; border-radius: 4px; background: #2e86de; color: #fff; cursor: pointer; font-weight: bold; }
-#mp-panel { position: absolute; left: 20px; top: 200px; z-index: 50; background: rgba(0,0,0,.85); color: #fff; font: 13px 'Segoe UI', sans-serif; padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,.25); width: 260px; line-height: 1.5; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
+#mp-panel { position: absolute; left: 20px; top: 188px; z-index: 50; background: rgba(0,0,0,.85); color: #fff; font: 13px 'Segoe UI', sans-serif; padding: 10px 14px; border-radius: 6px; border: 1px solid rgba(255,255,255,.25); width: 260px; line-height: 1.5; box-shadow: 0 8px 25px rgba(0,0,0,0.5); }
 #mp-panel .mp-h { font-weight: bold; font-size: 14px; margin-top: 4px; user-select: none; cursor: pointer; }
 #mp-panel b#mp-id { color: #ffd700; font-family: monospace; font-size: 16px; letter-spacing: 2px; }
 #mp-panel button { background: #2e86de; color: #fff; border: 0; border-radius: 3px; padding: 4px 10px; cursor: pointer; font-weight: bold; margin-top: 4px; }
