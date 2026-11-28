@@ -9,6 +9,7 @@ window.addEventListener('resize', resize);
 resize();
 function clearInputKeys() {
   [keysP1, keysP2].forEach(k => k.left = k.right = k.up = k.down = false);
+  climbKey = false;
 } 
 window.addEventListener('blur', clearInputKeys);
 const m = document.getElementById('m');
@@ -34,6 +35,7 @@ let hasWon = false;
 const hasSnake = c => !!(c.activeTalismans && c.activeTalismans.snake);
 const SNAKE_ALPHA = 0.12;
 let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+let climbKey = false;
 let isSplit = false;
 let isGuest = false, remoteP2 = false, gAimX = 0, gAimY = 0;
 function aimPt(chr) {
@@ -1373,12 +1375,14 @@ window.addEventListener('keydown', (e) => {
         return;
     }
     if (isPaused) return;
+    if (e.key === 'c' || e.key === 'C') climbKey = true;
     const dir = moveKey(e);
     if (dir) {
         keysP1[dir] = true;
         if (dir === 'up' && hp > 0 && !character.isFlying && !character.isJumping) {
             character.vy = character.jumpForce;
             character.isJumping = true;
+            if (climbKey) character.climbOn = true;
             if (!e.repeat) sayHip();
         }
         e.preventDefault();
@@ -1397,6 +1401,7 @@ window.addEventListener('keydown', (e) => {
     }
 });
 window.addEventListener('keyup', (e) => {
+    if (e.key === 'c' || e.key === 'C') climbKey = false;
     const dir = moveKey(e);
     if (dir) keysP1[dir] = false;
 });
@@ -1476,7 +1481,9 @@ function updatePlayer(chr, keysState, playerNum) {
     }
     chr.downHeld = !!keysState.down;
     if (chr.dropThru !== undefined && chr.y < chr.dropThru - 10) chr.dropThru = undefined;
-    const groundLevel = Math.max(groundH(chr.x), lgS, roofSurface(chr.x, prevY, chr.dropThru));
+    const baseLevel = Math.max(groundH(chr.x), lgS);
+    if (chr.climbOn && !chr.isFlying && chr.y <= baseLevel + 0.5 && chr.vy <= 0) chr.climbOn = false;
+    const groundLevel = Math.max(baseLevel, chr.climbOn ? roofSurface(chr.x, prevY, chr.dropThru) : -1);
     chr.floorY = groundLevel;
     if (chr.wasFlying && !chr.isFlying && chr.y - groundLevel > canvas.height * 0.5) chr.rFall = true;
     chr.wasFlying = chr.isFlying;
