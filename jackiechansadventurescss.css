@@ -1,6 +1,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; }
-body { overflow: auto; background-color: #1a1a1a; transition: background 1.5s ease-in-out; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+html, body, #app, #root, main {overflow-x: hidden; max-width: 100vw; }
+html, body {height: 100%; }
+body {overflow-y: auto; background-color: #1a1a1a; transition: background 1.5 s ease-in-out; font-family: 'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
 body.coop #grd::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 60px; background: inherit; }
 body.coop .b { flex-direction: column; width: auto; padding: 8px 6px; gap: 4px; border-radius: 6px; }
 body.coop .b > span { display: none; }
