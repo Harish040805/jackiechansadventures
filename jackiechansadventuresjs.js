@@ -2601,28 +2601,50 @@ function u() {
     for (const f of fbs) {
         if (!f.trail) f.trail = [];
         f.trail.push({ x: f.x, y: f.y });
-        if (f.trail.length > 22) f.trail.shift();
+        if (f.trail.length > 28) f.trail.shift();
         if (Math.random() < 0.7 * dt) {
             particles.push({
                 x: f.x + (Math.random() - 0.5) * 8, y: f.y + (Math.random() - 0.5) * 8,
-                vx: (Math.random() - 0.5) * 1.2 - (f.vx || 0) * 0.05, vy: (Math.random() - 0.5) * 1.2 - 0.6,
+                vx: (Math.random() - 0.5) * 1.2, vy: (Math.random() - 0.5) * 1.2 - 0.6,
                 radius: Math.random() * 2.5 + 1.5, color: Math.random() < 0.5 ? '#ff9f43' : '#ff4757',
                 alpha: 0.9, decay: 0.05
             });
         }
-        ctx.save();
-        ctx.globalCompositeOperation = 'lighter';
-        const tn = f.trail.length;
-        for (let i = 0; i < tn; i++) {
-            const k = (i + 1) / tn, p = f.trail[i];
-            const r = f.radius * k * (0.9 + Math.random() * 0.25);
-            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
-            g.addColorStop(0, `rgba(255,${Math.floor(120 + 135 * k)},${Math.floor(40 * k)},${0.55 * k})`);
-            g.addColorStop(1, 'rgba(180,20,0,0)');
-            ctx.fillStyle = g;
-            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+        const tr = f.trail, tn = tr.length;
+        if (tn > 2) {
+            const nowT = performance.now();
+            const drawTail = (wMul, c0, c1, c2) => {
+                const L = [], R = [];
+                for (let i = 0; i < tn; i++) {
+                    const k = i / (tn - 1);
+                    const a = tr[Math.max(0, i - 1)], b = tr[Math.min(tn - 1, i + 1)];
+                    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+                    const nx = -dy / len, ny = dx / len;
+                    const w = f.radius * wMul * Math.pow(k, 1.3);
+                    const wob = Math.sin(nowT / 70 + i * 0.55) * 9 * (1 - k) * k * 4;
+                    const cx = tr[i].x + nx * wob, cy = tr[i].y + ny * wob;
+                    L.push([cx + nx * w, cy + ny * w]);
+                    R.push([cx - nx * w, cy - ny * w]);
+                }
+                const g = ctx.createLinearGradient(tr[0].x, tr[0].y, f.x, f.y);
+                g.addColorStop(0, c0); g.addColorStop(0.6, c1); g.addColorStop(1, c2);
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.moveTo(L[0][0], L[0][1]);
+                for (let i = 1; i < tn; i++) ctx.lineTo(L[i][0], L[i][1]);
+                for (let i = tn - 1; i >= 0; i--) ctx.lineTo(R[i][0], R[i][1]);
+                ctx.closePath();
+                ctx.fill();
+            };
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+            ctx.shadowBlur = 18;
+            ctx.shadowColor = '#ff6a00';
+            drawTail(1.6, 'rgba(180,20,0,0)',    'rgba(255,70,20,0.45)',  'rgba(255,140,40,0.7)');
+            drawTail(1.0, 'rgba(255,120,0,0)',   'rgba(255,170,40,0.6)',  'rgba(255,220,90,0.9)');
+            drawTail(0.45,'rgba(255,255,200,0)', 'rgba(255,240,170,0.7)', 'rgba(255,255,255,1)');
+            ctx.restore();
         }
-        ctx.restore();
         ctx.save();
         ctx.translate(f.x, f.y);
         const grad = ctx.createRadialGradient(0, 0, 2, 0, 0, f.radius);
